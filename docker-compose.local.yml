@@ -1,0 +1,14 @@
+version: "2.3"
+
+# How to override the configuration when doing development, so that yarn
+# packages from the local system are used.
+services:
+  node:
+    volumes:
+      - ./:/monofo
+      - /usr/local/share/.cache/yarn:/usr/local/share/.cache/yarn
+
+  node-14:
+    volumes:
+      - ./:/monofo
+      - /usr/local/share/.cache/yarn:/usr/local/share/.cache/yarn

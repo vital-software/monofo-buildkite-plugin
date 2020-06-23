@@ -1,0 +1,16 @@
+version: "2.3"
+
+services:
+  node:
+    build:
+      context: .
+      args:
+        - NODE_TAG=lts
+    image: dominics/monofo:node-latest
+
+  node-14:
+    build:
+      context: .
+      args:
+        - NODE_TAG=14
+    image: dominics/monofo:node-14-latest
