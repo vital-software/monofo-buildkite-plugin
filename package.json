@@ -29,28 +29,28 @@
   "dependencies": {
     "debug": "4.1.1",
     "js-yaml": "3.14.0",
-    "lodash": "4.17.13"
+    "lodash": "4.17.15"
   },
   "devDependencies": {
     "@types/debug": "4.1.5",
-    "@types/jest": "25.2.3",
+    "@types/jest": "26.0.0",
     "@types/js-yaml": "3.12.4",
-    "@types/lodash": "4.14.151",
+    "@types/lodash": "4.14.156",
     "@typescript-eslint/eslint-plugin": "2.24.0",
     "@typescript-eslint/parser": "2.34.0",
-    "cz-conventional-changelog": "2.1.0",
+    "cz-conventional-changelog": "3.2.0",
     "eslint": "6.8.0",
     "eslint-config-airbnb-typescript": "7.2.1",
     "eslint-config-prettier": "6.11.0",
-    "eslint-plugin-import": "2.20.1",
+    "eslint-plugin-import": "2.21.2",
     "eslint-plugin-jest": "23.17.1",
-    "eslint-plugin-prettier": "3.1.3",
-    "jest": "26.0.1",
+    "eslint-plugin-prettier": "3.1.4",
+    "jest": "26.1.0",
     "jest-fetch-mock": "3.0.3",
     "npm-run-all": "4.1.5",
     "prettier": "2.0.5",
     "standard-version": "6.0.1",
-    "ts-jest": "26.0.0",
+    "ts-jest": "26.1.1",
     "typescript": "3.9.5"
   },
   "config": {
