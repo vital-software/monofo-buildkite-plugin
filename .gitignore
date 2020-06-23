@@ -2,3 +2,4 @@ node_modules/
 build/
 *.log
 logs
+docker-compose.*override.yml
