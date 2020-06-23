@@ -2,6 +2,8 @@ src
 tsconfig.json
 .eslintrc.js
 .circleci
+.idea/
+*.config.js
 .github
 .prettierignore
 .vscode
@@ -11,3 +13,5 @@ build/test
 **/*.test.*
 coverage
 *.log
+.editorconfig
+*.tgz
