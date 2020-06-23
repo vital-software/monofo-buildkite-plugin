@@ -11,18 +11,16 @@
   "license": "GPL-3.0-or-later",
   "keywords": ["buildkite"],
   "scripts": {
-    "describe": "npm-scripts-info",
     "build": "tsc -p tsconfig.json",
     "build:watch": "run-s \"build -- -w\"",
+    "clean": "rm -rf build",
     "commit": "git-cz",
     "info": "npm-scripts-info",
     "lint": "eslint \"{src,test}/**/*.ts\"",
     "lint:fix": "run-s \"lint -- --fix\"",
     "test": "jest",
     "test:watch": "run-s \"test -- --watch\"",
-    "version": "standard-version",
-    "clean": "rm -rf build",
-    "preinstall": "node -e \"if(process.env.npm_execpath.indexOf('yarn') === -1) throw new Error('monofo must be installed with Yarn: https://yarnpkg.com/')\""
+    "version": "standard-version"
   },
   "engines": {
     "node": ">=12.10"
