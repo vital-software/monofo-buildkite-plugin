@@ -1,0 +1,16 @@
+steps:
+  - label: "build"
+    command: "yarn build"
+    plugins:
+      - docker#v3.5.0:
+          image: "node:12"
+          always-pull: true
+          propagate-environment: true
+
+  - label: "test"
+    command: "yarn test"
+    plugins:
+      - docker#v3.5.0:
+          image: "node:12"
+          always-pull: true
+          propagate-environment: true
