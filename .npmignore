@@ -1,0 +1,13 @@
+src
+tsconfig.json
+.eslintrc.js
+.circleci
+.github
+.prettierignore
+.vscode
+build/docs
+build/test
+**/*.spec.*
+**/*.test.*
+coverage
+*.log
