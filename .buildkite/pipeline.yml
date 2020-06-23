@@ -1,19 +1,35 @@
 env:
   NODE_ENV: development
+  BUILDKITE_PLUGIN_DOCKER_COMPOSE_CONFIG_0: "docker-compose.yml"
+  BUILDKITE_PLUGIN_DOCKER_COMPOSE_CONFIG_1: "docker-compose.buildkite.yml"
+  BUILDKITE_PLUGIN_DOCKER_COMPOSE_BUILD_PARALLEL: "true"
+  BUILDKITE_PLUGIN_DOCKER_COMPOSE_IMAGE_REPOSITORY: "dominics/monofo"
 
 steps:
-  - label: "build"
-    command: "yarn build"
+  - label: "build docker containers"
     plugins:
-      - docker#v3.5.0:
-          image: "node:12"
-          always-pull: true
-          propagate-environment: true
+      - docker-compose#v3.3.0:
+          build: [node, node-14]
 
-  - label: "test"
+  - wait
+
+  - label: "test app"
     command: "yarn test"
     plugins:
-      - docker#v3.5.0:
-          image: "node:12"
-          always-pull: true
-          propagate-environment: true
+      - docker-compose#v3.3.0:
+          run: node
+
+  - label: "test app on node-14"
+    command: "yarn test"
+    plugins:
+      - docker-compose#v3.3.0:
+          run: node-14
+
+  - wait
+
+  - label: "prepare version (not yet pushed/released)"
+    command: "yarn version"
+    branches: master
+    plugins:
+      - docker-compose#v3.3.0:
+          run: node

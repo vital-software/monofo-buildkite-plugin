@@ -17,7 +17,6 @@
     "build:watch": "run-s \"build -w\"",
     "clean": "rm -rf build",
     "commit": "git-cz",
-    "info": "npm-scripts-info",
     "lint": "eslint \"{src,test}/**/*.ts\"",
     "lint:fix": "run-s \"lint --fix\"",
     "test": "jest",
