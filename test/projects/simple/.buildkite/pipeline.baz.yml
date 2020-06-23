@@ -1,0 +1,9 @@
+monorepo:
+  expects:
+    - foo1
+    - bar2
+  produces:
+    - baz1
+
+steps:
+  - command: echo "baz1"

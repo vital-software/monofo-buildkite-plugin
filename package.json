@@ -9,17 +9,19 @@
   "typings": "build/src/index.d.ts",
   "repository": "https://github.com/dominics/monofo",
   "license": "GPL-3.0-or-later",
-  "keywords": ["buildkite"],
+  "keywords": [
+    "buildkite"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "build:watch": "run-s \"build -- -w\"",
+    "build:watch": "run-s \"build -w\"",
     "clean": "rm -rf build",
     "commit": "git-cz",
     "info": "npm-scripts-info",
     "lint": "eslint \"{src,test}/**/*.ts\"",
-    "lint:fix": "run-s \"lint -- --fix\"",
+    "lint:fix": "run-s \"lint --fix\"",
     "test": "jest",
-    "test:watch": "run-s \"test -- --watch\"",
+    "test:watch": "run-s \"test --watch\"",
     "version": "standard-version"
   },
   "engines": {
@@ -31,25 +33,26 @@
     "lodash": "4.17.13"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "2.24.0",
-    "@typescript-eslint/parser": "2.34.0",
     "@types/debug": "4.1.5",
     "@types/jest": "25.2.3",
+    "@types/js-yaml": "3.12.4",
     "@types/lodash": "4.14.151",
+    "@typescript-eslint/eslint-plugin": "2.24.0",
+    "@typescript-eslint/parser": "2.34.0",
     "cz-conventional-changelog": "2.1.0",
-    "jest": "26.0.1",
-    "jest-fetch-mock": "3.0.3",
-    "npm-run-all": "4.1.5",
-    "standard-version": "6.0.1",
-    "typescript": "3.9.5",
-    "ts-jest": "26.0.0",
     "eslint": "6.8.0",
     "eslint-config-airbnb-typescript": "7.2.1",
     "eslint-config-prettier": "6.11.0",
     "eslint-plugin-import": "2.20.1",
     "eslint-plugin-jest": "23.13.1",
     "eslint-plugin-prettier": "3.1.3",
-    "prettier": "2.0.5"
+    "jest": "26.0.1",
+    "jest-fetch-mock": "3.0.3",
+    "npm-run-all": "4.1.5",
+    "prettier": "2.0.5",
+    "standard-version": "6.0.1",
+    "ts-jest": "26.0.0",
+    "typescript": "3.9.5"
   },
   "config": {
     "commitizen": {

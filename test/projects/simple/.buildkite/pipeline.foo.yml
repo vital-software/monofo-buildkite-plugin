@@ -1,0 +1,6 @@
+monorepo:
+  produces:
+    - foo1
+
+steps:
+  - command: echo "foo1"

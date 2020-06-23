@@ -1,0 +1,10 @@
+monorepo:
+  expects:
+    - foo1
+  produces:
+    - bar1
+    - bar2
+
+steps:
+  - command: echo "bar1"
+  - command: echo "bar2"
