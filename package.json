@@ -35,7 +35,7 @@
     "@types/debug": "4.1.5",
     "@types/jest": "25.2.3",
     "@types/js-yaml": "3.12.4",
-    "@types/lodash": "4.14.151",
+    "@types/lodash": "4.14.156",
     "@typescript-eslint/eslint-plugin": "2.24.0",
     "@typescript-eslint/parser": "2.34.0",
     "cz-conventional-changelog": "2.1.0",
