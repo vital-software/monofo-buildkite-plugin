@@ -26,7 +26,16 @@ steps:
 
   - wait
 
-  - label: "prepare version (not yet pushed/released)"
+  - label: "plan release"
+    command: "yarn run release --dry-run"
+    branches: main
+    plugins:
+      - docker-compose#v3.3.0:
+          run: node
+
+  - block: "unblock"
+
+  - label: "release"
     command: "yarn run release"
     branches: main
     plugins:

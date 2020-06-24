@@ -36,6 +36,7 @@ services:
       - BUILDKITE_TOKEN
       - BUILDKITE_TRIGGERED_FROM_BUILD_ID
       - CI
+      - GITHUB_TOKEN
 
   node-14:
     environment:
@@ -72,3 +73,4 @@ services:
       - BUILDKITE_TOKEN
       - BUILDKITE_TRIGGERED_FROM_BUILD_ID
       - CI
+      - GITHUB_TOKEN

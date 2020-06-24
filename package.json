@@ -19,7 +19,7 @@
     "commit": "git-cz",
     "lint": "eslint \"{src,test}/**/*.ts\"",
     "lint:fix": "run-s \"lint --fix\"",
-    "release": "standard-version",
+    "release": "semantic-release",
     "test": "jest",
     "test:watch": "run-s \"test --watch\""
   },
@@ -60,9 +60,9 @@
     "nock": "12.0.3",
     "npm-run-all": "4.1.5",
     "prettier": "2.0.5",
-    "standard-version": "8.0.0",
     "ts-jest": "26.1.1",
-    "typescript": "3.9.5"
+    "typescript": "3.9.5",
+    "semantic-release": "17.1.0"
   },
   "config": {
     "commitizen": {
@@ -82,5 +82,21 @@
     "hooks": {
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
+  },
+  "release": {
+    "branches": [
+      "+([0-9])?(.{+([0-9]),x}).x",
+      "main",
+      "next",
+      "next-major",
+      {
+        "name": "beta",
+        "prerelease": true
+      },
+      {
+        "name": "alpha",
+        "prerelease": true
+      }
+    ]
   }
 }
