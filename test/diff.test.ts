@@ -1,19 +1,13 @@
-import { getDiffBase, getDiff, getMatchingDiffResults } from '../src/diff';
+import { getBaseCommit, matchConfigs } from '../src/diff';
 
-describe('getDiffBase', () => {
+describe('getBaseCommit', () => {
   it('is a function', () => {
-    expect(typeof getDiffBase).toBe('function');
+    expect(typeof getBaseCommit).toBe('function');
   });
 });
 
-describe('getDiff', () => {
+describe('matchConfigs', () => {
   it('is a function', () => {
-    expect(typeof getDiff).toBe('function');
-  });
-});
-
-describe('getMatchingDiffResults', () => {
-  it('is a function', () => {
-    expect(typeof getMatchingDiffResults).toBe('function');
+    expect(typeof matchConfigs).toBe('function');
   });
 });
