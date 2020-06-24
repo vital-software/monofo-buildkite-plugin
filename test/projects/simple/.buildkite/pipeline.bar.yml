@@ -4,6 +4,7 @@ monorepo:
   produces:
     - bar1
     - bar2
+  matches: "bar/"
 
 steps:
   - command: echo "bar1"

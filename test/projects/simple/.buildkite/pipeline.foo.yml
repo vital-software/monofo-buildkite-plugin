@@ -1,6 +1,9 @@
 monorepo:
   produces:
     - foo1
+  matches:
+    - "foo/**/*.js"
+    - "foo/README.md"
 
 steps:
   - command: echo "foo1"

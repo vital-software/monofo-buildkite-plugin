@@ -29,13 +29,16 @@
   "dependencies": {
     "debug": "4.1.1",
     "js-yaml": "3.14.0",
-    "lodash": "4.17.15"
+    "lodash": "4.17.15",
+    "minimatch": "3.0.4",
+    "toposort": "2.0.2"
   },
   "devDependencies": {
     "@types/debug": "4.1.5",
     "@types/jest": "26.0.0",
     "@types/js-yaml": "3.12.4",
     "@types/lodash": "4.14.156",
+    "@types/toposort": "2.0.3",
     "@typescript-eslint/eslint-plugin": "2.34.0",
     "@typescript-eslint/parser": "2.34.0",
     "cz-conventional-changelog": "3.2.0",
