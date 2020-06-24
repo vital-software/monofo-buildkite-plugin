@@ -11,7 +11,13 @@ build/docs
 build/test
 **/*.spec.*
 **/*.test.*
+test/
+.buildkite/
 coverage
 *.log
 .editorconfig
 *.tgz
+.dockerignore
+scripts
+Dockerfile
+docker-compose.*.yml
