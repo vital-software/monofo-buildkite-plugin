@@ -23,5 +23,6 @@ _agent_ token.
 
 ## Development
 
+- `yarn commit` - Start a commit with formatting
 - `yarn test` - Runs the tests
 - `yarn build` - Compiles Typescript
