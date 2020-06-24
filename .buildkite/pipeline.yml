@@ -5,20 +5,20 @@ env:
   BUILDKITE_PLUGIN_DOCKER_COMPOSE_IMAGE_REPOSITORY: "dominics/monofo"
 
 steps:
-  - label: "build docker containers"
+  - label: ":docker:"
     plugins:
       - docker-compose#v3.3.0:
           build: [node, node-14]
 
   - wait
 
-  - label: "test app"
+  - label: ":yarn: LTS"
     command: "yarn test"
     plugins:
       - docker-compose#v3.3.0:
           run: node
 
-  - label: "test app on node-14"
+  - label: ":yarn: 14.x"
     command: "yarn test"
     plugins:
       - docker-compose#v3.3.0:
@@ -26,16 +26,17 @@ steps:
 
   - wait
 
-  - label: "plan release"
+  - label: ":brain: Plan"
     command: "yarn run release --dry-run"
     branches: main
     plugins:
       - docker-compose#v3.3.0:
           run: node
 
-  - block: "unblock"
+  - block: ":raising_hand: Unblock Release?"
+    branches: main
 
-  - label: "release"
+  - label: ":shipit:"
     command: "yarn run release"
     branches: main
     plugins:
