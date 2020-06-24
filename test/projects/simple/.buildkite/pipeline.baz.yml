@@ -6,5 +6,8 @@ monorepo:
     - baz1
   matches: baz/no-match
 
+env:
+  BAZ: some-value
+
 steps:
   - command: echo "baz1"

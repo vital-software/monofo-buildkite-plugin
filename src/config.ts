@@ -9,11 +9,6 @@ const log = debug('monofo:config');
 
 const CONFIG_REL_PATH = '.buildkite/';
 const PIPELINE_FILE = /^pipeline\.(?<name>.*)\.yml$/;
-const MONOREPO_EMPTY_CONFIG = {
-  expects: [],
-  produces: [],
-  matches: [],
-};
 
 function thrw<T>(e: Error): T {
   throw e;
@@ -29,9 +24,10 @@ export interface Config extends ConfigFile {
     expects: string[];
     produces: string[];
     matches: string[];
+    excluded_steps: { [key: string]: any }[];
   };
   steps: { [key: string]: any }[];
-  env?: { [key: string]: any } | string[];
+  env: { [key: string]: any };
 }
 
 /**
@@ -57,15 +53,13 @@ async function getConfigFiles(dir: string): Promise<Config[]> {
     });
 }
 
-function arr(v: undefined | string[] | string): string[] {
-  if (_.isArray(v)) {
+function strings(v: undefined | string[] | string): string[] {
+  if (!v || v.length <= 0) {
+    return [];
+  } else if (_.isArray(v)) {
     return v;
   } else {
-    if (!v || (v?.length || 0) <= 0) {
-      return [];
-    } else {
-      return [String(v)];
-    }
+    return [String(v)];
   }
 }
 
@@ -80,13 +74,21 @@ async function readConfig(config: ConfigFile): Promise<ConfigFile> {
   return fs.readFile(config.path).then((buf) => {
     const { monorepo, steps, env } = safeLoad(buf.toString());
 
+    if (_.isArray(env)) {
+      throw new Error('TODO: monofo cannot cope with env being an array yet (split to object)');
+    }
+
+    // TODO: Could do a lot more type checking here for malformed pipeline.yml files
+
     return {
       ...config,
       name,
       monorepo: {
-        expects: arr(monorepo.expects),
-        produces: arr(monorepo.produces),
-        matches: arr(monorepo.matches),
+        ...monorepo,
+        expects: strings(monorepo.expects),
+        produces: strings(monorepo.produces),
+        matches: strings(monorepo.matches),
+        excluded_steps: monorepo.excluded_steps || [],
       },
       steps,
       env,

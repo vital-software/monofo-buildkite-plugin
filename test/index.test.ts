@@ -12,12 +12,12 @@ describe('main()', () => {
   it('can be executed with no configuration', () => {
     process.env = fakeProcess();
     process.chdir(__dirname);
-    return expect(main()).rejects.toThrowError('No pipeline files');
+    return expect(main(() => {})).rejects.toThrowError('No pipeline files');
   });
 
   it('can be executed with simple configuration', async () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, 'projects/simple'));
-    expect(await main()).toBe(undefined);
+    expect(await main(() => {})).toBe(undefined);
   });
 });

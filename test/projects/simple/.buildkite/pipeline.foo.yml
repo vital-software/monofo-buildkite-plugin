@@ -5,5 +5,9 @@ monorepo:
     - "foo/**/*.ts"
     - "foo/**/README.md"
 
+env:
+  FOO: some-value
+  FOO2: another-value
+
 steps:
   - command: echo "foo1"
