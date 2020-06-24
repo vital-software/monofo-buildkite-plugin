@@ -5,7 +5,7 @@ export const PIPELINE = 'bar';
 export const BRANCH = 'baz';
 export const COMMIT = 'aaaaaaecaba866edea48550644df2baaaaaaaaaa';
 
-export function fakeProcess() {
+export function fakeProcess(): NodeJS.ProcessEnv {
   return {
     BUILDKITE_BRANCH: BRANCH,
     BUILDKITE_COMMIT: COMMIT,
@@ -21,7 +21,7 @@ export function fakeBuildkiteInfo(): BuildkiteInfo {
   return getBuildkiteInfo(fakeProcess());
 }
 
-export function fakeBuildkiteBuildsListing(): { [key: string]: any }[] {
+export function fakeBuildkiteBuildsListing(): { [key: string]: string | number | boolean | object }[] {
   return [
     {
       id: 'f62a1b4d-10f9-4790-bc1c-e2c3a0c80983',

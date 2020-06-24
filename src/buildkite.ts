@@ -54,6 +54,7 @@ export function getLastSuccessfulBuildCommit(info: BuildkiteInfo): Promise<strin
 }
 
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace NodeJS {
     interface ProcessEnv {
       BUILDKITE_BRANCH: string;

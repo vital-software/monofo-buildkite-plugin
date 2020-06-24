@@ -1,8 +1,8 @@
+import minimatch from 'minimatch';
+import debug from 'debug';
 import { Config } from './config';
 import { getBuildkiteInfo, getLastSuccessfulBuildCommit } from './buildkite';
 import { mergeBase } from './git';
-import minimatch from 'minimatch';
-import debug from 'debug';
 
 const log = debug('monofo:diff');
 
@@ -19,10 +19,9 @@ export function getBaseCommit(): Promise<string> {
       log(`Failed to find base commit for ${bk.branch} via Buildkite API, falling back to previous commit`, e);
       return 'HEAD~1';
     });
-  } else {
-    // We are on a feature branch, and should just diff against the merge-base of the current commit and the main branch
-    return mergeBase(`origin/${bk.defaultBranch}`, bk.commit);
   }
+  // We are on a feature branch, and should just diff against the merge-base of the current commit and the main branch
+  return mergeBase(`origin/${bk.defaultBranch}`, bk.commit);
 }
 
 /**
@@ -43,6 +42,6 @@ function matchingChanges(matchList: string[], changedFiles: string[]): string[] 
 
 export function matchConfigs(configs: Config[], changedFiles: string[]): ConfigWithChanges[] {
   return configs.map((config) => {
-    return Object.assign({}, config, { changes: matchingChanges(config.monorepo.matches, changedFiles) });
+    return { ...config, changes: matchingChanges(config.monorepo.matches, changedFiles) };
   });
 }

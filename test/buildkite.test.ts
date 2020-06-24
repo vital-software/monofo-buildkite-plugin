@@ -1,7 +1,7 @@
-import { getLastSuccessfulBuildCommit } from '../src/buildkite';
-import { fakeBuildkiteBuildsListing, fakeBuildkiteInfo, COMMIT } from './fixtures';
 import nock from 'nock';
 import { URL } from 'url';
+import { getLastSuccessfulBuildCommit } from '../src/buildkite';
+import { fakeBuildkiteBuildsListing, fakeBuildkiteInfo, COMMIT } from './fixtures';
 
 describe('getLastSuccessfulBuildCommit', () => {
   it('returns the commit of a successful build', () => {

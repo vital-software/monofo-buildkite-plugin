@@ -1,8 +1,8 @@
+import { mocked } from 'ts-jest/utils';
+import path from 'path';
 import { getBaseCommit, matchConfigs } from '../src/diff';
 import { fakeProcess } from './fixtures';
 import { mergeBase } from '../src/git';
-import { mocked } from 'ts-jest/utils';
-import path from 'path';
 import getConfigs from '../src/config';
 
 jest.mock('../src/git');
@@ -26,7 +26,7 @@ describe('matchConfigs', () => {
   it('matches changed files against configs', async () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, 'projects/simple'));
-    const result = await matchConfigs(await getConfigs(), ['foo/abc.js', 'foo/README.md', 'bar/abc.ts', 'baz/abc.ts']);
+    const result = matchConfigs(await getConfigs(), ['foo/abc.js', 'foo/README.md', 'bar/abc.ts', 'baz/abc.ts']);
 
     expect(result[0].changes).toStrictEqual(['foo/README.md']);
     expect(result[1].changes).toStrictEqual([]);

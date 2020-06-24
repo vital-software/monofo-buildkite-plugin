@@ -1,6 +1,6 @@
-import { ConfigWithChanges } from './diff';
 import _ from 'lodash';
 import debug from 'debug';
+import { ConfigWithChanges } from './diff';
 
 const log = debug('monofo:pipeline');
 
@@ -26,10 +26,9 @@ function toMerge({ name, changes, env, steps, monorepo }: ConfigWithChanges): Pi
     }
     log(message);
     return { env, steps: monorepo.excluded_steps };
-  } else {
-    log(`${name} will be INCLUDED because it has ${count(changes, 'matching change')}: ${changes.join(', ')}`);
-    return { env, steps };
   }
+  log(`${name} will be INCLUDED because it has ${count(changes, 'matching change')}: ${changes.join(', ')}`);
+  return { env, steps };
 }
 
 export function mergePipelines(results: ConfigWithChanges[]): Pipeline {

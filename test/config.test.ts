@@ -1,5 +1,5 @@
-import getConfigs from '../src/config';
 import path from 'path';
+import getConfigs from '../src/config';
 
 describe('getConfig()', () => {
   it('reads pipeline files and returns an array of config files - empty', async () => {

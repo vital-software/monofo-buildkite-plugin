@@ -36,7 +36,6 @@ module.exports = {
         ],
 
         // Soften some errors
-        '@typescript-eslint/ban-ts-ignore': 'warn',
         'import/prefer-default-export': 'warn',
         'no-restricted-syntax': ['warn', 'ForInStatement', 'LabeledStatement', 'WithStatement'], // Removes ForOfStatement from extended standards
         'no-return-assign': ['error', 'except-parens'],

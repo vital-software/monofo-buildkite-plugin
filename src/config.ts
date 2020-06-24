@@ -56,15 +56,15 @@ async function getConfigFiles(dir: string): Promise<Config[]> {
 function strings(v: undefined | string[] | string): string[] {
   if (!v || v.length <= 0) {
     return [];
-  } else if (_.isArray(v)) {
-    return v;
-  } else {
-    return [String(v)];
   }
+  if (_.isArray(v)) {
+    return v;
+  }
+  return [String(v)];
 }
 
 async function readConfig(config: ConfigFile): Promise<ConfigFile> {
-  const match = path.basename(config.path).match(PIPELINE_FILE);
+  const match = PIPELINE_FILE.exec(path.basename(config.path));
   const name = match?.groups?.name;
 
   if (!name) {
@@ -72,7 +72,7 @@ async function readConfig(config: ConfigFile): Promise<ConfigFile> {
   }
 
   return fs.readFile(config.path).then((buf) => {
-    const { monorepo, steps, env } = safeLoad(buf.toString());
+    const { monorepo, steps, env } = (safeLoad(buf.toString()) as unknown) as Config;
 
     if (_.isArray(env)) {
       // Fail noisily rather than missing the merge of the env vars

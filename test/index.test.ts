@@ -1,5 +1,5 @@
-import { main } from '../src';
 import path from 'path';
+import { main } from '../src';
 import { fakeProcess } from './fixtures';
 import { mergeBase, diff } from '../src/git';
 
@@ -18,7 +18,7 @@ describe('main()', () => {
     return expect(main(() => Promise.resolve())).rejects.toThrowError('No pipeline files');
   });
 
-  it('can be executed with simple configuration', async (cb) => {
+  it('can be executed with simple configuration', () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, 'projects/simple'));
 
