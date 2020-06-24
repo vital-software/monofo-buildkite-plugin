@@ -3,6 +3,7 @@ import * as path from 'path';
 import { safeLoad } from 'js-yaml';
 import toposort from 'toposort';
 import debug from 'debug';
+import _ from 'lodash';
 
 const log = debug('monofo:config');
 
@@ -56,6 +57,18 @@ async function getConfigFiles(dir: string): Promise<Config[]> {
     });
 }
 
+function arr(v: undefined | string[] | string): string[] {
+  if (_.isArray(v)) {
+    return v;
+  } else {
+    if (!v || (v?.length || 0) <= 0) {
+      return [];
+    } else {
+      return [String(v)];
+    }
+  }
+}
+
 async function readConfig(config: ConfigFile): Promise<ConfigFile> {
   const match = path.basename(config.path).match(PIPELINE_FILE);
   const name = match?.groups?.name;
@@ -70,7 +83,11 @@ async function readConfig(config: ConfigFile): Promise<ConfigFile> {
     return {
       ...config,
       name,
-      monorepo: Object.assign({}, MONOREPO_EMPTY_CONFIG, monorepo),
+      monorepo: {
+        expects: arr(monorepo.expects),
+        produces: arr(monorepo.produces),
+        matches: arr(monorepo.matches),
+      },
       steps,
       env,
     } as Config;
@@ -99,7 +116,7 @@ function sort(configs: Config[]): Config[] {
  * Reads pipeline.foo.yml files from .buildkite/*, parses them, and returns them as Config objects in the right order
  * to be processed
  */
-export default async function getConfig(): Promise<Config[]> {
+export default async function getConfigs(): Promise<Config[]> {
   const configDir = path.join(process.cwd(), CONFIG_REL_PATH);
   return getConfigFiles(configDir)
     .then((configs) => Promise.all(configs.map(readConfig)))

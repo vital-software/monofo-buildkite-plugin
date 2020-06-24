@@ -1,26 +1,56 @@
+import got from 'got';
+import _ from 'lodash';
+import debug from 'debug';
+
+const log = debug('monofo:buildkite');
+
 export interface BuildkiteInfo {
   branch: string;
   commit: string;
   defaultBranch: string;
-  organization_slug: string;
-  pipeline_slug: string;
   source: string;
+  buildsUrl: string;
 }
 
-export function getBuildkiteInfo(): BuildkiteInfo {
+export function getBuildkiteInfo(e: NodeJS.ProcessEnv = process.env): BuildkiteInfo {
+  if (typeof e !== 'object' || !e.BUILDKITE_COMMIT) {
+    throw new Error('Expected to find BUILDKITE_COMMIT env var');
+  }
+
   return {
-    branch: process.env.BUILDKITE_BRANCH,
-    commit: process.env.BUILDKITE_COMMIT,
+    branch: e.BUILDKITE_BRANCH,
+    commit: e.BUILDKITE_COMMIT,
     // We probably actually want the Github default branch, but close enough:
-    defaultBranch: process.env.BUILDKITE_PIPELINE_DEFAULT_BRANCH,
-    source: process.env.BUILDKITE_SOURCE,
-    organization_slug: process.env.BUILDKITE_ORGANIZATION_SLUG,
-    pipeline_slug: process.env.BUILDKITE_PIPELINE_SLUG,
+    defaultBranch: e.BUILDKITE_PIPELINE_DEFAULT_BRANCH,
+    source: e.BUILDKITE_SOURCE,
+    buildsUrl: [
+      'https://api.buildkite.com/v2',
+      `/organizations/${e.BUILDKITE_ORGANIZATION_SLUG}/pipelines/${e.BUILDKITE_PIPELINE_SLUG}/builds`,
+      `?state=passed&branch=${encodeURIComponent(e.BUILDKITE_BRANCH)}`,
+    ].join(''),
   };
 }
 
-export function getLastSuccessfulBuildCommit(branch: string): Promise<string> {
-  return Promise.resolve('HEAD');
+/**
+ * Get the commit of the last successful build of the current branch
+ * @param info
+ */
+export function getLastSuccessfulBuildCommit(info: BuildkiteInfo): Promise<string> {
+  return got(info.buildsUrl, {
+    headers: {
+      Authorization: `Bearer ${process.env.BUILDKITE_API_ACCESS_TOKEN}`,
+      Accept: 'application/json',
+    },
+  })
+    .json<{ [key: string]: any }[]>()
+    .then((builds) => {
+      if (!_.isArray(builds) || builds.length < 1) {
+        throw new Error('Could not find any matching successful builds');
+      } else {
+        log(`Found successful build for ${info.branch}: ${builds[0].web_url} @ ${builds[0].commit}`);
+        return builds[0].commit;
+      }
+    });
 }
 
 declare global {

@@ -23,5 +23,5 @@ export function mergeBase(...commits: string[]): Promise<string> {
 }
 
 export function diff(...commits: string[]): Promise<string[]> {
-  return git('diff', '--name-only', ...commits).then((names) => names.split('\n'));
+  return git('diff', '--name-only', ...commits).then((names) => names.split('\n').filter((v) => v));
 }

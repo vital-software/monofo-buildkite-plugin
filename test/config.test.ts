@@ -1,15 +1,15 @@
-import getConfig from '../src/config';
+import getConfigs from '../src/config';
 import path from 'path';
 
 describe('getConfig()', () => {
   it('reads pipeline files and returns an array of config files - empty', async () => {
     process.chdir(__dirname);
-    expect(await getConfig()).toHaveLength(0);
+    expect(await getConfigs()).toHaveLength(0);
   });
 
   it('reads pipeline files and returns an array of config files - simple', async () => {
     process.chdir(path.resolve(__dirname, 'projects/simple'));
-    const config = await getConfig();
+    const config = await getConfigs();
 
     expect(config).toHaveLength(3);
     expect(config[0].name).toBe('foo');

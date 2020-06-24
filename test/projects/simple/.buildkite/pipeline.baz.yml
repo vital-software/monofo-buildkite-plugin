@@ -4,7 +4,7 @@ monorepo:
     - bar2
   produces:
     - baz1
-  matches: baz
+  matches: baz/no-match
 
 steps:
   - command: echo "baz1"
