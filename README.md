@@ -5,7 +5,11 @@ Buildkite dynamic pipeline generator for mono-repos
 ## Usage
 
 ```sh
+# If using NPM
 npx monofo | buildkite-agent pipeline upload
+
+# If using Yarn
+yarn global add monofo && monofo | buildkite-agent pipeline upload
 ```
 
 ### Configuration

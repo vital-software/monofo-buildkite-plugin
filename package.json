@@ -1,6 +1,6 @@
 {
   "name": "monofo",
-  "version": "0.0.2-0",
+  "version": "0.1.0",
   "description": "Buildkite pipeline helper",
   "main": "build/index.js",
   "bin": {
@@ -97,6 +97,14 @@
         "name": "alpha",
         "prerelease": true
       }
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/changelog",
+      "@semantic-release/npm",
+      "@semantic-release/git",
+      "@semantic-release/github"
     ]
   }
 }
