@@ -1,0 +1,5 @@
+env:
+  NOPE: some-value
+
+steps:
+  - command: echo "unused"

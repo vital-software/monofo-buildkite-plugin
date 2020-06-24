@@ -75,7 +75,13 @@ async function readConfig(config: ConfigFile): Promise<ConfigFile> {
     const { monorepo, steps, env } = safeLoad(buf.toString());
 
     if (_.isArray(env)) {
+      // Fail noisily rather than missing the merge of the env vars
       throw new Error('TODO: monofo cannot cope with env being an array yet (split to object)');
+    }
+
+    if (!monorepo || typeof monorepo !== 'object') {
+      log(`Skipping ${name} because it has no monorepo configuration`);
+      return config;
     }
 
     // TODO: Could do a lot more type checking here for malformed pipeline.yml files
@@ -103,7 +109,7 @@ function sort(configs: Config[]): Config[] {
   const byName = Object.fromEntries(configs.map((c) => [c.name, c]));
   const byProducerOf = Object.fromEntries(configs.flatMap((c) => c.monorepo.produces.map((p) => [p, c])));
 
-  return toposort(
+  const sorted = toposort(
     configs.flatMap((c) => {
       return c.monorepo.expects.map((e) => {
         return byProducerOf[e]
@@ -111,7 +117,10 @@ function sort(configs: Config[]): Config[] {
           : thrw<[string, string]>(new Error(`Could not find a component that produces "${e}"`));
       });
     })
-  ).map((name) => byName[name]);
+  );
+
+  log(`Will apply pipelines in order: [${sorted.join(', ')}]`);
+  return sorted.map((name) => byName[name]);
 }
 
 /**
