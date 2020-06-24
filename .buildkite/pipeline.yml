@@ -27,7 +27,7 @@ steps:
   - wait
 
   - label: "prepare version (not yet pushed/released)"
-    command: "yarn version"
+    command: "yarn run release"
     branches: main
     plugins:
       - docker-compose#v3.3.0:

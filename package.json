@@ -19,9 +19,9 @@
     "commit": "git-cz",
     "lint": "eslint \"{src,test}/**/*.ts\"",
     "lint:fix": "run-s \"lint --fix\"",
+    "release": "standard-version",
     "test": "jest",
-    "test:watch": "run-s \"test --watch\"",
-    "version": "standard-version"
+    "test:watch": "run-s \"test --watch\""
   },
   "engines": {
     "node": ">=12.10"
