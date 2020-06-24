@@ -28,7 +28,7 @@ steps:
 
   - label: "prepare version (not yet pushed/released)"
     command: "yarn version"
-    branches: master
+    branches: main
     plugins:
       - docker-compose#v3.3.0:
           run: node
