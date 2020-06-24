@@ -1,3 +1,10 @@
+## [0.1.1](https://github.com/dominics/monofo/compare/v0.1.0...v0.1.1) (2020-06-24)
+
+
+### Bug Fixes
+
+* **ci:** fix semantic release not updating changelog/package ([6ba9863](https://github.com/dominics/monofo/commit/6ba9863fd9281744ab2e1f6ccfe88be529ca8b77))
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
