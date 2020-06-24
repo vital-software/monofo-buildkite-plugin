@@ -5,14 +5,14 @@ import { ConfigWithChanges } from './diff';
 const log = debug('monofo:pipeline');
 
 export interface Pipeline {
-  steps: { [key: string]: any }[];
-  env: { [key: string]: any };
+  steps: { [key: string]: unknown }[];
+  env: { [key: string]: string };
 }
 
 const EMPTY_PIPELINE: Pipeline = { env: {}, steps: [] };
 
-const s = (n: number) => (n === 1 ? '' : 's');
-const count = (arr: Array<unknown>, name: string) => `${arr.length} ${name}${s(arr.length)}`;
+const s = (n: number): string => (n === 1 ? '' : 's');
+const count = (arr: Array<unknown>, name: string): string => `${arr.length} ${name}${s(arr.length)}`;
 
 /**
  * If a config has changes, its steps are merged into the final build. Otherwise, it is excluded, its excluded_steps are
@@ -32,6 +32,7 @@ function toMerge({ name, changes, env, steps, monorepo }: ConfigWithChanges): Pi
 }
 
 export function mergePipelines(results: ConfigWithChanges[]): Pipeline {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return _.mergeWith(EMPTY_PIPELINE, ...results.map(toMerge), (dst: any, src: any) =>
     _.isArray(dst) ? dst.concat(src) : undefined
   );

@@ -13,7 +13,7 @@ const write = util.promisify(process.stdout.write);
 const stdOutThenExit = (pipeline: Pipeline): Promise<void> =>
   write(`${safeDump(pipeline)}\n`).then(() => process.exit(0));
 
-export async function main(writePipeline: (p: Pipeline) => Promise<void> = stdOutThenExit): Promise<void> {
+export default async function main(writePipeline: (p: Pipeline) => Promise<void> = stdOutThenExit): Promise<void> {
   const config = getConfigs();
   const changed = getBaseCommit().then(diff);
 
@@ -28,7 +28,7 @@ export async function main(writePipeline: (p: Pipeline) => Promise<void> = stdOu
 }
 
 if (require.main === module) {
-  (async function () {
+  (async (): Promise<void> => {
     try {
       await main();
     } catch (e) {

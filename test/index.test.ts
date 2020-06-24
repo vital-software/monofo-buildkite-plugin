@@ -1,5 +1,5 @@
 import path from 'path';
-import { main } from '../src';
+import main from '../src';
 import { fakeProcess } from './fixtures';
 import { mergeBase, diff } from '../src/git';
 
@@ -22,10 +22,10 @@ describe('main()', () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, 'projects/simple'));
 
-    main((p) => {
+    return main((p) => {
       expect(p.steps.map((s) => s.command)).toStrictEqual(['echo "foo1"', "echo 'bar was replaced'", 'echo "baz1"']);
       expect(Object.entries(p.env)).toHaveLength(4); // merged from all files
-      return Promise.resolve().then(() => cb());
+      return Promise.resolve();
     });
   });
 });

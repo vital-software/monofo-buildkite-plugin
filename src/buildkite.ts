@@ -4,12 +4,23 @@ import debug from 'debug';
 
 const log = debug('monofo:buildkite');
 
+/**
+ * Our own internal value instance that collects environment variable values
+ */
 export interface BuildkiteInfo {
   branch: string;
   commit: string;
   defaultBranch: string;
   source: string;
   buildsUrl: string;
+}
+
+/**
+ * As returned for a build from the Buildkite REST API
+ */
+export interface BuildkiteBuild {
+  web_url: string;
+  commit: string;
 }
 
 export function getBuildkiteInfo(e: NodeJS.ProcessEnv = process.env): BuildkiteInfo {
@@ -42,7 +53,7 @@ export function getLastSuccessfulBuildCommit(info: BuildkiteInfo): Promise<strin
       Accept: 'application/json',
     },
   })
-    .json<{ [key: string]: any }[]>()
+    .json<BuildkiteBuild[]>()
     .then((builds) => {
       if (!_.isArray(builds) || builds.length < 1) {
         throw new Error('Could not find any matching successful builds');
