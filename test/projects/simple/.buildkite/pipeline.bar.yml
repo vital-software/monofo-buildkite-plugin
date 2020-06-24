@@ -4,7 +4,10 @@ monorepo:
   produces:
     - bar1
     - bar2
-  matches: bar/**
+  matches: bar/no-match
+  excluded_steps:
+    - label: "Some other step"
+      command: "echo 'bar was replaced'"
 
 env:
   BAR: some-value

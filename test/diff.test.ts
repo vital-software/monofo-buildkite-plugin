@@ -26,10 +26,10 @@ describe('matchConfigs', () => {
   it('matches changed files against configs', async () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, 'projects/simple'));
-    const result = await matchConfigs(await getConfigs(), ['foo/abc.js', 'foo/README.md', 'bar/abc.ts']);
+    const result = await matchConfigs(await getConfigs(), ['foo/abc.js', 'foo/README.md', 'bar/abc.ts', 'baz/abc.ts']);
 
     expect(result[0].changes).toStrictEqual(['foo/README.md']);
-    expect(result[1].changes).toStrictEqual(['bar/abc.ts']);
-    expect(result[2].changes).toHaveLength(0);
+    expect(result[1].changes).toStrictEqual([]);
+    expect(result[2].changes).toStrictEqual(['baz/abc.ts']);
   });
 });

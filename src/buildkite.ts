@@ -1,5 +1,5 @@
-import got from 'got';
 import _ from 'lodash';
+import got from 'got';
 import debug from 'debug';
 
 const log = debug('monofo:buildkite');

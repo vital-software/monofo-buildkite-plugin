@@ -4,7 +4,7 @@ monorepo:
     - bar2
   produces:
     - baz1
-  matches: baz/no-match
+  matches: baz/**
 
 env:
   BAZ: some-value

@@ -4,7 +4,7 @@ import debug from 'debug';
 
 const log = debug('monofo:pipeline');
 
-interface Pipeline {
+export interface Pipeline {
   steps: { [key: string]: any }[];
   env: { [key: string]: any };
 }
@@ -20,12 +20,11 @@ const count = (arr: Array<unknown>, name: string) => `${arr.length} ${name}${s(a
  */
 function toMerge({ name, changes, env, steps, monorepo }: ConfigWithChanges): Pipeline {
   if (changes.length <= 0) {
-    log(
-      `${name} will be EXCLUDED because it has no matching changes. ${count(
-        monorepo.excluded_steps,
-        'replacement step'
-      )} will be used instead.`
-    );
+    let message = `${name} will be EXCLUDED because it has no matching changes.`;
+    if (monorepo.excluded_steps.length > 0) {
+      message += ` ${count(monorepo.excluded_steps, 'replacement step')} will be used instead.`;
+    }
+    log(message);
     return { env, steps: monorepo.excluded_steps };
   } else {
     log(`${name} will be INCLUDED because it has ${count(changes, 'matching change')}: ${changes.join(', ')}`);
@@ -33,7 +32,7 @@ function toMerge({ name, changes, env, steps, monorepo }: ConfigWithChanges): Pi
   }
 }
 
-export function toPipeline(results: ConfigWithChanges[]): Pipeline {
+export function mergePipelines(results: ConfigWithChanges[]): Pipeline {
   return _.mergeWith(EMPTY_PIPELINE, ...results.map(toMerge), (dst: any, src: any) =>
     _.isArray(dst) ? dst.concat(src) : undefined
   );

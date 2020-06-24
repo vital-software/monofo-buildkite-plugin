@@ -2,13 +2,17 @@
 
 import getConfigs from './config';
 import { getBaseCommit, matchConfigs } from './diff';
-import { toPipeline } from './pipeline';
+import { mergePipelines, Pipeline } from './pipeline';
 import debug from 'debug';
 import { diff } from './git';
-import Promise from 'bluebird';
 import { safeDump } from 'js-yaml';
+import util from 'util';
 
-export async function main(shutdown: () => void = () => process.exit(0)) {
+const write = util.promisify(process.stdout.write);
+const stdOutThenExit = (pipeline: Pipeline): Promise<void> =>
+  write(safeDump(pipeline) + '\n').then(() => process.exit(0));
+
+export async function main(writePipeline: (p: Pipeline) => Promise<void> = stdOutThenExit): Promise<void> {
   const config = getConfigs();
   const changed = getBaseCommit().then(diff);
 
@@ -16,11 +20,10 @@ export async function main(shutdown: () => void = () => process.exit(0)) {
     throw new Error(`No pipeline files to process (cwd: ${process.cwd()})`);
   }
 
-  return Promise.join(config, changed, matchConfigs)
-    .then(toPipeline)
-    .then((pipeline) => {
-      process.stdout.write(safeDump(pipeline) + '\n', 'utf-8', shutdown);
-    });
+  return config
+    .then((c) => changed.then((f) => matchConfigs(c, f)))
+    .then(mergePipelines)
+    .then(writePipeline);
 }
 
 if (require.main === module) {
