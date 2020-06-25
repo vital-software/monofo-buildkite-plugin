@@ -2,19 +2,22 @@ import { mocked } from 'ts-jest/utils';
 import path from 'path';
 import { getBaseCommit, matchConfigs } from '../src/diff';
 import { fakeProcess } from './fixtures';
-import { mergeBase } from '../src/git';
+import { revParse } from '../src/git';
 import getConfigs from '../src/config';
 
 jest.mock('../src/git');
 
-const mockedMergeBase = mocked(mergeBase, true);
+// const mockMergeBase = mocked(mergeBase, true);
+const mockRevParse = mocked(revParse, true);
 
 describe('getBaseCommit', () => {
   it('returns the merge base on a non-default branch', async () => {
     process.env = fakeProcess();
-    mockedMergeBase.mockImplementation(() => Promise.resolve('foo'));
+    // mockMergeBase.mockImplementation(() => Promise.resolve('foo'));
+    mockRevParse.mockImplementation(() => Promise.resolve('aklwdmklawmkl'));
+
     const commit = await getBaseCommit();
-    expect(commit).toBe('foo');
+    expect(commit).toBe('aklwdmklawmkl');
   });
 });
 

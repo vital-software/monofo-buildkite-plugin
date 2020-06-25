@@ -2,7 +2,7 @@ import minimatch from 'minimatch';
 import debug from 'debug';
 import { Config } from './config';
 import { getBuildkiteInfo, getLastSuccessfulBuildCommit } from './buildkite';
-import { mergeBase } from './git';
+import { mergeBase, revParse } from './git';
 
 const log = debug('monofo:diff');
 
@@ -10,14 +10,14 @@ export interface ConfigWithChanges extends Config {
   changes: string[];
 }
 
-export function getBaseCommit(): Promise<string> {
+export async function getBaseCommit(): Promise<string> {
   const bk = getBuildkiteInfo(process.env);
 
   if (bk.branch === bk.defaultBranch) {
     // We are on the main branch, and should look for the previous successful build of it
     return getLastSuccessfulBuildCommit(bk).catch((e) => {
-      log(`Failed to find base commit for ${bk.branch} via Buildkite API, falling back to previous commit`, e);
-      return 'HEAD~1';
+      log(`Failed to find base commit for ${bk.branch} via Buildkite API, falling back to HEAD~1`, e);
+      return revParse('HEAD~1');
     });
   }
   // We are on a feature branch, and should just diff against the merge-base of the current commit and the main branch

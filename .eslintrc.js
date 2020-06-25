@@ -44,5 +44,13 @@ module.exports = {
     // And turn some completely off
     'no-underscore-dangle': 'off',
     'max-classes-per-file': 'off'
-  }
+  },
+  overrides: [
+    {
+      files: "bin/**/*.js",
+      rules: {
+        '@typescript-eslint/no-var-requires': 'off',
+      }
+    }
+  ]
 };
