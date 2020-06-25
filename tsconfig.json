@@ -21,7 +21,7 @@
     "emitDecoratorMetadata": true,
     "lib": ["es2020"]
   },
-  "include": ["src/**/*.ts", "test/**/*.ts"],
+  "include": ["src/**/*.ts", "test/**/*.ts", ".eslinttrc.js", "*.config.js", "bin/*.js"],
   "exclude": ["node_modules/**"],
   "compileOnSave": false
 }

@@ -2,7 +2,7 @@
 /** @type {import('@jest/types').Config.InitialOptions} */
 const config = {
   transform: {
-    '^.+\\.tsx?$': require.resolve('ts-jest'),
+    '^.+\\.tsx?$': require.resolve('ts-jest')
   },
   testEnvironment: 'node',
   verbose: true,
@@ -11,7 +11,7 @@ const config = {
   coverageDirectory: '<rootDir>/output/coverage-backend/',
   moduleFileExtensions: ['ts', 'js'],
   modulePaths: ['<rootDir>/src/', '<rootDir>/test/', '<rootDir>/node_modules/'],
-  testRegex: '.*\\.test.ts$',
+  testRegex: '.*\\.test.ts$'
 };
 
 module.exports = config;
