@@ -28,12 +28,14 @@
   },
   "dependencies": {
     "bluebird": "3.7.2",
+    "chalk": "4.1.0",
     "debug": "4.1.1",
     "got": "11.3.0",
     "js-yaml": "3.14.0",
     "lodash": "4.17.15",
     "minimatch": "3.0.4",
-    "toposort": "2.0.2"
+    "toposort": "2.0.2",
+    "yargs": "15.3.1"
   },
   "devDependencies": {
     "@commitlint/cli": "9.0.1",
