@@ -18,10 +18,14 @@ function git(...args: string[]): Promise<string> {
   });
 }
 
-export function mergeBase(...commits: string[]): Promise<string> {
-  return git('merge-base', ...commits);
+export function mergeBase(...args: string[]): Promise<string> {
+  return git('merge-base', ...args).then((v) => v.trim());
 }
 
-export function diff(...commits: string[]): Promise<string[]> {
-  return git('diff', '--name-only', ...commits).then((names) => names.split('\n').filter((v) => v));
+export function diff(...args: string[]): Promise<string[]> {
+  return git('diff', '--name-only', ...args).then((names) => names.split('\n').filter((v) => v));
+}
+
+export function revParse(...args: string[]): Promise<string> {
+  return git('rev-parse', ...args).then((v) => v.trim());
 }

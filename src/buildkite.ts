@@ -23,10 +23,26 @@ export interface BuildkiteBuild {
   commit: string;
 }
 
+const required = [
+  'BUILDKITE_BRANCH',
+  'BUILDKITE_COMMIT',
+  'BUILDKITE_ORGANIZATION_SLUG',
+  'BUILDKITE_PIPELINE_DEFAULT_BRANCH',
+  'BUILDKITE_PIPELINE_SLUG',
+  'BUILDKITE_SOURCE',
+  'BUILDKITE_API_ACCESS_TOKEN',
+];
+
 export function getBuildkiteInfo(e: NodeJS.ProcessEnv = process.env): BuildkiteInfo {
-  if (typeof e !== 'object' || !e.BUILDKITE_COMMIT) {
-    throw new Error('Expected to find BUILDKITE_COMMIT env var');
+  if (typeof e !== 'object') {
+    throw new Error('Invalid configuration source object');
   }
+
+  required.forEach((req) => {
+    if (!e[req]) {
+      throw new Error(`Expected to find ${req} env var`);
+    }
+  });
 
   return {
     branch: e.BUILDKITE_BRANCH,

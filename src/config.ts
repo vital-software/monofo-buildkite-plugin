@@ -24,10 +24,10 @@ export interface Config extends ConfigFile {
     expects: string[];
     produces: string[];
     matches: string[];
-    excluded_steps: { [key: string]: any }[];
+    excluded_steps: Record<string, unknown>[];
   };
-  steps: { [key: string]: any }[];
-  env: { [key: string]: any };
+  steps: Record<string, unknown>[];
+  env: Record<string, string>;
 }
 
 /**

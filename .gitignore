@@ -1,5 +1,7 @@
 node_modules/
 build/
 *.log
+/.log*
 logs
 docker-compose.*override.yml
+.idea/

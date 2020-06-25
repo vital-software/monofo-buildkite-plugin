@@ -32,8 +32,8 @@ function toMerge({ name, changes, env, steps, monorepo }: ConfigWithChanges): Pi
 }
 
 export function mergePipelines(results: ConfigWithChanges[]): Pipeline {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return _.mergeWith(EMPTY_PIPELINE, ...results.map(toMerge), (dst: any, src: any) =>
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  return _.mergeWith(EMPTY_PIPELINE, ...results.map(toMerge), (dst: unknown, src: unknown) =>
     _.isArray(dst) ? dst.concat(src) : undefined
   );
 }
