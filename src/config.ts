@@ -9,25 +9,18 @@ const log = debug('monofo:config');
 
 const CONFIG_REL_PATH = '.buildkite/';
 const PIPELINE_FILE = /^pipeline\.(?<name>.*)\.yml$/;
+const BUILDKITE_REQUIRED_ENV = [
+  'BUILDKITE_BRANCH',
+  'BUILDKITE_COMMIT',
+  'BUILDKITE_ORGANIZATION_SLUG',
+  'BUILDKITE_PIPELINE_DEFAULT_BRANCH',
+  'BUILDKITE_PIPELINE_SLUG',
+  'BUILDKITE_SOURCE',
+  'BUILDKITE_API_ACCESS_TOKEN',
+];
 
 function thrw<T>(e: Error): T {
   throw e;
-}
-
-interface ConfigFile {
-  path: string;
-}
-
-export interface Config extends ConfigFile {
-  name: string;
-  monorepo: {
-    expects: string[];
-    produces: string[];
-    matches: string[];
-    excluded_steps: Record<string, unknown>[];
-  };
-  steps: Record<string, unknown>[];
-  env: Record<string, string>;
 }
 
 /**
@@ -132,4 +125,26 @@ export default async function getConfigs(): Promise<Config[]> {
   return getConfigFiles(configDir)
     .then((configs) => Promise.all(configs.map(readConfig)))
     .then((configs) => sort(configs.filter(isConfig)));
+}
+
+export function getBuildkiteInfo(e: NodeJS.ProcessEnv = process.env): BuildkiteEnvironment {
+  if (typeof e !== 'object') {
+    throw new Error('Invalid configuration source object');
+  }
+
+  BUILDKITE_REQUIRED_ENV.forEach((req) => {
+    if (!e[req]) {
+      throw new Error(`Expected to find ${req} env var`);
+    }
+  });
+
+  return {
+    // We probably actually want the Github default branch, but close enough:
+    defaultBranch: e.BUILDKITE_PIPELINE_DEFAULT_BRANCH,
+    org: e.BUILDKITE_ORGANIZATION_SLUG,
+    pipeline: e.BUILDKITE_PIPELINE_SLUG,
+    branch: e.BUILDKITE_BRANCH,
+    commit: e.BUILDKITE_COMMIT,
+    source: e.BUILDKITE_SOURCE,
+  };
 }

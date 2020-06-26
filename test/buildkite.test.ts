@@ -1,18 +1,18 @@
 import nock from 'nock';
 import { URL } from 'url';
-import { getLastSuccessfulBuildCommit } from '../src/buildkite';
+import { buildsUrl, getLastSuccessfulBuild } from '../src/buildkite';
 import { fakeBuildkiteBuildsListing, fakeBuildkiteInfo, COMMIT } from './fixtures';
 
 describe('getLastSuccessfulBuildCommit', () => {
   it('returns the commit of a successful build', () => {
     const fake = fakeBuildkiteInfo();
-    const url = new URL(fake.buildsUrl);
+    const url = new URL(buildsUrl(fake));
 
     nock(url.origin)
       .get(`${url.pathname}${url.search}`)
       .reply(200, JSON.stringify(fakeBuildkiteBuildsListing()))
       .matchHeader('accept', 'application/json');
 
-    return expect(getLastSuccessfulBuildCommit(fake)).resolves.toBe(COMMIT);
+    return expect(getLastSuccessfulBuild(fake)).resolves.toHaveProperty('commit', COMMIT);
   });
 });
