@@ -1,23 +1,20 @@
 import { mocked } from 'ts-jest/utils';
 import path from 'path';
 import { getBaseBuild, matchConfigs } from '../src/diff';
-import { COMMIT, fakeBuildkiteBuild, fakeProcess } from './fixtures';
+import { COMMIT, fakeProcess } from './fixtures';
 import { mergeBase } from '../src/git';
 import getConfigs, { getBuildkiteInfo } from '../src/config';
-import { lookBackwardForSuccessfulBuild } from '../src/buildkite';
 
 jest.mock('../src/git');
 jest.mock('../src/buildkite');
 
 const mockMergeBase = mocked(mergeBase, true);
-const mockLookBackwardForSuccessfulBuild = mocked(lookBackwardForSuccessfulBuild, true);
 
 describe('getBaseBuild', () => {
   it('returns the merge base on a non-default branch', async () => {
     process.env = fakeProcess();
     process.env.BUILDKITE_BRANCH = 'foo';
     mockMergeBase.mockImplementation(() => Promise.resolve('foo'));
-    mockLookBackwardForSuccessfulBuild.mockImplementation(() => Promise.resolve(fakeBuildkiteBuild()));
 
     const build = await getBaseBuild(getBuildkiteInfo());
     expect(build.commit).toBe(COMMIT);

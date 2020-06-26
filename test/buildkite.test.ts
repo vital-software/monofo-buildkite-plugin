@@ -1,18 +1,23 @@
 import nock from 'nock';
-import { URL } from 'url';
-import { buildsUrl, getLastSuccessfulBuild } from '../src/buildkite';
+import BuildkiteClient, { GetBuildsOptions } from '../src/buildkite';
 import { fakeBuildkiteBuildsListing, fakeBuildkiteInfo, COMMIT } from './fixtures';
 
-describe('getLastSuccessfulBuildCommit', () => {
-  it('returns the commit of a successful build', () => {
-    const fake = fakeBuildkiteInfo();
-    const url = new URL(buildsUrl(fake));
+describe('BuildkiteClient', () => {
+  describe('getLastSuccessfulBuild()', () => {
+    it('returns the last successful build', () => {
+      const fake = fakeBuildkiteInfo();
+      const client = new BuildkiteClient(fake);
+      const opts: GetBuildsOptions = { state: 'passed' };
+      const url = client.urlGetBuilds(opts);
 
-    nock(url.origin)
-      .get(`${url.pathname}${url.search}`)
-      .reply(200, JSON.stringify(fakeBuildkiteBuildsListing()))
-      .matchHeader('accept', 'application/json');
+      nock(url.origin)
+        .get(`${url.pathname}${url.search}`)
+        .reply(200, JSON.stringify(fakeBuildkiteBuildsListing()))
+        .matchHeader('accept', 'application/json');
 
-    return expect(getLastSuccessfulBuild(fake)).resolves.toHaveProperty('commit', COMMIT);
+      return expect(client.getBuilds(opts)).resolves.toEqual(
+        expect.arrayContaining([expect.objectContaining({ commit: COMMIT })])
+      );
+    });
   });
 });

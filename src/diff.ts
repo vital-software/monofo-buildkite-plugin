@@ -1,18 +1,48 @@
 import minimatch from 'minimatch';
 import debug from 'debug';
-import { getLastSuccessfulBuild, lookBackwardForSuccessfulBuild } from './buildkite';
-import { mergeBase, revParse } from './git';
-import { getBuildkiteInfo } from './config';
+import _ from 'lodash';
+import { mergeBase } from './git';
+import BuildkiteClient from './buildkite';
 
 const log = debug('monofo:diff');
+
+async function getSuitableDefaultBranchBuildsAtOrBeforeCommit(
+  info: BuildkiteEnvironment,
+  commit: string
+): Promise<BuildkiteBuild> {
+  const client = new BuildkiteClient(info);
+
+  const b = await client.getBuilds({ branch: info.defaultBranch, state: 'passed', per_page: 100 });
+
+  return client
+    .getBuilds({ state: 'passed', branch: info.defaultBranch })
+    .then((builds) => {
+      if (!_.isArray(builds) || builds.length < 1) {
+        throw new Error('Could not find any matching successful builds');
+      } else {
+        const [build] = builds;
+        log(`Found successful build for ${info.branch}: ${build.web_url} @ ${build.commit}`);
+        return build;
+      }
+    })
+    .catch((e) => {
+      log(
+        `Failed to find successful build for default branch (${info.branch}) via Buildkite API, will use fallback mode`,
+        e
+      );
+      throw e;
+    });
+}
 
 /**
  * If we are on the main branch, we look for the previous successful build of it
  */
-function getBaseBuildForDefaultBranch(bk: BuildkiteEnvironment): Promise<BuildkiteBuild> {
-  return getLastSuccessfulBuild(bk).catch((e) => {
+async function getBaseBuildForDefaultBranch(info: BuildkiteEnvironment): Promise<BuildkiteBuild> {
+  const client = new BuildkiteClient(info);
+
+  return getSuitableDefaultBranchBuildsAtOrBeforeCommit(info, info.commit).catch((e) => {
     log(
-      `Failed to find successful build for default branch (${bk.branch}) via Buildkite API, will use fallback mode`,
+      `Failed to find successful build for default branch (${info.branch}) via Buildkite API, will use fallback mode`,
       e
     );
     throw e;
@@ -20,13 +50,14 @@ function getBaseBuildForDefaultBranch(bk: BuildkiteEnvironment): Promise<Buildki
 }
 
 /**
- * If we are on a feature branch, we just diff against the merge-base of the current commit and the main branch
+ * If we are on a feature branch, we just diff against the merge-base of the current commit and the main branch, and then find a successful build at or before
+ * that commit.
  */
-function getBaseBuildForFeatureBranch(bk: BuildkiteEnvironment): Promise<BuildkiteBuild> {
-  return mergeBase(`origin/${bk.defaultBranch}`, bk.commit).then((commit) =>
-    lookBackwardForSuccessfulBuild(bk, commit).catch((e) => {
+function getBaseBuildForFeatureBranch(info: BuildkiteEnvironment): Promise<BuildkiteBuild> {
+  return mergeBase(`origin/${info.defaultBranch}`, info.commit).then((commit) =>
+    getSuitableDefaultBranchBuildsAtOrBeforeCommit(info, commit).catch((e) => {
       log(
-        `Failed to find successful build for merge base (${commit}) of feature branch (${bk.branch}) via Buildkite API, will use fallback mode`,
+        `Failed to find successful build for merge base (${commit}) of feature branch (${info.branch}) via Buildkite API, will use fallback mode`,
         e
       );
       throw e;
@@ -40,8 +71,8 @@ function getBaseBuildForFeatureBranch(bk: BuildkiteEnvironment): Promise<Buildki
  * When resolved, will always be a commit on the main branch. It will also be a commit with a succeessful build (so we
  * can snarf artifacts)
  */
-export async function getBaseBuild(bk: BuildkiteEnvironment): Promise<BuildkiteBuild> {
-  return bk.branch === bk.defaultBranch ? getBaseBuildForDefaultBranch(bk) : getBaseBuildForFeatureBranch(bk);
+export async function getBaseBuild(info: BuildkiteEnvironment): Promise<BuildkiteBuild> {
+  return info.branch === info.defaultBranch ? getBaseBuildForDefaultBranch(info) : getBaseBuildForFeatureBranch(info);
 }
 
 /**

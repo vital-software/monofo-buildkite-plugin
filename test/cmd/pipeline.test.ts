@@ -1,17 +1,5 @@
 /* eslint-disable import/first,import/order */
-import { fakeBuildkiteBuildsListing, fakeProcess } from '../fixtures';
-
-// doMock so it doesn't get hoisted to the top of the file
-jest.doMock('../../src/buildkite', () => {
-  const actual: Record<string, unknown> = jest.requireActual('../../src/buildkite');
-  return {
-    __esModule: true,
-    ...actual,
-    // Can't use COMMIT variable because of hoisting-to-top-of-file behavior
-    getLastSuccessfulBuild: jest.fn().mockReturnValue(Promise.resolve(fakeBuildkiteBuildsListing()[0])),
-  };
-});
-
+import { fakeProcess } from '../fixtures';
 import path from 'path';
 import { Arguments } from 'yargs';
 import { safeLoad } from 'js-yaml';
@@ -21,6 +9,7 @@ import { Pipeline } from '../../src/pipeline';
 import execSync from './exec';
 
 jest.mock('../../src/git');
+jest.mock('../../src/buildkite');
 
 const mockMergeBase = mergeBase as jest.Mock<Promise<string>>;
 mockMergeBase.mockImplementation(() => Promise.resolve('foo'));

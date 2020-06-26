@@ -1,58 +1,55 @@
-import _ from 'lodash';
 import got from 'got';
 import debug from 'debug';
 import { URL } from 'url';
 
-const log = debug('monofo:buildkite');
+const log = debug('monofo:buildkite:client');
 
-export function buildsUrl(bk: BuildkiteEnvironment): string {
-  const url = new URL(`/organizations/${bk.org}/pipelines/${bk.pipeline}/builds`, 'https://api.buildkite.com/');
-  url.search = `?state=passed&branch=${encodeURIComponent(bk.branch)}`;
-  return url.toString();
+interface PaginationOptions {
+  page?: number;
+  per_page?: number;
 }
 
-/**
- * Get the commit of the last successful build of the current branch
- *
- * @todo last should be defined by commit topology, not when the build was triggered
- */
-export function getLastSuccessfulBuild(info: BuildkiteEnvironment): Promise<BuildkiteBuild> {
-  return got(buildsUrl(info), {
-    headers: {
-      Authorization: `Bearer ${process.env.BUILDKITE_API_ACCESS_TOKEN}`,
-      Accept: 'application/json',
-    },
-  })
-    .json<BuildkiteBuild[]>()
-    .then((builds) => {
-      if (!_.isArray(builds) || builds.length < 1) {
-        throw new Error('Could not find any matching successful builds');
-      } else {
-        const [build] = builds;
-        log(`Found successful build for ${info.branch}: ${build.web_url} @ ${build.commit}`);
-        return build;
-      }
+export interface GetBuildsOptions extends PaginationOptions {
+  state?: string;
+  branch?: string;
+}
+
+export default class BuildkiteClient {
+  constructor(
+    private readonly info: BuildkiteEnvironment,
+    private readonly accessToken: string = process.env.BUILDKITE_API_ACCESS_TOKEN
+  ) {}
+
+  private baseUrl = new URL(
+    `https://api.buildkite.com/v2/organizations/${this.info.org}/pipelines/${this.info.pipeline}`
+  );
+
+  private async request<T>(url: URL): Promise<T> {
+    return got(url.toString(), {
+      headers: {
+        Authorization: `Bearer ${this.accessToken}`,
+        Accept: 'application/json',
+      },
+    }).json<T>();
+  }
+
+  getBuilds(options: GetBuildsOptions = {}): Promise<BuildkiteBuild[]> {
+    return this.request<BuildkiteBuild[]>(this.urlGetBuilds(options));
+  }
+
+  /**
+   * URLs are public so we can nock them
+   */
+  urlGetBuilds(options: GetBuildsOptions = {}): URL {
+    const u = new URL(this.baseUrl.href);
+
+    u.pathname += '/foo';
+    u.searchParams.append('branch', options.branch || this.info.branch);
+
+    Object.entries(options).forEach(([name, value]) => {
+      u.searchParams.append(name, value);
     });
-}
 
-export function lookBackwardForSuccessfulBuild(
-  info: BuildkiteEnvironment,
-  beforeCommit: string
-): Promise<BuildkiteBuild> {
-  return Promise.reject(new Error('Unimplemented backward lookup for successful build'));
-}
-
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace NodeJS {
-    interface ProcessEnv {
-      BUILDKITE_BRANCH: string;
-      BUILDKITE_COMMIT: string;
-      BUILDKITE_ORGANIZATION_SLUG: string;
-      BUILDKITE_PIPELINE_DEFAULT_BRANCH: string;
-      BUILDKITE_PIPELINE_SLUG: string;
-      BUILDKITE_SOURCE: string;
-      BUILDKITE_API_ACCESS_TOKEN: string;
-    }
+    return u;
   }
 }
