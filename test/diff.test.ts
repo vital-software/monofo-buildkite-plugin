@@ -1,23 +1,26 @@
 import { mocked } from 'ts-jest/utils';
 import path from 'path';
-import { getBaseCommit, matchConfigs } from '../src/diff';
-import { fakeProcess } from './fixtures';
-import { revParse } from '../src/git';
-import getConfigs from '../src/config';
+import { getBaseBuild, matchConfigs } from '../src/diff';
+import { COMMIT, fakeBuildkiteBuild, fakeProcess } from './fixtures';
+import { mergeBase } from '../src/git';
+import getConfigs, { getBuildkiteInfo } from '../src/config';
+import { lookBackwardForSuccessfulBuild } from '../src/buildkite';
 
 jest.mock('../src/git');
+jest.mock('../src/buildkite');
 
-// const mockMergeBase = mocked(mergeBase, true);
-const mockRevParse = mocked(revParse, true);
+const mockMergeBase = mocked(mergeBase, true);
+const mockLookBackwardForSuccessfulBuild = mocked(lookBackwardForSuccessfulBuild, true);
 
-describe('getBaseCommit', () => {
+describe('getBaseBuild', () => {
   it('returns the merge base on a non-default branch', async () => {
     process.env = fakeProcess();
-    // mockMergeBase.mockImplementation(() => Promise.resolve('foo'));
-    mockRevParse.mockImplementation(() => Promise.resolve('aklwdmklawmkl'));
+    process.env.BUILDKITE_BRANCH = 'foo';
+    mockMergeBase.mockImplementation(() => Promise.resolve('foo'));
+    mockLookBackwardForSuccessfulBuild.mockImplementation(() => Promise.resolve(fakeBuildkiteBuild()));
 
-    const commit = await getBaseCommit();
-    expect(commit).toBe('aklwdmklawmkl');
+    const build = await getBaseBuild(getBuildkiteInfo());
+    expect(build.commit).toBe(COMMIT);
   });
 });
 
@@ -29,7 +32,7 @@ describe('matchConfigs', () => {
   it('matches changed files against configs', async () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, 'projects/simple'));
-    const result = matchConfigs(await getConfigs(), ['foo/abc.js', 'foo/README.md', 'bar/abc.ts', 'baz/abc.ts']);
+    const result = matchConfigs('foo', await getConfigs(), ['foo/abc.js', 'foo/README.md', 'bar/abc.ts', 'baz/abc.ts']);
 
     expect(result[0].changes).toStrictEqual(['foo/README.md']);
     expect(result[1].changes).toStrictEqual([]);

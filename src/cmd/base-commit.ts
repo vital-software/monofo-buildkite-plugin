@@ -1,5 +1,6 @@
 import { CommandModule } from 'yargs';
-import { getBaseCommit } from '../diff';
+import { getBaseBuild } from '../diff';
+import { getBuildkiteInfo } from '../config';
 
 const cmd: CommandModule = {
   command: 'base-commit',
@@ -8,10 +9,15 @@ const cmd: CommandModule = {
   builder: {},
 
   handler(): Promise<string> {
-    return getBaseCommit().then((v) => {
-      process.stdout.write(`${v}\n`);
-      return v;
-    });
+    return getBaseBuild(getBuildkiteInfo(process.env))
+      .then((b) => {
+        process.stdout.write(`${b.commit}\n`);
+        return b.commit;
+      })
+      .catch((e: Error) => {
+        process.stderr.write(`${e.message}\n`);
+        return Promise.reject(e);
+      });
   },
 };
 

@@ -1,27 +1,47 @@
 import minimatch from 'minimatch';
 import debug from 'debug';
-import { Config } from './config';
-import { getBuildkiteInfo, getLastSuccessfulBuildCommit } from './buildkite';
+import { getLastSuccessfulBuild, lookBackwardForSuccessfulBuild } from './buildkite';
 import { mergeBase, revParse } from './git';
+import { getBuildkiteInfo } from './config';
 
 const log = debug('monofo:diff');
 
-export interface ConfigWithChanges extends Config {
-  changes: string[];
+/**
+ * If we are on the main branch, we look for the previous successful build of it
+ */
+function getBaseBuildForDefaultBranch(bk: BuildkiteEnvironment): Promise<BuildkiteBuild> {
+  return getLastSuccessfulBuild(bk).catch((e) => {
+    log(
+      `Failed to find successful build for default branch (${bk.branch}) via Buildkite API, will use fallback mode`,
+      e
+    );
+    throw e;
+  });
 }
 
-export async function getBaseCommit(): Promise<string> {
-  const bk = getBuildkiteInfo(process.env);
+/**
+ * If we are on a feature branch, we just diff against the merge-base of the current commit and the main branch
+ */
+function getBaseBuildForFeatureBranch(bk: BuildkiteEnvironment): Promise<BuildkiteBuild> {
+  return mergeBase(`origin/${bk.defaultBranch}`, bk.commit).then((commit) =>
+    lookBackwardForSuccessfulBuild(bk, commit).catch((e) => {
+      log(
+        `Failed to find successful build for merge base (${commit}) of feature branch (${bk.branch}) via Buildkite API, will use fallback mode`,
+        e
+      );
+      throw e;
+    })
+  );
+}
 
-  if (bk.branch === bk.defaultBranch) {
-    // We are on the main branch, and should look for the previous successful build of it
-    return getLastSuccessfulBuildCommit(bk).catch((e) => {
-      log(`Failed to find base commit for ${bk.branch} via Buildkite API, falling back to HEAD~1`, e);
-      return revParse('HEAD~1');
-    });
-  }
-  // We are on a feature branch, and should just diff against the merge-base of the current commit and the main branch
-  return mergeBase(`origin/${bk.defaultBranch}`, bk.commit);
+/**
+ * The base commit is the commit used to compare a build with
+ *
+ * When resolved, will always be a commit on the main branch. It will also be a commit with a succeessful build (so we
+ * can snarf artifacts)
+ */
+export async function getBaseBuild(bk: BuildkiteEnvironment): Promise<BuildkiteBuild> {
+  return bk.branch === bk.defaultBranch ? getBaseBuildForDefaultBranch(bk) : getBaseBuildForFeatureBranch(bk);
 }
 
 /**
@@ -40,8 +60,8 @@ function matchingChanges(matchList: string[], changedFiles: string[]): string[] 
   );
 }
 
-export function matchConfigs(configs: Config[], changedFiles: string[]): ConfigWithChanges[] {
+export function matchConfigs(buildId: string, configs: Config[], changedFiles: string[]): DecoratedConfig[] {
   return configs.map((config) => {
-    return { ...config, changes: matchingChanges(config.monorepo.matches, changedFiles) };
+    return { ...config, buildId, changes: matchingChanges(config.monorepo.matches, changedFiles) };
   });
 }

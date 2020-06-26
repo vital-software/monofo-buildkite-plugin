@@ -1,7 +1,20 @@
+/* eslint-disable import/first,import/order */
+import { fakeBuildkiteBuildsListing, fakeProcess } from '../fixtures';
+
+// doMock so it doesn't get hoisted to the top of the file
+jest.doMock('../../src/buildkite', () => {
+  const actual: Record<string, unknown> = jest.requireActual('../../src/buildkite');
+  return {
+    __esModule: true,
+    ...actual,
+    // Can't use COMMIT variable because of hoisting-to-top-of-file behavior
+    getLastSuccessfulBuild: jest.fn().mockReturnValue(Promise.resolve(fakeBuildkiteBuildsListing()[0])),
+  };
+});
+
 import path from 'path';
 import { Arguments } from 'yargs';
 import { safeLoad } from 'js-yaml';
-import { fakeProcess } from '../fixtures';
 import { mergeBase, diff } from '../../src/git';
 import * as pipeline from '../../src/cmd/pipeline';
 import { Pipeline } from '../../src/pipeline';
@@ -31,7 +44,7 @@ describe('monofo pipeline', () => {
     return expect(out).rejects.toThrowError('No pipeline files');
   });
 
-  it('can be executed with simple configuration', async () => {
+  it('can be executed with simple configuration on the default branch', async () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, '../projects/simple'));
 
