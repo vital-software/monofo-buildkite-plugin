@@ -1,3 +1,11 @@
+# [0.2.0](https://github.com/dominics/monofo/compare/v0.1.2...v0.2.0) (2020-06-28)
+
+
+### Features
+
+* added yargs CLI interface and some subcommands ([788ae73](https://github.com/dominics/monofo/commit/788ae7313fee03d5d1469c2502e5598f49c219c0))
+* move to separate API client for buildkite ([d257735](https://github.com/dominics/monofo/commit/d257735f9355ab525c11db2ae398586008f17320))
+
 ## [0.1.2](https://github.com/dominics/monofo/compare/v0.1.1...v0.1.2) (2020-06-24)
 
 
