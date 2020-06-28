@@ -11,7 +11,8 @@ const config = {
   coverageDirectory: '<rootDir>/output/coverage-backend/',
   moduleFileExtensions: ['ts', 'js'],
   modulePaths: ['<rootDir>/src/', '<rootDir>/test/', '<rootDir>/node_modules/'],
-  testRegex: '.*\\.test.ts$'
+  testRegex: '.*\\.test.ts$',
+  roots: ["<rootDir>/src", "<rootDir>/test"],
 };
 
 module.exports = config;
