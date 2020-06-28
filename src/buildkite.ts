@@ -41,15 +41,16 @@ export default class BuildkiteClient {
    * URLs are public so we can nock them
    */
   urlGetBuilds(options: GetBuildsOptions = {}): URL {
-    const u = new URL(this.baseUrl.href);
+    const url = new URL(this.baseUrl.href);
 
-    u.pathname += '/foo';
-    u.searchParams.append('branch', options.branch || this.info.branch);
+    url.pathname += '/builds';
 
-    Object.entries(options).forEach(([name, value]) => {
-      u.searchParams.append(name, value);
+    Object.entries({ branch: this.info.branch || options.branch, ...options }).forEach(([name, val]) => {
+      if (typeof val !== 'undefined') {
+        url.searchParams.append(name, String(val));
+      }
     });
 
-    return u;
+    return url;
   }
 }
