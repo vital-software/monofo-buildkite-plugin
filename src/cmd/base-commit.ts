@@ -4,7 +4,6 @@ import { getBuildkiteInfo } from '../config';
 
 const cmd: CommandModule = {
   command: 'base-commit',
-  aliases: ['bc'],
   describe: 'Output a base commit hash, from which the current build should be compared',
   builder: {},
 

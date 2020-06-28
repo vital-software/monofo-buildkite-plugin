@@ -5,13 +5,10 @@
 //   - find a job corresponding to the lastest
 
 import { CommandModule } from 'yargs';
-import { getBaseBuild } from '../diff';
-import { getBuildkiteInfo } from '../config';
 
 const cmd: CommandModule = {
-  command: 'artifact ',
-  aliases: ['bc'],
-  describe: 'Output a base commit hash, from which the current build should be compared',
+  command: 'artifact',
+  describe: 'Inject an artifact into the current build',
   builder: (yargs) => {
     return yargs.string('build-id');
   },

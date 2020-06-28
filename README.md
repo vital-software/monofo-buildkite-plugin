@@ -59,9 +59,9 @@ yarn global add monofo && monofo pipeline | buildkite-agent pipeline upload
 yarn run monofo pipeline
 ```
 
-### Configuration
+## Configuration
 
-#### Buildkite API Access Token
+### Buildkite API Access Token
 
 When calculating the commit to diff against, monofo uses Buildkite API to look
 up the last successful build of the current branch. To do so, monofo needs a
@@ -71,6 +71,23 @@ secrets.
 
 The token only needs the `read_builds` scope. We need an _API_ token, not an
 _agent_ token.
+
+## CLI
+
+```
+$ monofo --help
+ Monofo provides utilities for dynamically generating monorepo pipelines
+
+ Commands:
+   monofo.js artifact     Inject an artifact into the current build
+   monofo.js base-commit  Output a base commit hash, from which the current build
+                          should be compared
+   monofo.js pipeline     Output a merged pipeline.yml                  [default]
+
+ Options:
+   --version  Show version number                                       [boolean]
+   --help     Show help                                                 [boolean]
+```
 
 ## Development
 
