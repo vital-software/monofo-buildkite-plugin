@@ -1,4 +1,4 @@
-src
+src/
 tsconfig.json
 .eslintrc.js
 .circleci
@@ -9,6 +9,7 @@ tsconfig.json
 .vscode
 build/docs
 build/test
+__mocks__
 **/*.spec.*
 **/*.test.*
 test/
@@ -21,3 +22,6 @@ coverage
 scripts
 Dockerfile
 docker-compose.*.yml
+docker-compose.yml
+.log*
+.eslintignore
