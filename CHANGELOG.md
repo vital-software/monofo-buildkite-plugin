@@ -1,3 +1,10 @@
+## [0.3.1](https://github.com/dominics/monofo/compare/v0.3.0...v0.3.1) (2020-06-29)
+
+
+### Bug Fixes
+
+* actually package built code ([0a71d5f](https://github.com/dominics/monofo/commit/0a71d5f694a90270836d27a60c65eb23666460f0))
+
 # [0.3.0](https://github.com/dominics/monofo/compare/v0.2.0...v0.3.0) (2020-06-29)
 
 
