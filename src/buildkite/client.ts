@@ -14,6 +14,8 @@ export interface GetBuildsOptions extends PaginationOptions {
   branch?: string;
 }
 
+export type ListArtifactsOptions = PaginationOptions;
+
 export default class BuildkiteClient {
   constructor(
     private readonly info: BuildkiteEnvironment,

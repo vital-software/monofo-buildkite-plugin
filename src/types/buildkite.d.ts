@@ -19,3 +19,15 @@ interface BuildkiteBuild {
   commit: string;
   [others: string]: unknown;
 }
+
+interface Step {
+  depends_on?: string | string[];
+  key?: string;
+  label?: string;
+  plugins?: Record<string, unknown>[];
+  [others: string]: unknown;
+}
+
+interface CommandStep extends Step {
+  command: string;
+}

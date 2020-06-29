@@ -13,5 +13,14 @@ env:
   BAR: some-value
 
 steps:
-  - command: echo "bar1"
-  - command: echo "bar2"
+  - command: 'echo "bar1" | tee bar1'
+    plugins:
+      - artifacts#v1.3.0:
+          download: foo1
+          upload: bar1
+
+  - command: 'echo "bar2" | tee bar2'
+    plugins:
+      - artifacts#v1.3.0:
+          download: foo1
+          upload: bar2

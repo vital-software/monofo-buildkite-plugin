@@ -160,6 +160,7 @@ declare global {
       BUILDKITE_PIPELINE_SLUG: string;
       BUILDKITE_SOURCE: string;
       BUILDKITE_API_ACCESS_TOKEN: string;
+      PIPELINE_RUN_ALL?: string;
     }
   }
 }

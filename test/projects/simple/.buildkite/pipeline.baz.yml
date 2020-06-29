@@ -2,6 +2,7 @@ monorepo:
   expects:
     - foo1
     - bar2
+    - qux1
   produces:
     - baz1
   matches: baz/**
@@ -11,3 +12,9 @@ env:
 
 steps:
   - command: echo "baz1"
+    plugins:
+      - artifacts#v1.3.0:
+          download: [foo1, bar2]
+          upload:
+            - from: baz/baz1
+              to: baz1

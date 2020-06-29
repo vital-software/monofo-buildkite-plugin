@@ -13,15 +13,32 @@ const EMPTY_PIPELINE: Pipeline = { env: {}, steps: [] };
 const s = (n: number): string => (n === 1 ? '' : 's');
 const count = (arr: Array<unknown>, name: string): string => `${arr.length} ${name}${s(arr.length)}`;
 
-function replaceExcludedSteps(config: DecoratedConfig): Record<string, unknown>[] {
-  // TODO: autogenerate artifact replacement steps instead
-  return config.monorepo.excluded_steps;
+/**
+ * Normally, this subcomponent would produce artifacts: config.produces, but now that it has been excluded, we want to
+ * replace it with a call to our artifacts utility, which will retrieve them from a previous build.
+ */
+function replacementForExcludedSteps(config: Required<DecoratedConfig>): Record<string, unknown>[] {
+  return config.monorepo.excluded_steps.length > 0
+    ? config.monorepo.excluded_steps
+    : [
+        {
+          label: `Inject artifacts for ${config.name}`,
+          command: `monofo artifact --build-id=${config.buildId} ${config.monorepo.produces.join(' ')}`, // TODO: npx? yarn? $0?
+          plugins: [
+            {
+              'artifacts#v1.3.0': {
+                upload: config.monorepo.produces,
+              },
+            },
+          ],
+        } as CommandStep,
+      ];
 }
 
-function exclude(config: DecoratedConfig, reason: string): Pipeline {
+function exclude(config: Required<DecoratedConfig>, reason: string): Pipeline {
   const message = `${config.name} will be EXCLUDED because it has ${reason}.`;
   log(message);
-  return { env: config.env, steps: replaceExcludedSteps(config) };
+  return { env: config.env, steps: replacementForExcludedSteps(config) };
 }
 
 function include({ name, env, changes, steps }: DecoratedConfig, reason: string): Pipeline {
@@ -34,6 +51,11 @@ function include({ name, env, changes, steps }: DecoratedConfig, reason: string)
  * are merged in instead
  */
 function toMerge(config: DecoratedConfig): Pipeline {
+  if (process.env.PIPELINE_RUN_ALL) {
+    log('PIPELINE_RUN_ALL override in place, will include all pipeline parts');
+    return include(config, 'no previous successful build');
+  }
+
   if (!config.buildId) {
     log("Didn't find previous successful build, falling back to perform all parts of pipeline");
     return include(config, 'no previous successful build');
@@ -41,7 +63,7 @@ function toMerge(config: DecoratedConfig): Pipeline {
 
   // At this point, we know it has a config.buildId we can grab artifacts from
   if (config.changes.length <= 0) {
-    return exclude(config, 'no matching changes');
+    return exclude(config as Required<DecoratedConfig>, 'no matching changes');
   }
 
   return include(config, `${count(config.changes, 'matching change')}: ${config.changes.join(', ')}`);

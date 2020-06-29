@@ -1,15 +1,14 @@
-/* eslint-disable import/first,import/order */
-import { fakeProcess } from '../fixtures';
 import path from 'path';
 import { Arguments } from 'yargs';
 import { safeLoad } from 'js-yaml';
+import { fakeProcess } from '../fixtures';
 import { mergeBase, diff } from '../../src/git';
 import * as pipeline from '../../src/cmd/pipeline';
 import { Pipeline } from '../../src/pipeline';
 import execSync from './exec';
 
 jest.mock('../../src/git');
-jest.mock('../../src/buildkite');
+jest.mock('../../src/buildkite/client');
 
 const mockMergeBase = mergeBase as jest.Mock<Promise<string>>;
 mockMergeBase.mockImplementation(() => Promise.resolve('foo'));
@@ -42,7 +41,12 @@ describe('monofo pipeline', () => {
       .then((o) => (safeLoad(o) as unknown) as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
-        expect(p.steps.map((s) => s.command)).toStrictEqual(['echo "foo1"', "echo 'bar was replaced'", 'echo "baz1"']);
+        expect(p.steps.map((s) => s.command)).toStrictEqual([
+          'echo "foo1" > foo1',
+          "echo 'bar was replaced'",
+          'monofo artifact --build-id=f62a1b4d-10f9-4790-bc1c-e2c3a0c80983 qux1',
+          'echo "baz1"',
+        ]);
         expect(Object.entries(p.env)).toHaveLength(4); // merged from all files
       });
   });

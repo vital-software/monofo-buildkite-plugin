@@ -1,6 +1,6 @@
-// @todo This unfortunately can't live in test/__mocks__, see https://github.com/facebook/jest/issues/2726
+// @todo This unfortunately can't live in test/buildkite/__mocks__, see https://github.com/facebook/jest/issues/2726
 
-import { fakeBuildkiteBuildsListing } from '../../test/fixtures';
+import { fakeBuildkiteBuildsListing } from '../../../test/fixtures';
 
 export const mockGetBuilds = jest.fn().mockImplementation(() => Promise.resolve(fakeBuildkiteBuildsListing()));
 

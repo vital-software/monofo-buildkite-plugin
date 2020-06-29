@@ -16,5 +16,5 @@ interface Config extends ConfigFile {
 
 interface DecoratedConfig extends Config {
   changes: string[];
-  buildId: string | undefined;
+  buildId?: string;
 }

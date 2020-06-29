@@ -2,7 +2,7 @@ import minimatch from 'minimatch';
 import debug from 'debug';
 import _ from 'lodash';
 import { mergeBase } from './git';
-import BuildkiteClient from './buildkite';
+import BuildkiteClient from './buildkite/client';
 
 const log = debug('monofo:diff');
 

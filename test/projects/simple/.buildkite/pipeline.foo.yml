@@ -10,4 +10,7 @@ env:
   FOO2: another-value
 
 steps:
-  - command: echo "foo1"
+  - command: echo "foo1" > foo1
+    plugins:
+      - artifacts#v1.3.0:
+          upload: foo1

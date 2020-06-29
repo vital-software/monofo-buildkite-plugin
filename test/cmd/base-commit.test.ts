@@ -1,13 +1,12 @@
-/* eslint-disable import/first,import/order */
-import { fakeProcess, COMMIT } from '../fixtures';
 import path from 'path';
 import { Arguments } from 'yargs';
+import { fakeProcess, COMMIT } from '../fixtures';
 import { mergeBase, diff } from '../../src/git';
 import baseCommit from '../../src/cmd/base-commit';
 import execSync from './exec';
 
 jest.mock('../../src/git');
-jest.mock('../../src/buildkite');
+jest.mock('../../src/buildkite/client');
 
 const mockMergeBase = mergeBase as jest.Mock<Promise<string>>;
 mockMergeBase.mockImplementation(() => Promise.resolve(COMMIT));
@@ -18,10 +17,6 @@ mockDiff.mockImplementation(() => Promise.resolve(['foo/README.md', 'baz/abc.ts'
 describe('cmd base-commit', () => {
   beforeEach(() => {
     process.env = fakeProcess();
-  });
-
-  afterEach(() => {
-    delete require.cache[require.resolve('yargs')];
   });
 
   it('can output help information', async () => {

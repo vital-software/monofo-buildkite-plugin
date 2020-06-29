@@ -1,0 +1,15 @@
+monorepo:
+  expects:
+    - foo1
+  produces:
+    - qux1
+  matches: qux/no-match
+
+steps:
+  - command: echo "qux1"
+    plugins:
+      - artifacts#v1.3.0:
+          download: foo1
+          upload:
+            - from: qux/qux1
+              to: qux1

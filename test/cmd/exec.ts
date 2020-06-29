@@ -5,12 +5,17 @@ import yargs, { Arguments, CommandModule } from 'yargs';
  * yargsa or a similar library replaces it (yargs will call the parse callback long before an async command is
  * resolved: https://github.com/yargs/yargs/issues/1069)
  */
-export default async function execSync(command: CommandModule, args: string): Promise<string> {
+export default async function execSync<T = CommonArguments, U = unknown>(
+  command: CommandModule<T, U>,
+  args: string
+): Promise<string> {
   return new Promise((resolve) => {
     yargs
-      .command(command)
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      .command<U>(command)
       .help()
-      .parse(args, (err: Error | undefined, argv: Arguments<unknown>, output: string) => {
+      .parse(args, (err: Error | undefined, argv: Arguments<U>, output: string) => {
         resolve(output);
       });
   });

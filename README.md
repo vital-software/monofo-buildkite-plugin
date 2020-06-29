@@ -61,6 +61,11 @@ yarn run monofo pipeline
 
 ## Configuration
 
+### Escape Hatch: Disabling Monofo
+
+If you set the environment variable `PIPELINE_RUN_ALL` to any truthy value,
+all parts of the pipeline will be output; a good way to "force a full build".
+
 ### Buildkite API Access Token
 
 When calculating the commit to diff against, monofo uses Buildkite API to look

@@ -6,7 +6,7 @@ import { mergeBase } from '../src/git';
 import getConfigs, { getBuildkiteInfo } from '../src/config';
 
 jest.mock('../src/git');
-jest.mock('../src/buildkite');
+jest.mock('../src/buildkite/client');
 
 const mockMergeBase = mocked(mergeBase, true);
 
@@ -33,6 +33,7 @@ describe('matchConfigs', () => {
 
     expect(result[0].changes).toStrictEqual(['foo/README.md']);
     expect(result[1].changes).toStrictEqual([]);
-    expect(result[2].changes).toStrictEqual(['baz/abc.ts']);
+    expect(result[2].changes).toStrictEqual([]);
+    expect(result[3].changes).toStrictEqual(['baz/abc.ts']);
   });
 });
