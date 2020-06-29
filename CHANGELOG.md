@@ -1,3 +1,15 @@
+# [0.3.0](https://github.com/dominics/monofo/compare/v0.2.0...v0.3.0) (2020-06-29)
+
+
+### Bug Fixes
+
+* fix the url for getting builds ([e0fb7d4](https://github.com/dominics/monofo/commit/e0fb7d4dc89b879de49f87691f0e6fed4a67e0da))
+
+
+### Features
+
+* implement artifact command with exec ([beaca53](https://github.com/dominics/monofo/commit/beaca5380d310a4a514be7942cd2163dfda633d6))
+
 # [0.2.0](https://github.com/dominics/monofo/compare/v0.1.2...v0.2.0) (2020-06-28)
 
 
