@@ -6,10 +6,8 @@ import { AgentOutput, download } from '../buildkite/agent';
 const log = debug('monofo:cmd:artifact');
 
 function getTasks(artifact: string, additionalBuilds: string[] = []): (() => Promise<AgentOutput>)[] {
-  log(`Getting tasks to download artifact ${artifact} from current and ${additionalBuilds.join(', ')}`);
-  return [() => download(artifact, artifact)].concat(
-    additionalBuilds.map((b: string) => () => download(artifact, artifact, b))
-  );
+  log(`Getting tasks to download artifact ${artifact} from ${additionalBuilds.join(', ')}`);
+  return additionalBuilds.map((b: string) => () => download(artifact, artifact, b));
 }
 
 function downloadArtifact(artifact: string, additionalBuilds: string[] = []): Promise<void> {
@@ -33,8 +31,7 @@ const cmd: CommandModule<CommonArguments, ArtifactArguments> = {
           type: 'string',
           describe:
             'A build ID (UUID) to look within for the named artifacts. ' +
-            'May be specified multiple times, in which case the builds will be checked in order. ' +
-            '(The current build is always examined first.)',
+            'May be specified multiple times, in which case the builds will be checked in order.',
         },
       })
       .positional('artifacts', {

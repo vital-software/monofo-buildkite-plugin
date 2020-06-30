@@ -39,10 +39,7 @@ describe('cmd artifact', () => {
       }) as unknown) as Promise<void>
     ).rejects.toBeInstanceOf(Error);
 
-    expect(mockDownload).toHaveBeenCalledTimes(12);
-    expect(mockDownload).toHaveBeenCalledWith('foo', 'foo');
-    expect(mockDownload).toHaveBeenCalledWith('bar', 'bar');
-    expect(mockDownload).toHaveBeenCalledWith('baz', 'baz');
+    expect(mockDownload).toHaveBeenCalledTimes(9);
     expect(mockDownload).toHaveBeenCalledWith('foo', 'foo', 'abc');
     expect(mockDownload).toHaveBeenCalledWith('foo', 'foo', 'def');
     expect(mockDownload).toHaveBeenCalledWith('foo', 'foo', 'ghi');
