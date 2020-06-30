@@ -1,3 +1,15 @@
+# [0.5.0](https://github.com/dominics/monofo/compare/v0.4.0...v0.5.0) (2020-06-30)
+
+
+### Features
+
+* perform artifact injection once at top of build ([6655df5](https://github.com/dominics/monofo/commit/6655df583f239a3f859c9a80f4bed6d631748829))
+
+
+### Performance Improvements
+
+* don't check the current build in artifact stage, we already know they're missing ([7d29001](https://github.com/dominics/monofo/commit/7d290017316ab72ea7f35200125bcfc5c34bc6a1))
+
 # [0.4.0](https://github.com/dominics/monofo/compare/v0.3.1...v0.4.0) (2020-06-30)
 
 
