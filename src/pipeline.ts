@@ -40,7 +40,7 @@ function artifactInjection(configs: ConfigWithDecision[]): Pipeline {
         key: ARTIFACT_INJECTION_STEP_KEY,
         label: `Inject artifacts for skipped: ${names.join(', ')}`,
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        command: `${RUN_PREFIX}monofo artifact --build-id=${buildId} ${produces.join(' ')}`,
+        command: `${RUN_PREFIX}monofo artifact --build=${buildId} ${produces.join(' ')}`,
         plugins: [
           {
             'artifacts#v1.3.0': {
