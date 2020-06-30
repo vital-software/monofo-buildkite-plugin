@@ -27,6 +27,7 @@ export default class BuildkiteClient {
   );
 
   private async request<T>(url: URL): Promise<T> {
+    log(`Making request to ${url.toString()}`);
     return got(url.toString(), {
       headers: {
         Authorization: `Bearer ${this.accessToken}`,

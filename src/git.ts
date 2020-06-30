@@ -26,6 +26,6 @@ export function diff(...args: string[]): Promise<string[]> {
   return git('diff', '--name-only', ...args).then((names) => names.split('\n').filter((v) => v));
 }
 
-export function revParse(...args: string[]): Promise<string> {
-  return git('rev-parse', ...args).then((v) => v.trim());
+export function revList(...args: string[]): Promise<string[]> {
+  return git('rev-list', ...args).then((v) => v.trim().split('\n'));
 }

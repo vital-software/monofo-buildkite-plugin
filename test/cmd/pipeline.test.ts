@@ -1,8 +1,9 @@
 import path from 'path';
 import { Arguments } from 'yargs';
 import { safeLoad } from 'js-yaml';
-import { fakeProcess } from '../fixtures';
-import { mergeBase, diff } from '../../src/git';
+import { mocked } from 'ts-jest/utils';
+import { COMMIT, fakeProcess } from '../fixtures';
+import { mergeBase, diff, revList } from '../../src/git';
 import * as pipeline from '../../src/cmd/pipeline';
 import { Pipeline } from '../../src/pipeline';
 import execSync from './exec';
@@ -15,6 +16,9 @@ mockMergeBase.mockImplementation(() => Promise.resolve('foo'));
 
 const mockDiff = diff as jest.Mock<Promise<string[]>>;
 mockDiff.mockImplementation(() => Promise.resolve(['foo/README.md', 'baz/abc.ts']));
+
+const mockRevList = mocked(revList, true);
+mockRevList.mockImplementation(() => Promise.resolve([COMMIT]));
 
 describe('monofo pipeline', () => {
   it('returns help output', async () => {

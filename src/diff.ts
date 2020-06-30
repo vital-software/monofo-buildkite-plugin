@@ -1,36 +1,49 @@
 import minimatch from 'minimatch';
 import debug from 'debug';
 import _ from 'lodash';
-import { mergeBase } from './git';
+import { mergeBase, revList } from './git';
 import BuildkiteClient from './buildkite/client';
 
 const log = debug('monofo:diff');
 
-async function getSuitableDefaultBranchBuildsAtOrBeforeCommit(
+/**
+ * Finds the most recent build where:
+ *  - The commit was an ancestor of the default branch (i.e. a merge commit, or something that landed on main directly)
+ *  - There's an associated buildkite build that was successful
+ *  - The commit was at or before the given commit
+ */
+async function getSuitableDefaultBranchBuildAtOrBeforeCommit(
   info: BuildkiteEnvironment,
   commit: string
 ): Promise<BuildkiteBuild> {
   const client = new BuildkiteClient(info);
 
-  const b = await client.getBuilds({ branch: info.defaultBranch, state: 'passed', per_page: 100 });
+  const builds: Promise<BuildkiteBuild[]> = client.getBuilds({
+    branch: info.defaultBranch,
+    state: 'passed',
+    per_page: 100,
+  });
 
-  return client
-    .getBuilds({ state: 'passed', branch: info.defaultBranch })
-    .then((builds) => {
-      if (!_.isArray(builds) || builds.length < 1) {
+  const gitCommits: Promise<string[]> = revList('--first-parent', '-n', '100', commit);
+  const buildkiteCommits: Promise<string[]> = builds.then((all) => all.map((build) => build.commit));
+
+  return Promise.all([gitCommits, buildkiteCommits])
+    .then((commitLists) => _.intersection<string>(...commitLists))
+    .then((intersection: string[]) => {
+      if (intersection.length < 1) {
         throw new Error('Could not find any matching successful builds');
-      } else {
-        const [build] = builds;
-        log(`Found successful build for ${info.branch}: ${build.web_url} @ ${build.commit}`);
-        return build;
       }
-    })
-    .catch((e) => {
-      log(
-        `Failed to find successful build for default branch (${info.branch}) via Buildkite API, will use fallback mode`,
-        e
-      );
-      throw e;
+
+      log(`Found ${intersection[0]} as latest successful build of default branch from ${commit} or earlier`);
+      return builds.then((b: BuildkiteBuild[]) => {
+        const build = _.find(b, (v: BuildkiteBuild) => v.commit === intersection[0]);
+
+        if (!build) {
+          return Promise.reject(new Error(`Cannot find build ${intersection[0]}`));
+        }
+
+        return Promise.resolve(build);
+      });
     });
 }
 
@@ -38,13 +51,8 @@ async function getSuitableDefaultBranchBuildsAtOrBeforeCommit(
  * If we are on the main branch, we look for the previous successful build of it
  */
 async function getBaseBuildForDefaultBranch(info: BuildkiteEnvironment): Promise<BuildkiteBuild> {
-  const client = new BuildkiteClient(info);
-
-  return getSuitableDefaultBranchBuildsAtOrBeforeCommit(info, info.commit).catch((e) => {
-    log(
-      `Failed to find successful build for default branch (${info.branch}) via Buildkite API, will use fallback mode`,
-      e
-    );
+  return getSuitableDefaultBranchBuildAtOrBeforeCommit(info, info.commit).catch((e) => {
+    log(`Failed to find successful build for default branch (${info.branch}) via Buildkite API`, e);
     throw e;
   });
 }
@@ -53,9 +61,9 @@ async function getBaseBuildForDefaultBranch(info: BuildkiteEnvironment): Promise
  * If we are on a feature branch, we just diff against the merge-base of the current commit and the main branch, and then find a successful build at or before
  * that commit.
  */
-function getBaseBuildForFeatureBranch(info: BuildkiteEnvironment): Promise<BuildkiteBuild> {
+async function getBaseBuildForFeatureBranch(info: BuildkiteEnvironment): Promise<BuildkiteBuild> {
   return mergeBase(`origin/${info.defaultBranch}`, info.commit).then((commit) =>
-    getSuitableDefaultBranchBuildsAtOrBeforeCommit(info, commit).catch((e) => {
+    getSuitableDefaultBranchBuildAtOrBeforeCommit(info, commit).catch((e) => {
       log(
         `Failed to find successful build for merge base (${commit}) of feature branch (${info.branch}) via Buildkite API, will use fallback mode`,
         e

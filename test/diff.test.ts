@@ -2,11 +2,14 @@ import { mocked } from 'ts-jest/utils';
 import path from 'path';
 import { getBaseBuild, matchConfigs } from '../src/diff';
 import { COMMIT, fakeProcess } from './fixtures';
-import { mergeBase } from '../src/git';
+import { mergeBase, revList } from '../src/git';
 import getConfigs, { getBuildkiteInfo } from '../src/config';
 
 jest.mock('../src/git');
 jest.mock('../src/buildkite/client');
+
+const mockRevList = mocked(revList, true);
+mockRevList.mockImplementation(() => Promise.resolve([COMMIT]));
 
 const mockMergeBase = mocked(mergeBase, true);
 
