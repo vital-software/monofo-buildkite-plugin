@@ -12,6 +12,11 @@ env:
 
 steps:
   - command: echo "baz1"
+    key: baz1
+    depends_on:
+      - fooKey1
+      - barKey1
+      - barKey2
     plugins:
       - artifacts#v1.3.0:
           download: [foo1, bar2]

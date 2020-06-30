@@ -11,6 +11,7 @@ env:
 
 steps:
   - command: echo "foo1" > foo1
+    key: fooKey1
     plugins:
       - artifacts#v1.3.0:
           upload: foo1

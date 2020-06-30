@@ -14,12 +14,15 @@ env:
 
 steps:
   - command: 'echo "bar1" | tee bar1'
+    key: barKey1
+    depends_on: fooKey1
     plugins:
       - artifacts#v1.3.0:
           download: foo1
           upload: bar1
 
   - command: 'echo "bar2" | tee bar2'
+    key: barKey2
     plugins:
       - artifacts#v1.3.0:
           download: foo1
