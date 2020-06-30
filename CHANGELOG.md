@@ -1,3 +1,10 @@
+# [0.6.0](https://github.com/dominics/monofo/compare/v0.5.0...v0.6.0) (2020-06-30)
+
+
+### Features
+
+* add a run prefix to the artifact step ([46d53b8](https://github.com/dominics/monofo/commit/46d53b806fde037598f1fd8b250e071711322c15))
+
 # [0.5.0](https://github.com/dominics/monofo/compare/v0.4.0...v0.5.0) (2020-06-30)
 
 
