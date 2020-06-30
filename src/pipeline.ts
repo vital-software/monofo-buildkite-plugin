@@ -11,6 +11,10 @@ export interface Pipeline {
 const ARTIFACT_INJECTION_STEP_KEY = 'monorepo-inject-artifacts';
 const EMPTY_PIPELINE: Pipeline = { env: {}, steps: [] };
 
+// NPM alternative:
+// const RUN_PREFIX = `npx `;
+const RUN_PREFIX = `yarn global add -s monofo@latest && DEBUG="monofo:*" $$(yarn global bin)/`;
+
 const plurals = (n: number): string => (n === 1 ? '' : 's');
 const count = (arr: Array<unknown>, name: string): string => `${arr.length} ${name}${plurals(arr.length)}`;
 
@@ -36,7 +40,7 @@ function artifactInjection(configs: ConfigWithDecision[]): Pipeline {
         key: ARTIFACT_INJECTION_STEP_KEY,
         label: `Inject artifacts for skipped: ${names.join(', ')}`,
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        command: `monofo artifact --build-id=${buildId} ${produces.join(' ')}`, // TODO: npx? yarn? $0?
+        command: `${RUN_PREFIX}monofo artifact --build-id=${buildId} ${produces.join(' ')}`,
         plugins: [
           {
             'artifacts#v1.3.0': {
