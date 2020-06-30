@@ -1,3 +1,10 @@
+## [0.6.1](https://github.com/vital-software/monofo/compare/v0.6.0...v0.6.1) (2020-06-30)
+
+
+### Bug Fixes
+
+* prompt release after failed npm publish ([25064c5](https://github.com/vital-software/monofo/commit/25064c5803c914b3836552860c12f34c6884f794))
+
 # [0.6.0](https://github.com/dominics/monofo/compare/v0.5.0...v0.6.0) (2020-06-30)
 
 
