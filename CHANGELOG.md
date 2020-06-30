@@ -1,3 +1,10 @@
+# [0.4.0](https://github.com/dominics/monofo/compare/v0.3.1...v0.4.0) (2020-06-30)
+
+
+### Features
+
+* finish implementation of getSuitableDefaultBranchBuildAtOrBeforeCommit ([e950b93](https://github.com/dominics/monofo/commit/e950b935009fe43ee80b3f27d8b02b0bf8602fb9))
+
 ## [0.3.1](https://github.com/dominics/monofo/compare/v0.3.0...v0.3.1) (2020-06-29)
 
 
