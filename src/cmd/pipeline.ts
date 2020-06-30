@@ -8,7 +8,7 @@ import { mergePipelines } from '../pipeline';
 
 const log = debug('monofo:cmd:pipeline');
 
-function fallback(e: Error, configs: Config[]): DecoratedConfig[] {
+function fallback(e: Error, configs: Config[]): ConfigWithChanges[] {
   return configs.map((c) => ({ ...c, changes: ['fallback'], buildId: undefined }));
 }
 

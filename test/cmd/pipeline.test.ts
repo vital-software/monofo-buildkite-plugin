@@ -46,9 +46,9 @@ describe('monofo pipeline', () => {
       .then((p) => {
         expect(p).toBeDefined();
         expect(p.steps.map((s) => s.command)).toStrictEqual([
+          'monofo artifact --build-id=f62a1b4d-10f9-4790-bc1c-e2c3a0c80983 bar1 bar2 qux1',
           'echo "foo1" > foo1',
           "echo 'bar was replaced'",
-          'monofo artifact --build-id=f62a1b4d-10f9-4790-bc1c-e2c3a0c80983 qux1',
           'echo "baz1"',
         ]);
         expect(Object.entries(p.env)).toHaveLength(4); // merged from all files

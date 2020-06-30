@@ -99,7 +99,7 @@ function matchingChanges(matchList: string[], changedFiles: string[]): string[] 
   );
 }
 
-export function matchConfigs(buildId: string, configs: Config[], changedFiles: string[]): DecoratedConfig[] {
+export function matchConfigs(buildId: string, configs: Config[], changedFiles: string[]): ConfigWithChanges[] {
   return configs.map((config) => {
     return { ...config, buildId, changes: matchingChanges(config.monorepo.matches, changedFiles) };
   });
