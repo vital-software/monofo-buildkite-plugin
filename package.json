@@ -2,14 +2,15 @@
   "name": "monofo",
   "version": "0.6.0",
   "description": "Buildkite pipeline helper",
-  "author": "Dominic Scheirlinck <dominic@varspool.com>",
+  "author": "Dominic Scheirlinck <dominic@vitaler.com>",
   "bin": {
     "monofo": "./bin/monofo.js"
   },
-  "repository": "https://github.com/dominics/monofo",
+  "repository": "https://github.com/vital-software/monofo",
   "license": "GPL-3.0-or-later",
   "keywords": [
-    "buildkite"
+    "buildkite",
+    "monorepo"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
