@@ -26,16 +26,6 @@ steps:
 
   - wait
 
-  - label: ":brain: Plan"
-    command: "yarn run release --dry-run"
-    branches: main
-    plugins:
-      - docker-compose#v3.3.0:
-          run: node
-
-  - block: ":raising_hand: Unblock Release?"
-    branches: main
-
   - label: ":shipit:"
     command: "yarn run release"
     branches: main
