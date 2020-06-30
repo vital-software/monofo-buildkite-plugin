@@ -8,10 +8,6 @@ export interface Pipeline {
   env: Record<string, string>;
 }
 
-export interface IncludedPartsDecisions {
-  [partName: string]: IncludeDecision;
-}
-
 const ARTIFACT_INJECTION_STEP_KEY = 'monorepo-inject-artifacts';
 const EMPTY_PIPELINE: Pipeline = { env: {}, steps: [] };
 
@@ -147,14 +143,7 @@ export function mergePipelines(results: ConfigWithChanges[]): Pipeline {
     log(`${config.name} will be ${config.included ? 'INCLUDED' : 'EXCLUDED'} because it has ${config.reason}`);
   });
 
-  return _.mergeWith(
-    artifactInjection(decisions),
-    ...decisions.map(({ included, steps, monorepo, env }) => {
-      if (included) {
-        return { env, steps };
-      }
-      return { env, steps: !included && monorepo.excluded_steps.length > 0 ? monorepo.excluded_steps : [] };
-    }),
-    (dst: unknown, src: unknown) => (_.isArray(dst) ? dst.concat(src) : undefined)
+  return _.mergeWith(artifactInjection(decisions), ...decisions.map(toMerge), (dst: unknown, src: unknown) =>
+    _.isArray(dst) ? dst.concat(src) : undefined
   ) as Pipeline;
 }
