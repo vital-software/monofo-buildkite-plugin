@@ -1,3 +1,10 @@
+# [0.8.0](https://github.com/vital-software/monofo/compare/v0.7.0...v0.8.0) (2020-07-01)
+
+
+### Features
+
+* **pipeline:** added a message at the end of an empty pipeline ([d88032b](https://github.com/vital-software/monofo/commit/d88032bb00ee0ba531b5226a790b8441c9376447))
+
 # [0.7.0](https://github.com/vital-software/monofo/compare/v0.6.2...v0.7.0) (2020-07-01)
 
 
