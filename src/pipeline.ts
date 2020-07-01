@@ -9,6 +9,7 @@ export interface Pipeline {
 }
 
 const ARTIFACT_INJECTION_STEP_KEY = 'monorepo-inject-artifacts';
+const ARTIFACT_INJECTION_STEP_LABEL = `:crystal_ball: Get skipped artifacts`;
 const EMPTY_PIPELINE: Pipeline = { env: {}, steps: [] };
 
 const plurals = (n: number): string => (n === 1 ? '' : 's');
@@ -34,7 +35,7 @@ function artifactInjection(configs: ConfigWithDecision[]): Pipeline {
     steps: [
       {
         key: ARTIFACT_INJECTION_STEP_KEY,
-        label: `:crystal_ball: get skipped artifacts`,
+        label: ARTIFACT_INJECTION_STEP_LABEL,
         command: `echo 'inject for: ${names.join(', ')}'`,
         plugins: [
           {
