@@ -1,3 +1,10 @@
+## [0.8.4](https://github.com/vital-software/monofo/compare/v0.8.3...v0.8.4) (2020-07-01)
+
+
+### Bug Fixes
+
+* make error message on stale build more actionable ([8adb2de](https://github.com/vital-software/monofo/commit/8adb2de3761ec7a0aa0e882353c1743915213531))
+
 ## [0.8.3](https://github.com/vital-software/monofo/compare/v0.8.2...v0.8.3) (2020-07-01)
 
 
