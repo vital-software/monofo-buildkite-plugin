@@ -56,7 +56,7 @@ describe('monofo pipeline', () => {
           download: ['bar1', 'bar2', 'qux1'],
           upload: ['bar1', 'bar2', 'qux1'],
         });
-        expect(Object.entries(p.env)).toHaveLength(4); // merged from all files
+        expect(Object.entries(p.env)).toHaveLength(3); // merged from only included files
       });
   });
 

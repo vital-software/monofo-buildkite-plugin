@@ -74,7 +74,7 @@ function toMerge({ steps, env, included, monorepo }: ConfigWithDecision): Pipeli
         steps,
       }
     : {
-        env,
+        env: {},
         steps: monorepo.excluded_steps.length > 0 ? monorepo.excluded_steps : [],
       };
 }
