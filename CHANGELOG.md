@@ -1,3 +1,10 @@
+## [0.8.2](https://github.com/vital-software/monofo/compare/v0.8.1...v0.8.2) (2020-07-01)
+
+
+### Bug Fixes
+
+* also log the matching patterns ([320730b](https://github.com/vital-software/monofo/commit/320730bd43c307c1b50311ce6c7461efaf6e7b6d))
+
 ## [0.8.1](https://github.com/vital-software/monofo/compare/v0.8.0...v0.8.1) (2020-07-01)
 
 
