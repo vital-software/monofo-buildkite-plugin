@@ -105,7 +105,7 @@ export function matchConfigs(buildId: string, configs: Config[], changedFiles: s
 
   return configs.map((config) => {
     const changes = matchingChanges(config.monorepo.matches, changedFiles);
-    log(`Found ${count(changes, 'matching change')} for ${config.name}`);
+    log(`Found ${count(changes, 'matching change')} for ${config.name} (${JSON.stringify(config.monorepo.matches)})`);
     return { ...config, buildId, changes };
   });
 }
