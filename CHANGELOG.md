@@ -1,3 +1,10 @@
+## [0.8.3](https://github.com/vital-software/monofo/compare/v0.8.2...v0.8.3) (2020-07-01)
+
+
+### Bug Fixes
+
+* log merge-base step of diff algo ([9d9d09c](https://github.com/vital-software/monofo/commit/9d9d09c25d6c1fe84620f3a9a5782e8c8ea15cc8))
+
 ## [0.8.2](https://github.com/vital-software/monofo/compare/v0.8.1...v0.8.2) (2020-07-01)
 
 
