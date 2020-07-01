@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import debug from 'debug';
 import { ARTIFACT_INJECTION_STEP_KEY, artifactInjectionSteps, nothingToDoSteps } from './steps';
+import { count } from './util';
 
 const log = debug('monofo:pipeline');
 
@@ -8,9 +9,6 @@ export interface Pipeline {
   steps: Step[];
   env: Record<string, string>;
 }
-
-const plurals = (n: number): string => (n === 1 ? '' : 's');
-const count = (arr: Array<unknown>, name: string): string => `${arr.length} ${name}${plurals(arr.length)}`;
 
 /**
  * Loop through the decided configurations and, for any excluded parts, collect the keys of steps that are now skipped.

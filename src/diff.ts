@@ -3,6 +3,7 @@ import debug from 'debug';
 import _ from 'lodash';
 import { mergeBase, revList } from './git';
 import BuildkiteClient from './buildkite/client';
+import { count } from './util';
 
 const log = debug('monofo:diff');
 
@@ -100,7 +101,11 @@ function matchingChanges(matchList: string[], changedFiles: string[]): string[] 
 }
 
 export function matchConfigs(buildId: string, configs: Config[], changedFiles: string[]): ConfigWithChanges[] {
+  log(`Found ${count(changedFiles, 'changed file')}: ${changedFiles.join(', ')}`);
+
   return configs.map((config) => {
-    return { ...config, buildId, changes: matchingChanges(config.monorepo.matches, changedFiles) };
+    const changes = matchingChanges(config.monorepo.matches, changedFiles);
+    log(`Found ${count(changes, 'matching change')} for ${config.name}`);
+    return { ...config, buildId, changes };
   });
 }
