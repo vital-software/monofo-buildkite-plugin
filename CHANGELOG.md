@@ -1,3 +1,10 @@
+# [0.7.0](https://github.com/vital-software/monofo/compare/v0.6.2...v0.7.0) (2020-07-01)
+
+
+### Features
+
+* **pipeline:** use the artifacts plugin to download and inject missing artifacts ([4e19f03](https://github.com/vital-software/monofo/commit/4e19f032f2e837970a753b45bb0816f8aad12dd8))
+
 ## [0.6.2](https://github.com/vital-software/monofo/compare/v0.6.1...v0.6.2) (2020-07-01)
 
 
