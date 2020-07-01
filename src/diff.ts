@@ -63,15 +63,16 @@ async function getBaseBuildForDefaultBranch(info: BuildkiteEnvironment): Promise
  * that commit.
  */
 async function getBaseBuildForFeatureBranch(info: BuildkiteEnvironment): Promise<BuildkiteBuild> {
-  return mergeBase(`origin/${info.defaultBranch}`, info.commit).then((commit) =>
-    getSuitableDefaultBranchBuildAtOrBeforeCommit(info, commit).catch((e) => {
+  return mergeBase(`origin/${info.defaultBranch}`, info.commit).then((commit) => {
+    log(`Found merge base of ${commit} for current feature branch`);
+    return getSuitableDefaultBranchBuildAtOrBeforeCommit(info, commit).catch((e) => {
       log(
         `Failed to find successful build for merge base (${commit}) of feature branch (${info.branch}) via Buildkite API, will use fallback mode`,
         e
       );
       throw e;
-    })
-  );
+    });
+  });
 }
 
 /**

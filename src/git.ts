@@ -7,6 +7,7 @@ function git(...args: string[]): Promise<string> {
   const command = ['git'].concat(args).join(' ');
 
   return new Promise((resolve, reject) => {
+    log(`Running command: ${command}`);
     exec(command, (err, stdout, stderr) => {
       if (err) {
         log(`Failed to execute ${command} (stderr follows):\n${stderr}`);
