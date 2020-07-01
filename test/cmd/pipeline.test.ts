@@ -2,7 +2,7 @@ import path from 'path';
 import { Arguments } from 'yargs';
 import { safeLoad } from 'js-yaml';
 import { mocked } from 'ts-jest/utils';
-import { COMMIT, fakeProcess } from '../fixtures';
+import { BUILD_ID, COMMIT, fakeProcess } from '../fixtures';
 import { mergeBase, diff, revList } from '../../src/git';
 import * as pipeline from '../../src/cmd/pipeline';
 import { Pipeline } from '../../src/pipeline';
@@ -46,11 +46,17 @@ describe('monofo pipeline', () => {
       .then((p) => {
         expect(p).toBeDefined();
         expect(p.steps.map((s) => s.command)).toStrictEqual([
-          'yarn global add -s monofo@latest && DEBUG="monofo:*" $$(yarn global bin)/monofo artifact --build=f62a1b4d-10f9-4790-bc1c-e2c3a0c80983 bar1 bar2 qux1',
+          "echo 'inject for: bar, qux'",
           'echo "foo1" > foo1',
           "echo 'bar was replaced'",
           'echo "baz1"',
         ]);
+        const { plugins } = p.steps[0];
+        expect(plugins ? plugins[0]['artifacts#v1.3.0'] : null).toStrictEqual({
+          build: BUILD_ID,
+          download: ['bar1', 'bar2', 'qux1'],
+          upload: ['bar1', 'bar2', 'qux1'],
+        });
         expect(Object.entries(p.env)).toHaveLength(4); // merged from all files
       });
   });

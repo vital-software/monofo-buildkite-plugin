@@ -4,7 +4,7 @@ import debug from 'debug';
 const log = debug('monofo:pipeline');
 
 export interface Pipeline {
-  steps: Record<string, unknown>[];
+  steps: Step[];
   env: Record<string, string>;
 }
 
@@ -38,12 +38,13 @@ function artifactInjection(configs: ConfigWithDecision[]): Pipeline {
     steps: [
       {
         key: ARTIFACT_INJECTION_STEP_KEY,
-        label: `Inject artifacts for skipped: ${names.join(', ')}`,
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        command: `${RUN_PREFIX}monofo artifact --build=${buildId} ${produces.join(' ')}`,
+        label: `:crystal_ball: get skipped artifacts`,
+        command: `echo 'inject for: ${names.join(', ')}'`,
         plugins: [
           {
             'artifacts#v1.3.0': {
+              build: buildId,
+              download: produces,
               upload: produces,
             },
           },

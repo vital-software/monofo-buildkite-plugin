@@ -4,6 +4,7 @@ export const ORG = 'dominics';
 export const PIPELINE = 'monofo';
 export const BRANCH = 'main';
 export const COMMIT = 'f993bd4d8d59b9c70c8092d327c6ac1c6a263b1f';
+export const BUILD_ID = 'f62a1b4d-10f9-4790-bc1c-e2c3a0c80983';
 
 export function fakeProcess(): NodeJS.ProcessEnv {
   return {
@@ -23,7 +24,7 @@ export function fakeBuildkiteInfo(): BuildkiteEnvironment {
 
 export function fakeBuildkiteBuild(): BuildkiteBuild {
   return {
-    id: 'f62a1b4d-10f9-4790-bc1c-e2c3a0c80983',
+    id: BUILD_ID,
     url: 'https://api.buildkite.com/v2/organizations/my-great-org/pipelines/my-pipeline/builds/1',
     web_url: 'https://buildkite.com/my-great-org/my-pipeline/builds/1',
     number: 1,
