@@ -67,7 +67,7 @@ async function getBaseBuildForFeatureBranch(info: BuildkiteEnvironment): Promise
     log(`Found merge base of ${commit} for current feature branch`);
     return getSuitableDefaultBranchBuildAtOrBeforeCommit(info, commit).catch((e) => {
       log(
-        `Failed to find successful build for merge base (${commit}) of feature branch (${info.branch}) via Buildkite API, will use fallback mode`,
+        `Failed to find successful build for merge base (${commit}) of feature branch (${info.branch}) via Buildkite API, will use fallback mode. Try bringing your branch up-to-date with ${info.defaultBranch}, if it isn't already?`,
         e
       );
       throw e;
@@ -78,7 +78,7 @@ async function getBaseBuildForFeatureBranch(info: BuildkiteEnvironment): Promise
 /**
  * The base commit is the commit used to compare a build with
  *
- * When resolved, will always be a commit on the main branch. It will also be a commit with a succeessful build (so we
+ * When resolved, will always be a commit on the main branch. It will also be a commit with a successful build (so we
  * can snarf artifacts)
  */
 export async function getBaseBuild(info: BuildkiteEnvironment): Promise<BuildkiteBuild> {

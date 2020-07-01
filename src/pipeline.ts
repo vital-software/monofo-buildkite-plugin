@@ -5,11 +5,6 @@ import { count } from './util';
 
 const log = debug('monofo:pipeline');
 
-export interface Pipeline {
-  steps: Step[];
-  env: Record<string, string>;
-}
-
 /**
  * Loop through the decided configurations and, for any excluded parts, collect the keys of steps that are now skipped.
  * Then rewrite the depends_on of any dependent steps to point at the artifact injection step.

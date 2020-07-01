@@ -5,7 +5,6 @@ import { mocked } from 'ts-jest/utils';
 import { BUILD_ID, COMMIT, fakeProcess } from '../fixtures';
 import { mergeBase, diff, revList } from '../../src/git';
 import * as pipeline from '../../src/cmd/pipeline';
-import { Pipeline } from '../../src/pipeline';
 import execSync from './exec';
 
 jest.mock('../../src/git');
