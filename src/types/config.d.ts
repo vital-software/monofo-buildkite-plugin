@@ -27,7 +27,9 @@ interface ConfigWithChanges extends Config {
   buildId?: string;
 }
 
-interface ConfigWithDecision extends ConfigWithChanges {
+interface IncludeDecision {
   included: boolean;
   reason: string;
 }
+
+type ConfigWithDecision = IncludeDecision & ConfigWithChanges;
