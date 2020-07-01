@@ -20,6 +20,11 @@ interface BuildkiteBuild {
   [others: string]: unknown;
 }
 
+interface Pipeline {
+  steps: Step[];
+  env: Record<string, string>;
+}
+
 interface Step {
   depends_on?: string | string[];
   key?: string;
