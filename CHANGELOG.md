@@ -1,3 +1,10 @@
+## [0.6.2](https://github.com/vital-software/monofo/compare/v0.6.1...v0.6.2) (2020-07-01)
+
+
+### Bug Fixes
+
+* **pipeline:** use correct option when calling artifact ([b61e9a4](https://github.com/vital-software/monofo/commit/b61e9a4e2e681e6f17f5f7fbaec81c81c5d14d9b))
+
 ## [0.6.1](https://github.com/vital-software/monofo/compare/v0.6.0...v0.6.1) (2020-06-30)
 
 
