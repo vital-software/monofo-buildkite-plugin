@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import debug from 'debug';
-import { ARTIFACT_INJECTION_STEP_KEY, artifactInjectionStep } from './steps';
+import { ARTIFACT_INJECTION_STEP_KEY, artifactInjectionSteps, nothingToDoSteps } from './steps';
 
 const log = debug('monofo:pipeline');
 
@@ -86,6 +86,10 @@ function toMerge({ steps, env, included, monorepo }: ConfigWithDecision): Pipeli
       };
 }
 
+function toPipeline(steps: Step[]): Pipeline {
+  return { env: {}, steps };
+}
+
 /**
  * @param results
  */
@@ -106,7 +110,10 @@ export function mergePipelines(results: ConfigWithChanges[]): Pipeline {
     log(`${config.name} will be ${config.included ? 'INCLUDED' : 'EXCLUDED'} because it has ${config.reason}`);
   });
 
-  return _.mergeWith(artifactInjectionStep(decisions), ...decisions.map(toMerge), (dst: unknown, src: unknown) =>
-    _.isArray(dst) ? dst.concat(src) : undefined
+  return _.mergeWith(
+    toPipeline(artifactInjectionSteps(decisions)),
+    ...decisions.map(toMerge),
+    toPipeline(nothingToDoSteps(decisions)),
+    (dst: unknown, src: unknown) => (_.isArray(dst) ? dst.concat(src) : undefined)
   ) as Pipeline;
 }
