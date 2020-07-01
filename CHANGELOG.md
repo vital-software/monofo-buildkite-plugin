@@ -1,3 +1,15 @@
+# [1.0.0](https://github.com/vital-software/monofo/compare/v0.8.4...v1.0.0) (2020-07-01)
+
+
+### Bug Fixes
+
+* only include environment variables from included pipeline components ([6d14788](https://github.com/vital-software/monofo/commit/6d14788654bc1e83b7c437a3b31e25560d121949))
+
+
+### BREAKING CHANGES
+
+* We now only include environment variable from pipelines that have matching changes
+
 ## [0.8.4](https://github.com/vital-software/monofo/compare/v0.8.3...v0.8.4) (2020-07-01)
 
 
