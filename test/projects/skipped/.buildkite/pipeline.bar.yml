@@ -1,0 +1,26 @@
+monorepo:
+  expects:
+    - foo1
+  produces:
+    - bar1
+    - bar2
+  matches: no-match
+  excluded_steps:
+    - label: "Some other step"
+      command: "echo 'bar was replaced'"
+
+steps:
+  - command: 'echo "bar1" | tee bar1'
+    key: barKey1
+    depends_on: fooKey1
+    plugins:
+      - artifacts#v1.3.0:
+          download: foo1
+          upload: bar1
+
+  - command: 'echo "bar2" | tee bar2'
+    key: barKey2
+    plugins:
+      - artifacts#v1.3.0:
+          download: foo1
+          upload: bar2
