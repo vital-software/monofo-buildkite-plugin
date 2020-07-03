@@ -17,6 +17,7 @@ interface BuildkiteBuild {
   id: string;
   web_url: string;
   commit: string;
+  blocked: boolean;
   [others: string]: unknown;
 }
 

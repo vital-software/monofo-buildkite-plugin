@@ -26,7 +26,9 @@ async function getSuitableDefaultBranchBuildAtOrBeforeCommit(
   });
 
   const gitCommits: Promise<string[]> = revList('--first-parent', '-n', '100', commit);
-  const buildkiteCommits: Promise<string[]> = builds.then((all) => all.map((build) => build.commit));
+  const buildkiteCommits: Promise<string[]> = builds.then((all) =>
+    all.filter((build) => !build.blocked).map((build) => build.commit)
+  );
 
   return Promise.all([gitCommits, buildkiteCommits])
     .then((commitLists) => _.intersection<string>(...commitLists))
