@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/vital-software/monofo/compare/v1.0.0...v1.0.1) (2020-07-03)
+
+
+### Bug Fixes
+
+* exclude blocked builds from consideration as base commit ([8452879](https://github.com/vital-software/monofo/commit/8452879edd543c864c04d2cf60daf8b93937786f))
+
 # [1.0.0](https://github.com/vital-software/monofo/compare/v0.8.4...v1.0.0) (2020-07-01)
 
 
