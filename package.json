@@ -45,7 +45,7 @@
     "@semantic-release/git": "9.0.0",
     "@types/bluebird": "3.5.32",
     "@types/debug": "4.1.5",
-    "@types/jest": "26.0.3",
+    "@types/jest": "26.0.7",
     "@types/js-yaml": "3.12.5",
     "@types/lodash": "4.14.157",
     "@types/minimatch": "3.0.3",
