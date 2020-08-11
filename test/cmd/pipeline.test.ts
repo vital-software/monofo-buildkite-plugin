@@ -49,6 +49,7 @@ describe('monofo pipeline', () => {
           'echo "foo1" > foo1',
           "echo 'bar was replaced'",
           'echo "baz1"',
+          'echo "unreferenced" > unref',
         ]);
         const { plugins } = p.steps[0];
         expect(plugins ? plugins[0]['artifacts#v1.3.0'] : null).toStrictEqual({
@@ -60,7 +61,7 @@ describe('monofo pipeline', () => {
       });
   });
 
-  it('can be executed with simple configuration on the default branch', async () => {
+  it('can be executed with simple configuration and skipped parts on the default branch', async () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, '../projects/skipped'));
 

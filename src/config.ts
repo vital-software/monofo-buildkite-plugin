@@ -102,7 +102,8 @@ function sort(configs: Config[]): Config[] {
   const byName = Object.fromEntries(configs.map((c) => [c.name, c]));
   const byProducerOf = Object.fromEntries(configs.flatMap((c) => c.monorepo.produces.map((p) => [p, c])));
 
-  const sorted = toposort(
+  const sorted = toposort.array(
+    Object.keys(byName),
     configs.flatMap((c) => {
       return c.monorepo.expects.map((e) => {
         return byProducerOf[e]
