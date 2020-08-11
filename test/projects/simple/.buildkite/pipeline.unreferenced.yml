@@ -1,0 +1,6 @@
+monorepo:
+  matches:
+    - "**"
+
+steps:
+  - command: echo "unreferenced" > unref
