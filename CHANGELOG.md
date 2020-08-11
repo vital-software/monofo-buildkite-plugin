@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/vital-software/monofo/compare/v1.0.1...v1.0.2) (2020-08-11)
+
+
+### Bug Fixes
+
+* **config:** include components that have no incoming edges ([de2c82e](https://github.com/vital-software/monofo/commit/de2c82eb452e8225468835a5757130f6395937a7))
+
 ## [1.0.1](https://github.com/vital-software/monofo/compare/v1.0.0...v1.0.1) (2020-07-03)
 
 
