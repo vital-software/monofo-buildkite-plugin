@@ -3,7 +3,7 @@ import debug from 'debug';
 const log = debug('monofo:steps');
 
 export const ARTIFACT_INJECTION_STEP_KEY = 'monorepo-inject-artifacts';
-const ARTIFACT_INJECTION_STEP_LABEL = `:crystal_ball: Get skipped artifacts`;
+const ARTIFACT_INJECTION_STEP_LABEL = `:crystal_ball:`;
 
 export function artifactInjectionSteps(configs: ConfigWithDecision[]): Step[] {
   const names = configs.filter((c) => !c.included).map((c) => c.name);
