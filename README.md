@@ -6,7 +6,7 @@ only be run if it needs to be (based on what's changed since the last build).
 
 Monofo keeps your pipeline running the same way it always has (e.g. you don't
 have to split your pipeline and use triggers), while potentially saving heaps of
-time by only building what's needed.
+time by only building what you need.
 
 ## Basic Usage
 
