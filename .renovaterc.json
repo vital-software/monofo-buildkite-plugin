@@ -1,0 +1,16 @@
+{
+  "extends": ["config:base", ":prHourlyLimitNone", "schedule:nonOfficeHours"],
+  "labels": ["type/update"],
+  "timezone": "Pacific/Auckland",
+  "packageRules": [
+    {
+      "packagePatterns": ["^eslint"],
+      "groupName": "eslint packages"
+    },
+    {
+      "depTypeList": ["devDependencies"],
+      "automerge": true,
+      "automergeType": "branch"
+    }
+  ]
+}
