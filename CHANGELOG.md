@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/vital-software/monofo/compare/v1.0.2...v1.0.3) (2020-10-19)
+
+
+### Bug Fixes
+
+* flush changes to release ([b91c2fa](https://github.com/vital-software/monofo/commit/b91c2fa2895f84a4690bf243c99db4a8145a1701))
+
 ## [1.0.2](https://github.com/vital-software/monofo/compare/v1.0.1...v1.0.2) (2020-08-11)
 
 
