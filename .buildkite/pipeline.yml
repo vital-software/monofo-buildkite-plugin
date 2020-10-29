@@ -8,7 +8,7 @@ env:
 steps:
   - label: ":docker:"
     agents:
-      queue: docker-build
+      queue: build
     plugins:
       - docker-compose#v3.3.0:
           build: [node, node-14]
