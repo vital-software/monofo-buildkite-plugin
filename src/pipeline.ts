@@ -9,14 +9,18 @@ const log = debug('monofo:pipeline');
  * Loop through the decided configurations and, for any excluded parts, collect the keys of steps that are now skipped.
  * Then rewrite the depends_on of any dependent steps to point at the artifact injection step.
  */
-function replaceExcludedKeys(configs: ConfigWithDecision[]): ConfigWithDecision[] {
+function replaceExcludedKeys(configs: ConfigWithDecision[], hasArtifactStep: boolean): ConfigWithDecision[] {
   const excludedKeys: string[] = configs
     .filter((c) => !c.included)
     .flatMap((c) => c.steps.map((s) => (typeof s.key === 'string' ? s.key : '')).filter((v) => v));
 
+  // If there's no artifact dependencies for the whole build, no need to wait for this step (it won't be added either)
+  const replaceWith = hasArtifactStep ? ARTIFACT_INJECTION_STEP_KEY : '';
+
   const filterDependsOn = (dependsOn: string | string[]): string[] => {
     return (typeof dependsOn === 'string' ? [dependsOn] : dependsOn)
-      .map((d) => (excludedKeys.indexOf(d) !== -1 ? ARTIFACT_INJECTION_STEP_KEY : d))
+      .map((d) => (excludedKeys.indexOf(d) !== -1 ? replaceWith : d))
+      .filter((v) => v)
       .filter((v, i, a) => a.indexOf(v) === i);
   };
 
@@ -89,23 +93,23 @@ function toPipeline(steps: Step[]): Pipeline {
 export function mergePipelines(results: ConfigWithChanges[]): Pipeline {
   log(`Merging ${results.length} pipelines`);
 
-  const decisions: ConfigWithDecision[] = replaceExcludedKeys(
-    results.map((r) => {
-      return {
-        ...r,
-        ...getMergeDecision(r),
-      } as ConfigWithDecision;
-    })
-  );
+  const decisions: ConfigWithDecision[] = results.map((r) => {
+    return {
+      ...r,
+      ...getMergeDecision(r),
+    } as ConfigWithDecision;
+  });
 
   // Announce decisions
   decisions.forEach((config) => {
     log(`${config.name} will be ${config.included ? 'INCLUDED' : 'EXCLUDED'} because it has ${config.reason}`);
   });
 
+  const artifactSteps = artifactInjectionSteps(decisions);
+
   return _.mergeWith(
-    toPipeline(artifactInjectionSteps(decisions)),
-    ...decisions.map(toMerge),
+    toPipeline(artifactSteps),
+    ...replaceExcludedKeys(decisions, artifactSteps.length > 0).map(toMerge),
     toPipeline(nothingToDoSteps(decisions)),
     (dst: unknown, src: unknown) => (_.isArray(dst) ? dst.concat(src) : undefined)
   ) as Pipeline;

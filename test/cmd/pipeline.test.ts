@@ -84,7 +84,7 @@ describe('monofo pipeline', () => {
       });
   });
 
-  it('can be executed with crossdeps', async () => {
+  it('can be executed with crossdeps alone', async () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, '../projects/crossdeps'));
 
@@ -93,19 +93,11 @@ describe('monofo pipeline', () => {
       .then((o) => (safeLoad(o) as unknown) as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
-        expect(p.steps).toHaveLength(2);
-        // TODO: update expectations once the artifacts step is here
-        // expect(p.steps.map((s) => s.command)).toStrictEqual([
-        //   "echo 'inject for: foo, bar'",
-        //   "echo 'bar was replaced'",
-        //   "echo 'All build parts were skipped'",
-        // ]);
-        // const { plugins } = p.steps[0];
-        // expect(plugins ? plugins[0]['artifacts#v1.3.0'] : null).toStrictEqual({
-        //   build: BUILD_ID,
-        //   download: ['foo1', 'bar1', 'bar2'],
-        //   upload: ['foo1', 'bar1', 'bar2'],
-        // });
+
+        // This had a cross-dependency, but the thing it depended on was skipped
+        // In addition, nothing that was skipped was producing required artifacts
+        // So the artifact step was skipped. This step can now run immediately.
+        expect(p.steps[0].depends_on).toHaveLength(0);
       });
   });
 });
