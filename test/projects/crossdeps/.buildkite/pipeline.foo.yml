@@ -1,0 +1,6 @@
+monorepo:
+  matches: no-match
+
+steps:
+  - command: echo "foo1" > foo1
+    key: fooKey1
