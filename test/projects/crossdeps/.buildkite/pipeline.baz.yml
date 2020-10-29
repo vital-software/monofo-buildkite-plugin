@@ -1,0 +1,7 @@
+monorepo:
+  matches:
+    - "baz/**/*.ts" # will match
+
+steps:
+  - command: 'echo "baz1" | tee baz1'
+    depends_on: fooKey1

@@ -83,4 +83,29 @@ describe('monofo pipeline', () => {
         });
       });
   });
+
+  it('can be executed with crossdeps', async () => {
+    process.env = fakeProcess();
+    process.chdir(path.resolve(__dirname, '../projects/crossdeps'));
+
+    const args: Arguments<unknown> = { $0: '', _: [] };
+    await ((pipeline.handler(args) as unknown) as Promise<string>)
+      .then((o) => (safeLoad(o) as unknown) as Pipeline)
+      .then((p) => {
+        expect(p).toBeDefined();
+        expect(p.steps).toHaveLength(2);
+        // TODO: update expectations once the artifacts step is here
+        // expect(p.steps.map((s) => s.command)).toStrictEqual([
+        //   "echo 'inject for: foo, bar'",
+        //   "echo 'bar was replaced'",
+        //   "echo 'All build parts were skipped'",
+        // ]);
+        // const { plugins } = p.steps[0];
+        // expect(plugins ? plugins[0]['artifacts#v1.3.0'] : null).toStrictEqual({
+        //   build: BUILD_ID,
+        //   download: ['foo1', 'bar1', 'bar2'],
+        //   upload: ['foo1', 'bar1', 'bar2'],
+        // });
+      });
+  });
 });
