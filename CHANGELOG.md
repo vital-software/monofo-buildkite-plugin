@@ -1,3 +1,11 @@
+## [1.0.4](https://github.com/vital-software/monofo/compare/v1.0.3...v1.0.4) (2020-10-29)
+
+
+### Bug Fixes
+
+* **core:** replace depends_on with nothing if no artifact step is to be added ([8206195](https://github.com/vital-software/monofo/commit/8206195e32865aec5e258ae109eecd01045d353a))
+* **deps:** update dependency got to v11.8.0 ([e1ed51c](https://github.com/vital-software/monofo/commit/e1ed51cb6e2b2a8d2423a53aeec303d9557b5ba3))
+
 ## [1.0.3](https://github.com/vital-software/monofo/compare/v1.0.2...v1.0.3) (2020-10-19)
 
 
