@@ -11,12 +11,13 @@ describe('getConfig()', () => {
     process.chdir(path.resolve(__dirname, 'projects/simple'));
     const config = await getConfigs();
 
-    expect(config).toHaveLength(6);
+    expect(config).toHaveLength(7);
     expect(config[0].name).toBe('changed');
-    expect(config[1].name).toBe('foo');
-    expect([config[2].name, config[2].name]).toContain('bar');
-    expect([config[3].name, config[2].name]).toContain('qux');
-    expect(config[4].name).toBe('baz');
-    expect(config[5].name).toBe('unreferenced');
+    expect(config[1].name).toBe('dependedon');
+    expect(config[2].name).toBe('foo');
+    expect([config[3].name, config[2].name]).toContain('bar');
+    expect([config[4].name, config[2].name]).toContain('qux');
+    expect(config[5].name).toBe('baz');
+    expect(config[6].name).toBe('unreferenced');
   });
 });
