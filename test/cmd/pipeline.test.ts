@@ -14,7 +14,7 @@ const mockMergeBase = mergeBase as jest.Mock<Promise<string>>;
 mockMergeBase.mockImplementation(() => Promise.resolve('foo'));
 
 const mockDiff = diff as jest.Mock<Promise<string[]>>;
-mockDiff.mockImplementation(() => Promise.resolve(['foo/README.md', 'baz/abc.ts']));
+mockDiff.mockImplementation(() => Promise.resolve(['foo/README.md', 'baz/abc.ts', '.buildkite/pipeline.changed.yml']));
 
 const mockRevList = mocked(revList, true);
 mockRevList.mockImplementation(() => Promise.resolve([COMMIT]));
@@ -46,6 +46,7 @@ describe('monofo pipeline', () => {
         expect(p).toBeDefined();
         expect(p.steps.map((s) => s.command)).toStrictEqual([
           "echo 'inject for: bar, qux'",
+          'echo "changed" > changed',
           'echo "foo1" > foo1',
           "echo 'bar was replaced'",
           'echo "baz1"',

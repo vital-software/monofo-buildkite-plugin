@@ -1,0 +1,5 @@
+# tests that changes to the pipeline itself are considered to match
+monorepo: {}
+
+steps:
+  - command: echo "changed" > changed
