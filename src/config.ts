@@ -103,7 +103,7 @@ async function readConfig(config: ConfigFile): Promise<ConfigFile> {
 }
 
 /**
- * Index the configs by the artifacts each produces, and sort them into dependency order
+ * Indexes the configs by the artifacts each produces, and the depends_on list, and sorts them into dependency order
  */
 function sort(configs: Config[]): Config[] {
   const byName = Object.fromEntries(configs.map((c) => [c.name, c]));
@@ -112,11 +112,21 @@ function sort(configs: Config[]): Config[] {
   const sorted = toposort.array(
     Object.keys(byName),
     configs.flatMap((c) => {
-      return c.monorepo.expects.map((e) => {
-        return byProducerOf[e]
-          ? ([byProducerOf[e].name, c.name] as [string, string]) // producer of an expected artifact must happen first
-          : thrw<[string, string]>(new Error(`Could not find a component that produces "${e}"`));
-      });
+      // The constraints on ordering are:
+      return [
+        // the producer of an expected artifact must happen before the current config
+        ...c.monorepo.expects.map((expected): [string, string] => {
+          return byProducerOf[expected]
+            ? [byProducerOf[expected].name, c.name]
+            : thrw(new Error(`Could not find a component that produces "${expected}"`));
+        }),
+        // configs we depend_on must happen before the current config
+        ...c.monorepo.depends_on.map((dependency): [string, string] => {
+          return byName[dependency]
+            ? [dependency, c.name]
+            : thrw(new Error(`Could not find a config named "pipeline.${dependency}.yml"`));
+        }),
+      ];
     })
   );
 
