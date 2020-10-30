@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/vital-software/monofo/compare/v1.1.0...v1.2.0) (2020-10-30)
+
+
+### Features
+
+* **core:** always treat pipeline changes as matching that pipeline ([6b3d948](https://github.com/vital-software/monofo/commit/6b3d948bbb40fd82afff4e1f807fb86129f6ffac)), closes [#33](https://github.com/vital-software/monofo/issues/33)
+
 # [1.1.0](https://github.com/vital-software/monofo/compare/v1.0.5...v1.1.0) (2020-10-30)
 
 
