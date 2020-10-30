@@ -9,7 +9,7 @@ require('yargs')
     default: false,
   })
   .usage('Monofo provides utilities for dynamically generating monorepo pipelines')
-  .epilogue('Visit https://github.com/dominics/monofo for documentation about this command.')
+  .epilogue('Visit https://github.com/vital-software/monofo for documentation about this command.')
   .strict(true)
   .commandDir('../build/src/cmd')
   .demandCommand()
