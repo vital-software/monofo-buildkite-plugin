@@ -7,7 +7,10 @@ const ARTIFACT_INJECTION_STEP_LABEL = `:crystal_ball:`;
 
 export function artifactInjectionSteps(configs: ConfigWithDecision[]): Step[] {
   const names = configs.filter((c) => !c.included).map((c) => c.name);
-  const produces = configs.filter((c) => !c.included).flatMap((e) => e.monorepo.produces);
+  const produces = configs
+    .filter((c) => !c.included)
+    .flatMap((e) => e.monorepo.produces)
+    .filter((artifact) => !artifact.startsWith('.phony/'));
   const { buildId } = configs[0];
 
   if (names.length < 1 || produces.length < 1 || !buildId) {
