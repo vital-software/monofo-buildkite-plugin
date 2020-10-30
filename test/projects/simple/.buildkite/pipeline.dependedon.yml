@@ -1,0 +1,5 @@
+monorepo: {}
+
+steps:
+  - command: 'echo "dependedon" | tee dependedon'
+    key: dependedon
