@@ -1,5 +1,17 @@
 # monofo
 
+- [Basic Usage](#basic-usage)
+  - [Splitting `pipeline.yml`](#splitting-pipelineyml)
+- [Configuration](#configuration)
+  - [Buildkite API Access Token](#buildkite-api-access-token)
+- [Advanced Usage](#advanced-usage)
+  - [Escape Hatch: Disabling Monofo](#escape-hatch-disabling-monofo)
+  - [Pipeline file changes match themselves](#pipeline-file-changes-match-themselves)
+  - [Phony deps](#phony-deps)
+  - [Depends On](#depends-on)
+- [CLI](#cli)
+- [Development](#development)
+
 A Buildkite dynamic pipeline generator for monorepos. `monofo` lets you split
 your `.buildkite/pipeline.yml` into multiple components, each of which will
 only be run if it needs to be (based on what's changed since the last build).
@@ -63,12 +75,31 @@ secrets.
 The token only needs the `read_builds` scope. We need an _API_ token, not an
 _agent_ token.
 
-## Other Features
+## Advanced Usage
 
 ### Escape Hatch: Disabling Monofo
 
 If you set the environment variable `PIPELINE_RUN_ALL` to any truthy value,
 all parts of the pipeline will be output; a good way to "force a full build".
+
+### Pipeline file changes match themselves
+
+For convenience, if you change `pipeline.foo.yml`, that change will
+automatically be considered matching for the `foo` pipeline, without having to
+add that pipeline file to the `matches` array yourself.
+
+### Phony deps
+
+Any artifacts that are prefixed with `.phony/` are considered to not be real.
+These artifacts are still evaulated when ordering pipeline steps (using
+`expects`/`provides`), but they won't be actually downloaded if components are
+skipped.
+
+### Depends On
+
+In any component pipeline, you can specify `monorepo.depends_on` as an array of
+pipeline component names (like `foo` for `pipeline.foo.yml`). Those pipelines
+will be included in a build if the pipeline that `depends_on` them is included.
 
 ## CLI
 
@@ -77,19 +108,16 @@ $ monofo --help
 Monofo provides utilities for dynamically generating monorepo pipelines
 
 Commands:
-  monofo.js artifact [options] <artifacts>  Ensures artifacts are present by
-                                            injecting them from other builds if
-                                            necessary
-  monofo.js base-commit                     Output a base commit hash, from
-                                            which the current build should be
-                                            compared
-  monofo.js pipeline                        Output a merged pipeline.yml
-                                                                       [default]
+  monofo base-commit  Output a base commit hash, from which the current build
+                      should be compared
+  monofo pipeline     Output a merged pipeline.yml                     [default]
 
 Options:
-  --version      Show version number                                   [boolean]
-  --verbose, -v  Run with verbose logging             [boolean] [default: false]
-  --help         Show help                                             [boolean]
+      --version  Show version number                                   [boolean]
+  -v, --verbose  Run with verbose logging             [boolean] [default: false]
+      --help     Show help                                             [boolean]
+
+Visit https://github.com/vital-software/monofo for documentation about this command.
 ```
 
 ## Development
