@@ -93,6 +93,7 @@ describe('monofo pipeline', () => {
       .then((o) => (safeLoad(o) as unknown) as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
+        expect(p.steps).toHaveLength(1); // No artifacts step, because only phony artifacts involved
 
         // This had a cross-dependency, but the thing it depended on was skipped
         // In addition, nothing that was skipped was producing required artifacts

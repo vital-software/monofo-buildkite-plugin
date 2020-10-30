@@ -1,4 +1,6 @@
 monorepo:
+  produces:
+    - .phony/foo
   matches: no-match
 
 steps:
