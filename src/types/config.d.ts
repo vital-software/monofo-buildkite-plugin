@@ -1,5 +1,6 @@
 interface ConfigFile {
   path: string;
+  basePath: string;
 }
 
 interface Config extends ConfigFile {

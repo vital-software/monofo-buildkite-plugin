@@ -30,14 +30,18 @@ function isConfig(c: ConfigFile): c is Config {
   return (c as Config).name?.length > 0 && typeof (c as Config).monorepo === 'object';
 }
 
-async function getConfigFiles(dir: string): Promise<Config[]> {
+/**
+ * Reads all pipeline.foo.yml files from .buildkite/ relative to a given basePath, and returns file locations
+ */
+async function getConfigFiles(basePath: string): Promise<ConfigFile[]> {
   return fs
-    .readdir(dir)
+    .readdir(path.join(basePath, CONFIG_REL_PATH))
     .then((files: string[]) => {
       return files.map((file) => {
         return {
-          path: path.join(dir, file),
-        } as Config;
+          basePath,
+          path: path.join(CONFIG_REL_PATH, file),
+        };
       });
     })
     .catch((e) => {
@@ -64,7 +68,7 @@ async function readConfig(config: ConfigFile): Promise<ConfigFile> {
     return Promise.resolve(config);
   }
 
-  return fs.readFile(config.path).then((buf) => {
+  return fs.readFile(path.join(config.basePath, config.path)).then((buf) => {
     const { monorepo, steps, env } = (safeLoad(buf.toString()) as unknown) as Config;
 
     if (_.isArray(env)) {
@@ -79,7 +83,7 @@ async function readConfig(config: ConfigFile): Promise<ConfigFile> {
 
     // TODO: Could do a lot more type checking here for malformed pipeline.yml files
 
-    return {
+    const ret: Config = {
       ...config,
       name,
       monorepo: {
@@ -91,7 +95,9 @@ async function readConfig(config: ConfigFile): Promise<ConfigFile> {
       },
       steps,
       env,
-    } as Config;
+    };
+
+    return ret;
   });
 }
 
@@ -122,8 +128,8 @@ function sort(configs: Config[]): Config[] {
  * to be processed
  */
 export default async function getConfigs(): Promise<Config[]> {
-  const configDir = path.join(process.cwd(), CONFIG_REL_PATH);
-  return getConfigFiles(configDir)
+  const basePath = process.cwd();
+  return getConfigFiles(basePath)
     .then((configs) => Promise.all(configs.map(readConfig)))
     .then((configs) => sort(configs.filter(isConfig)));
 }
