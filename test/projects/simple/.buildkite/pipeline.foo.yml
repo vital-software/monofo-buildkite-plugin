@@ -4,6 +4,7 @@ monorepo:
   matches:
     - "foo/**/*.ts"
     - "foo/**/README.md"
+  depends_on: dependedon
 
 env:
   FOO: some-value
