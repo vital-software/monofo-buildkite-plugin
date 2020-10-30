@@ -6,11 +6,11 @@ services:
       context: .
       args:
         - NODE_TAG=lts
-    image: dominics/monofo:node-latest
+    image: quay.io/vital/build-cache:monofo-node-latest
 
   node-14:
     build:
       context: .
       args:
         - NODE_TAG=14
-    image: dominics/monofo:node-14-latest
+    image: quay.io/vital/build-cache:monofo-node-14-latest
