@@ -86,8 +86,24 @@ function toPipeline(steps: Step[]): Pipeline {
   return { env: {}, steps };
 }
 
-function checkDependsOn(initialDecisions: ConfigWithDecision[]): ConfigWithDecision[] {
-  return initialDecisions;
+/**
+ * Mutates the config objects within ConfigWithDecision to account for transitive dependencies between pipelines
+ */
+function updateDecisionsForDependsOn(configs: ConfigWithDecision[]): void {
+  const byName = Object.fromEntries(configs.map((c) => [c.name, c]));
+
+  configs
+    .flatMap((config) => config.monorepo.depends_on.map((dependency) => [config.name, dependency]))
+    .reverse()
+    .forEach(([from, to]) => {
+      const dependent = byName[from];
+      const dependency = byName[to];
+
+      if (dependent.included && !dependency.included) {
+        dependency.included = true;
+        dependency.reason = `been pulled in by a depends_on from ${from}`;
+      }
+    });
 }
 
 /**
@@ -96,14 +112,15 @@ function checkDependsOn(initialDecisions: ConfigWithDecision[]): ConfigWithDecis
 export function mergePipelines(results: ConfigWithChanges[]): Pipeline {
   log(`Merging ${results.length} pipelines`);
 
-  const initialDecisions: ConfigWithDecision[] = results.map((r) => {
+  const decisions: ConfigWithDecision[] = results.map((r) => {
     return {
       ...r,
       ...getMergeDecision(r),
     } as ConfigWithDecision;
   });
 
-  const decisions = checkDependsOn(initialDecisions);
+  // Mutate for depends_on
+  updateDecisionsForDependsOn(decisions);
 
   // Announce decisions
   decisions.forEach((config) => {

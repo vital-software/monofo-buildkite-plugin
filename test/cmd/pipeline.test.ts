@@ -47,6 +47,7 @@ describe('monofo pipeline', () => {
         expect(p.steps.map((s) => s.command)).toStrictEqual([
           "echo 'inject for: bar, qux'",
           'echo "changed" > changed',
+          'echo "dependedon" > dependedon',
           'echo "foo1" > foo1',
           "echo 'bar was replaced'",
           'echo "baz1"',
