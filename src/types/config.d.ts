@@ -9,6 +9,7 @@ interface Config extends ConfigFile {
     expects: string[];
     produces: string[];
     matches: string[];
+    depends_on: string[];
     excluded_steps: Record<string, unknown>[];
   };
   steps: Step[];
