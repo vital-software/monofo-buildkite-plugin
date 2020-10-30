@@ -43,7 +43,7 @@
     "@commitlint/config-conventional": "11.0.0",
     "@semantic-release/changelog": "5.0.1",
     "@semantic-release/git": "9.0.0",
-    "@types/bluebird": "3.5.32",
+    "@types/bluebird": "3.5.33",
     "@types/debug": "4.1.5",
     "@types/jest": "26.0.15",
     "@types/js-yaml": "3.12.5",
