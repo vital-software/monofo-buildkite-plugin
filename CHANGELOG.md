@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/vital-software/monofo/compare/v1.0.5...v1.1.0) (2020-10-30)
+
+
+### Features
+
+* **steps:** allow for phony dependencies ([1279f03](https://github.com/vital-software/monofo/commit/1279f037e267fbb34edeb107f3415c58266ec86e))
+
 ## [1.0.5](https://github.com/vital-software/monofo/compare/v1.0.4...v1.0.5) (2020-10-30)
 
 

@@ -1,4 +1,6 @@
 monorepo:
+  expects:
+    - .phony/foo
   matches:
     - "baz/**/*.ts" # will match
 
