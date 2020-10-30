@@ -1,3 +1,10 @@
+## [1.0.5](https://github.com/vital-software/monofo/compare/v1.0.4...v1.0.5) (2020-10-30)
+
+
+### Bug Fixes
+
+* **deps:** update dependency debug to v4.2.0 ([4e8099b](https://github.com/vital-software/monofo/commit/4e8099b4895a2a38699ced00b501e1df1a63d21e))
+
 ## [1.0.4](https://github.com/vital-software/monofo/compare/v1.0.3...v1.0.4) (2020-10-29)
 
 
