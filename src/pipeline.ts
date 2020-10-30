@@ -5,6 +5,11 @@ import { count } from './util';
 
 const log = debug('monofo:pipeline');
 
+const decide = (included: boolean, reason: string): IncludeDecision => ({
+  included,
+  reason,
+});
+
 /**
  * Loop through the decided configurations and, for any excluded parts, collect the keys of steps that are now skipped.
  * Then rewrite the depends_on of any dependent steps to point at the artifact injection step.
@@ -49,12 +54,6 @@ export interface IncludeDecision {
  * are merged in instead
  */
 function getMergeDecision(config: ConfigWithChanges): IncludeDecision {
-  const decide = (included: boolean, reason: string) =>
-    ({
-      included,
-      reason,
-    } as IncludeDecision);
-
   if (process.env.PIPELINE_RUN_ALL) {
     return { included: true, reason: 'been forced to by PIPELINE_RUN_ALL' };
   }
@@ -64,11 +63,11 @@ function getMergeDecision(config: ConfigWithChanges): IncludeDecision {
   }
 
   // At this point, we know it has a config.buildId we can grab artifacts from
-  if (config.changes.length <= 0) {
-    return decide(false, 'no matching changes');
+  if (config.changes.length > 0) {
+    return decide(true, `${count(config.changes, 'matching change')}: ${config.changes.join(', ')}`);
   }
 
-  return decide(true, `${count(config.changes, 'matching change')}: ${config.changes.join(', ')}`);
+  return decide(false, 'no matching changes');
 }
 
 function toMerge({ steps, env, included, monorepo }: ConfigWithDecision): Pipeline {
@@ -87,18 +86,24 @@ function toPipeline(steps: Step[]): Pipeline {
   return { env: {}, steps };
 }
 
+function checkDependsOn(initialDecisions: ConfigWithDecision[]): ConfigWithDecision[] {
+  return initialDecisions;
+}
+
 /**
  * @param results
  */
 export function mergePipelines(results: ConfigWithChanges[]): Pipeline {
   log(`Merging ${results.length} pipelines`);
 
-  const decisions: ConfigWithDecision[] = results.map((r) => {
+  const initialDecisions: ConfigWithDecision[] = results.map((r) => {
     return {
       ...r,
       ...getMergeDecision(r),
     } as ConfigWithDecision;
   });
+
+  const decisions = checkDependsOn(initialDecisions);
 
   // Announce decisions
   decisions.forEach((config) => {
