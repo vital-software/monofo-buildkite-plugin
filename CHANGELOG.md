@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/vital-software/monofo/compare/v1.2.0...v1.3.0) (2020-11-01)
+
+
+### Features
+
+* **core:** add support for depends_on causing pipelines to be included ([048122a](https://github.com/vital-software/monofo/commit/048122a5286d0b7a63f8c6f5f9b303a73a54fa1c))
+
 # [1.2.0](https://github.com/vital-software/monofo/compare/v1.1.0...v1.2.0) (2020-10-30)
 
 
