@@ -1,27 +1,17 @@
 {
   "compilerOptions": {
-    "target": "es2019",
     "outDir": "build",
     "rootDir": ".",
     "moduleResolution": "node",
-    "module": "commonjs",
     "declaration": true,
     "inlineSourceMap": true,
-    "esModuleInterop": true,
-    "strict": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "traceResolution": false,
-    "listEmittedFiles": false,
-    "listFiles": false,
-    "pretty": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "lib": ["es2020"]
+    "emitDecoratorMetadata": true
   },
-  "include": ["src/**/*.ts", "test/**/*.ts", ".eslinttrc.js", "*.config.js", "bin/*.js"],
-  "exclude": ["node_modules/**"],
-  "compileOnSave": false
+  "include": ["src/**/*.ts", "test/**/*.ts", "bin/*.js"],
+  "extends": "@tsconfig/node12/tsconfig.json"
 }
