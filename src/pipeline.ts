@@ -61,7 +61,7 @@ function getMergeDecision(config: ConfigWithChanges): IncludeDecision {
     return decide(true, 'been forced to by PIPELINE_RUN_ALL');
   }
 
-  const envVarName = config.name.toLocaleUpperCase().replace('-', '_');
+  const envVarName = config.monorepo.name.toLocaleUpperCase().replace('-', '_');
 
   const overrideExcludeKey = `PIPELINE_NO_RUN_${envVarName}`;
   if (process.env[overrideExcludeKey]) {
@@ -105,10 +105,10 @@ function toPipeline(steps: Step[]): Pipeline {
  * Mutates the config objects within ConfigWithDecision to account for transitive dependencies between pipelines
  */
 function updateDecisionsForDependsOn(configs: ConfigWithDecision[]): void {
-  const byName = Object.fromEntries(configs.map((c) => [c.name, c]));
+  const byName = Object.fromEntries(configs.map((c) => [c.monorepo.name, c]));
 
   configs
-    .flatMap((config) => config.monorepo.depends_on.map((dependency) => [config.name, dependency]))
+    .flatMap((config) => config.monorepo.depends_on.map((dependency) => [config.monorepo.name, dependency]))
     .reverse()
     .forEach(([from, to]) => {
       const dependent = byName[from];
@@ -139,7 +139,7 @@ export function mergePipelines(results: ConfigWithChanges[]): Pipeline {
 
   // Announce decisions
   decisions.forEach((config) => {
-    log(`${config.name} will be ${config.included ? 'INCLUDED' : 'EXCLUDED'} because it has ${config.reason}`);
+    log(`${config.monorepo.name} will be ${config.included ? 'INCLUDED' : 'EXCLUDED'} because it has ${config.reason}`);
   });
 
   const artifactSteps = artifactInjectionSteps(decisions);

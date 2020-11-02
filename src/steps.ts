@@ -6,7 +6,7 @@ export const ARTIFACT_INJECTION_STEP_KEY = 'monorepo-inject-artifacts';
 const ARTIFACT_INJECTION_STEP_LABEL = `:crystal_ball:`;
 
 export function artifactInjectionSteps(configs: ConfigWithDecision[]): Step[] {
-  const names = configs.filter((c) => !c.included).map((c) => c.name);
+  const names = configs.filter((c) => !c.included).map((c) => c.monorepo.name);
   const produces = configs
     .filter((c) => !c.included)
     .flatMap((e) => e.monorepo.produces)
