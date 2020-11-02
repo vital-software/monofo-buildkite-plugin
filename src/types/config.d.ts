@@ -11,6 +11,7 @@ interface Config extends ConfigFile {
     matches: string[];
     depends_on: string[];
     excluded_steps: Record<string, unknown>[];
+    excluded_env: Record<string, string>;
   };
   steps: Step[];
   env: Record<string, string>;
