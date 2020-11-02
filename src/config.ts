@@ -1,14 +1,18 @@
 import { promises as fs } from 'fs';
-import * as path from 'path';
+import { join, basename } from 'path';
+import { promisify } from 'util';
 import debug from 'debug';
+import globAsync from 'glob';
 import { safeLoad } from 'js-yaml';
 import _ from 'lodash';
 import toposort from 'toposort';
 
+const glob = promisify(globAsync);
 const log = debug('monofo:config');
 
-const CONFIG_REL_PATH = '.buildkite/';
 const PIPELINE_FILE = /^pipeline\.(?<name>.*)\.yml$/;
+const PIPELINE_FILE_GLOB = '**/pipeline*.yml';
+const PIPELINE_FILE_IGNORE_GLOB = ['**/node_modules/**'];
 const BUILDKITE_REQUIRED_ENV = [
   'BUILDKITE_BRANCH',
   'BUILDKITE_COMMIT',
@@ -31,23 +35,28 @@ function isConfig(c: ConfigFile): c is Config {
 }
 
 /**
- * Reads all pipeline.foo.yml files from .buildkite/ relative to a given basePath, and returns file locations
+ * Searches for all pipeline files anywhere in the current working directory, and returns their file locations
  */
-async function getConfigFiles(basePath: string): Promise<ConfigFile[]> {
-  return fs
-    .readdir(path.join(basePath, CONFIG_REL_PATH))
-    .then((files: string[]) => {
-      return files.map((file) => {
-        return {
-          basePath,
-          path: path.join(CONFIG_REL_PATH, file),
-        };
-      });
-    })
-    .catch((e) => {
-      log(e);
-      return [];
+async function getConfigFiles(): Promise<ConfigFile[]> {
+  const cwd = process.cwd();
+
+  try {
+    const pipelines = await glob(PIPELINE_FILE_GLOB, {
+      dot: true,
+      cwd,
+      ignore: PIPELINE_FILE_IGNORE_GLOB,
     });
+
+    return pipelines.map((path) => {
+      return {
+        basePath: cwd,
+        path,
+      };
+    });
+  } catch (e) {
+    log(e);
+    return [];
+  }
 }
 
 function strings(v: undefined | string[] | string): string[] {
@@ -60,15 +69,13 @@ function strings(v: undefined | string[] | string): string[] {
   return [String(v)];
 }
 
+function nameFromFilename(config: ConfigFile): string | undefined {
+  const match = PIPELINE_FILE.exec(basename(config.path));
+  return match?.groups?.name || undefined;
+}
+
 async function readConfig(config: ConfigFile): Promise<ConfigFile> {
-  const match = PIPELINE_FILE.exec(path.basename(config.path));
-  const name = match?.groups?.name;
-
-  if (!name) {
-    return Promise.resolve(config);
-  }
-
-  return fs.readFile(path.join(config.basePath, config.path)).then((buf) => {
+  return fs.readFile(join(config.basePath, config.path)).then((buf) => {
     const { monorepo, steps, env } = (safeLoad(buf.toString()) as unknown) as Config;
 
     if (_.isArray(env)) {
@@ -76,14 +83,19 @@ async function readConfig(config: ConfigFile): Promise<ConfigFile> {
       throw new Error('TODO: monofo cannot cope with env being an array yet (split to object)');
     }
 
+    const name = monorepo.name || nameFromFilename(config);
+
+    if (!name) {
+      log(`Skipping ${config.path} because it has no pipeline name`);
+      return Promise.resolve(config);
+    }
+
     if (!monorepo || typeof monorepo !== 'object') {
       log(`Skipping ${name} because it has no monorepo configuration`);
       return config;
     }
 
-    // TODO: Could do a lot more type checking here for malformed pipeline.yml files
-
-    const ret: Config = {
+    return {
       ...config,
       name,
       monorepo: {
@@ -98,8 +110,6 @@ async function readConfig(config: ConfigFile): Promise<ConfigFile> {
       steps,
       env,
     };
-
-    return ret;
   });
 }
 
@@ -140,8 +150,7 @@ function sort(configs: Config[]): Config[] {
  * to be processed
  */
 export default async function getConfigs(): Promise<Config[]> {
-  const basePath = process.cwd();
-  return getConfigFiles(basePath)
+  return getConfigFiles()
     .then((configs) => Promise.all(configs.map(readConfig)))
     .then((configs) => sort(configs.filter(isConfig)));
 }
