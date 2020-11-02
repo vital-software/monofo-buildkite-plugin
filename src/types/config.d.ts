@@ -4,7 +4,11 @@ interface ConfigFile {
 }
 
 interface Config extends ConfigFile {
+  /**
+   * The name of the component pipeline - e.g. for pipeline.foo.yml, this is foo
+   */
   name: string;
+
   monorepo: {
     expects: string[];
     produces: string[];

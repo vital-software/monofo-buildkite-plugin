@@ -51,11 +51,26 @@ export interface IncludeDecision {
 
 /**
  * If a config has changes, its steps are merged into the final build. Otherwise, it is excluded, and its excluded_steps
- * are merged in instead
+ * are merged in instead. There are exceptions:
+ *  - An env var named PIPELINE_RUN_ALL, set to any value, indicates that all steps should run
+ *  - An env var named PIPELINE_RUN_<NAME>, where NAME is the UPPER_SNAKE_CASE version of the component pipeline name,
+ *    set to any value, indicates that step should run
  */
 function getMergeDecision(config: ConfigWithChanges): IncludeDecision {
   if (process.env.PIPELINE_RUN_ALL) {
-    return { included: true, reason: 'been forced to by PIPELINE_RUN_ALL' };
+    return decide(true, 'been forced to by PIPELINE_RUN_ALL');
+  }
+
+  const envVarName = config.name.toLocaleUpperCase().replace('-', '_');
+
+  const overrideExcludeKey = `PIPELINE_NO_RUN_${envVarName}`;
+  if (process.env[overrideExcludeKey]) {
+    return decide(false, `been forced NOT to by ${overrideExcludeKey}`);
+  }
+
+  const overrideIncludeKey = `PIPELINE_RUN_${envVarName}`;
+  if (process.env[overrideIncludeKey]) {
+    return decide(true, `been forced to by ${overrideIncludeKey}`);
   }
 
   if (!config.buildId) {
