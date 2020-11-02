@@ -8,6 +8,8 @@ monorepo:
   excluded_steps:
     - label: "Some other step"
       command: "echo 'bar was replaced'"
+  excluded_env:
+    BAR_WAS_EXCLUDED: "true"
 
 env:
   BAR: some-value

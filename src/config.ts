@@ -92,6 +92,7 @@ async function readConfig(config: ConfigFile): Promise<ConfigFile> {
         produces: strings(monorepo.produces),
         matches: strings(monorepo.matches),
         excluded_steps: monorepo.excluded_steps || [],
+        excluded_env: monorepo.excluded_env || {},
       },
       steps,
       env,

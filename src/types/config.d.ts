@@ -10,6 +10,7 @@ interface Config extends ConfigFile {
     produces: string[];
     matches: string[];
     excluded_steps: Record<string, unknown>[];
+    excluded_env: Record<string, string>;
   };
   steps: Step[];
   env: Record<string, string>;
