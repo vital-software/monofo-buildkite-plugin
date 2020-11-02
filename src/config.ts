@@ -1,9 +1,9 @@
 import { promises as fs } from 'fs';
 import * as path from 'path';
-import { safeLoad } from 'js-yaml';
-import toposort from 'toposort';
 import debug from 'debug';
+import { safeLoad } from 'js-yaml';
 import _ from 'lodash';
+import toposort from 'toposort';
 
 const log = debug('monofo:config');
 

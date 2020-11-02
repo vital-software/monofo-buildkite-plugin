@@ -1,11 +1,11 @@
 import path from 'path';
-import { Arguments } from 'yargs';
 import { safeLoad } from 'js-yaml';
 import { mocked } from 'ts-jest/utils';
+import { Arguments } from 'yargs';
+import execSync from '../../test/cmd/exec';
 import { BUILD_ID, COMMIT, fakeProcess } from '../../test/fixtures';
 import { mergeBase, diff, revList } from '../git';
 import * as pipeline from './pipeline';
-import execSync from '../../test/cmd/exec';
 
 jest.mock('../git');
 jest.mock('../buildkite/client');

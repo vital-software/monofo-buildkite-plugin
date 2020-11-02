@@ -1,5 +1,5 @@
-import _ from 'lodash';
 import debug from 'debug';
+import _ from 'lodash';
 import { ARTIFACT_INJECTION_STEP_KEY, artifactInjectionSteps, nothingToDoSteps } from './steps';
 import { count } from './util';
 
