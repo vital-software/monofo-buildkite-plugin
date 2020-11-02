@@ -5,7 +5,7 @@
 - [Configuration](#configuration)
   - [Buildkite API Access Token](#buildkite-api-access-token)
 - [Advanced Usage](#advanced-usage)
-  - [Escape Hatch: Disabling Monofo](#escape-hatch-disabling-monofo)
+  - [Controlling what is included](#controlling-what-is-included)
   - [Pipeline file changes match themselves](#pipeline-file-changes-match-themselves)
   - [Phony deps](#phony-deps)
   - [Depends On](#depends-on)
@@ -77,10 +77,15 @@ _agent_ token.
 
 ## Advanced Usage
 
-### Escape Hatch: Disabling Monofo
+### Controlling what is included
 
-If you set the environment variable `PIPELINE_RUN_ALL` to any truthy value,
-all parts of the pipeline will be output; a good way to "force a full build".
+If you set the environment variable `PIPELINE_RUN_ALL=1`, all parts of the
+pipeline will be output; this is a good way to "force a full build", or disable
+monofo temporarily.
+
+If you set `PIPELINE_RUN_<COMPONENT_NAME>=1`, that component will be included,
+even if it wouldn't ordinarily. And if you set `PIPELINE_NO_RUN_<COMPONENT_NAME>`
+that component will never be included, even if it does have matches.
 
 ### Pipeline file changes match themselves
 
