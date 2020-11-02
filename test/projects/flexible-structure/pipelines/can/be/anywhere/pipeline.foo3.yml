@@ -1,0 +1,7 @@
+monorepo:
+  name: foo3
+  matches: "foo/**/README.md"
+
+steps:
+  - command: echo "foo3" > foo3
+    key: foo3Key
