@@ -34,11 +34,17 @@ describe('matchConfigs', () => {
     process.chdir(path.resolve(__dirname, '../test/projects/kitchen-sink'));
     const result = matchConfigs('foo', await getConfigs(), ['foo/abc.js', 'foo/README.md', 'bar/abc.ts', 'baz/abc.ts']);
 
-    expect(result[0].changes).toStrictEqual([]);
-    expect(result[1].changes).toStrictEqual([]);
-    expect(result[2].changes).toStrictEqual(['foo/README.md']);
-    expect(result[3].changes).toStrictEqual([]);
-    expect(result[4].changes).toStrictEqual([]);
-    expect(result[5].changes).toStrictEqual(['baz/abc.ts']);
+    expect(result).toHaveLength(9);
+    expect(result.map((r) => r.changes)).toStrictEqual([
+      [],
+      [],
+      ['foo/README.md'],
+      ['foo/README.md'],
+      [],
+      [],
+      [],
+      ['baz/abc.ts'],
+      ['foo/abc.js', 'foo/README.md', 'bar/abc.ts', 'baz/abc.ts'],
+    ]);
   });
 });

@@ -1,0 +1,8 @@
+monorepo:
+  # This does match, but this pipeline is excluded with PIPELINE_NO_RUN_EXCLUDED=1
+  matches:
+    - "foo/**/README.md"
+
+steps:
+  - command: echo "excluded" > excluded
+    key: excluded

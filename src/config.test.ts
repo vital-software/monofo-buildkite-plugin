@@ -11,13 +11,17 @@ describe('getConfig()', () => {
     process.chdir(path.resolve(__dirname, '../test/projects/kitchen-sink'));
     const config = await getConfigs();
 
-    expect(config).toHaveLength(7);
-    expect(config[0].name).toBe('changed');
-    expect(config[1].name).toBe('dependedon');
-    expect(config[2].name).toBe('foo');
-    expect([config[3].name, config[2].name]).toContain('bar');
-    expect([config[4].name, config[2].name]).toContain('qux');
-    expect(config[5].name).toBe('baz');
-    expect(config[6].name).toBe('unreferenced');
+    expect(config).toHaveLength(9);
+    expect(config.map((c) => c.name)).toStrictEqual([
+      'changed',
+      'dependedon',
+      'excluded',
+      'foo',
+      'bar',
+      'included',
+      'qux',
+      'baz',
+      'unreferenced',
+    ]);
   });
 });
