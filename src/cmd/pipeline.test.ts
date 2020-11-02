@@ -2,13 +2,13 @@ import path from 'path';
 import { Arguments } from 'yargs';
 import { safeLoad } from 'js-yaml';
 import { mocked } from 'ts-jest/utils';
-import { BUILD_ID, COMMIT, fakeProcess } from '../fixtures';
-import { mergeBase, diff, revList } from '../../src/git';
-import * as pipeline from '../../src/cmd/pipeline';
-import execSync from './exec';
+import { BUILD_ID, COMMIT, fakeProcess } from '../../test/fixtures';
+import { mergeBase, diff, revList } from '../git';
+import * as pipeline from './pipeline';
+import execSync from '../../test/cmd/exec';
 
-jest.mock('../../src/git');
-jest.mock('../../src/buildkite/client');
+jest.mock('../git');
+jest.mock('../buildkite/client');
 
 const mockMergeBase = mergeBase as jest.Mock<Promise<string>>;
 mockMergeBase.mockImplementation(() => Promise.resolve('foo'));
@@ -37,7 +37,7 @@ describe('monofo pipeline', () => {
 
   it('can be executed with simple configuration on the default branch', async () => {
     process.env = fakeProcess();
-    process.chdir(path.resolve(__dirname, '../projects/simple'));
+    process.chdir(path.resolve(__dirname, '../../test/projects/simple'));
 
     const args: Arguments<unknown> = { $0: '', _: [] };
     await ((pipeline.handler(args) as unknown) as Promise<string>)
@@ -66,7 +66,7 @@ describe('monofo pipeline', () => {
 
   it('can be executed with simple configuration and skipped parts on the default branch', async () => {
     process.env = fakeProcess();
-    process.chdir(path.resolve(__dirname, '../projects/skipped'));
+    process.chdir(path.resolve(__dirname, '../../test/projects/skipped'));
 
     const args: Arguments<unknown> = { $0: '', _: [] };
     await ((pipeline.handler(args) as unknown) as Promise<string>)
@@ -89,7 +89,7 @@ describe('monofo pipeline', () => {
 
   it('can be executed with crossdeps alone', async () => {
     process.env = fakeProcess();
-    process.chdir(path.resolve(__dirname, '../projects/crossdeps'));
+    process.chdir(path.resolve(__dirname, '../../test/projects/crossdeps'));
 
     const args: Arguments<unknown> = { $0: '', _: [] };
     await ((pipeline.handler(args) as unknown) as Promise<string>)
