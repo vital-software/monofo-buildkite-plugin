@@ -31,7 +31,7 @@ describe('matchConfigs', () => {
 
   it('matches changed files against configs', async () => {
     process.env = fakeProcess();
-    process.chdir(path.resolve(__dirname, '../test/projects/simple'));
+    process.chdir(path.resolve(__dirname, '../test/projects/kitchen-sink'));
     const result = matchConfigs('foo', await getConfigs(), ['foo/abc.js', 'foo/README.md', 'bar/abc.ts', 'baz/abc.ts']);
 
     expect(result[0].changes).toStrictEqual([]);

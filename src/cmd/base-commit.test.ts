@@ -39,7 +39,7 @@ describe('cmd base-commit', () => {
 
   it('can be executed with simple configuration', async () => {
     process.env = fakeProcess();
-    process.chdir(path.resolve(__dirname, '../../test/projects/simple'));
+    process.chdir(path.resolve(__dirname, '../../test/projects/kitchen-sink'));
 
     const args: Arguments<unknown> = { $0: '', _: [] };
     return expect(baseCommit.handler(args)).resolves.toBe(COMMIT);
