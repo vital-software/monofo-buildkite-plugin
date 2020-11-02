@@ -3,22 +3,22 @@ interface ConfigFile {
   basePath: string;
 }
 
-interface Config extends ConfigFile {
+interface MonorepoConfig {
+  name?: string;
+  expects: string[];
+  produces: string[];
+  matches: string[];
+  depends_on: string[];
+  excluded_steps: Record<string, unknown>[];
+  excluded_env: Record<string, string>;
+}
+
+interface Config extends ConfigFile, Pipeline {
   /**
    * The name of the component pipeline - e.g. for pipeline.foo.yml, this is foo
    */
   name: string;
-
-  monorepo: {
-    expects: string[];
-    produces: string[];
-    matches: string[];
-    depends_on: string[];
-    excluded_steps: Record<string, unknown>[];
-    excluded_env: Record<string, string>;
-  };
-  steps: Step[];
-  env: Record<string, string>;
+  monorepo: MonorepoConfig;
 }
 
 interface ConfigWithChanges extends Config {
