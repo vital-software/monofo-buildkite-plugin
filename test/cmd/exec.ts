@@ -15,7 +15,7 @@ export default async function execSync<T = CommonArguments, U = unknown>(
       // @ts-ignore
       .command<U>(command)
       .help()
-      .parse(args, (err: Error | undefined, argv: Arguments<U>, output: string) => {
+      .parse(args, (_err: Error | undefined, _argv: Arguments<U>, output: string) => {
         resolve(output);
       });
   });
