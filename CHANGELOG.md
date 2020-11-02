@@ -1,3 +1,16 @@
+# [1.6.0](https://github.com/vital-software/monofo/compare/v1.5.0...v1.6.0) (2020-11-02)
+
+
+### Bug Fixes
+
+* pre-sort configs by name, so they're location independent ([c9e7ed4](https://github.com/vital-software/monofo/commit/c9e7ed42694e99155d95601c2fca3b57587b1d05))
+
+
+### Features
+
+* **core:** allow overriding the name of a component in yaml ([0a8a6ac](https://github.com/vital-software/monofo/commit/0a8a6ac8256eba92274ef4ad0b3b9f0b2086b8e2))
+* **core:** use glob to find pipeline files anywhere in the repo ([e086eea](https://github.com/vital-software/monofo/commit/e086eea3dcc2163b520fbb94b455162a01a8f2d0))
+
 # [1.5.0](https://github.com/vital-software/monofo/compare/v1.4.0...v1.5.0) (2020-11-02)
 
 
