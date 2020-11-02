@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/vital-software/monofo/compare/v1.3.0...v1.4.0) (2020-11-02)
+
+
+### Features
+
+* **core:** allow setting env values when excluded ([d74d65e](https://github.com/vital-software/monofo/commit/d74d65e9e6f601caa0a9ce627ef3eaa692958a4a))
+
 # [1.3.0](https://github.com/vital-software/monofo/compare/v1.2.0...v1.3.0) (2020-11-01)
 
 
