@@ -1,9 +1,9 @@
-import { mocked } from 'ts-jest/utils';
 import path from 'path';
-import { getBaseBuild, matchConfigs } from './diff';
+import { mocked } from 'ts-jest/utils';
 import { COMMIT, fakeProcess } from '../test/fixtures';
-import { mergeBase, revList } from './git';
 import getConfigs, { getBuildkiteInfo } from './config';
+import { getBaseBuild, matchConfigs } from './diff';
+import { mergeBase, revList } from './git';
 
 jest.mock('./git');
 jest.mock('./buildkite/client');

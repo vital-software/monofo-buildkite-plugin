@@ -1,6 +1,6 @@
 import { CommandModule } from 'yargs';
-import { getBaseBuild } from '../diff';
 import { getBuildkiteInfo } from '../config';
+import { getBaseBuild } from '../diff';
 
 const cmd: CommandModule = {
   command: 'base-commit',

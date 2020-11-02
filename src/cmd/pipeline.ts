@@ -1,6 +1,6 @@
-import { CommandModule } from 'yargs';
-import { safeDump } from 'js-yaml';
 import debug from 'debug';
+import { safeDump } from 'js-yaml';
+import { CommandModule } from 'yargs';
 import getConfigs, { getBuildkiteInfo } from '../config';
 import { getBaseBuild, matchConfigs } from '../diff';
 import { diff } from '../git';

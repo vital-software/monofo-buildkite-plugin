@@ -1,8 +1,8 @@
-import minimatch from 'minimatch';
 import debug from 'debug';
 import _ from 'lodash';
-import { mergeBase, revList } from './git';
+import minimatch from 'minimatch';
 import BuildkiteClient from './buildkite/client';
+import { mergeBase, revList } from './git';
 import { count } from './util';
 
 const log = debug('monofo:diff');

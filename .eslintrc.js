@@ -27,6 +27,11 @@ module.exports = {
     sourceType: 'module' // Allows for the use of imports
   },
   rules: {
+    'import/order': [
+      'error',
+      { alphabetize: { order: 'asc', caseInsensitive: true }, 'newlines-between': 'never' },
+    ],
+
     // Allow unbound static method references
     '@typescript-eslint/unbound-method': [
       'error',

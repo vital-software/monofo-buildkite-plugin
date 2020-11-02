@@ -1,6 +1,6 @@
-import got from 'got';
-import debug from 'debug';
 import { URL } from 'url';
+import debug from 'debug';
+import got from 'got';
 
 const log = debug('monofo:buildkite:client');
 

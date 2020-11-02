@@ -1,9 +1,9 @@
 import path from 'path';
 import { Arguments } from 'yargs';
+import execSync from '../../test/cmd/exec';
 import { fakeProcess, COMMIT } from '../../test/fixtures';
 import { mergeBase, diff, revList } from '../git';
 import baseCommit from './base-commit';
-import execSync from '../../test/cmd/exec';
 
 jest.mock('../git');
 jest.mock('../buildkite/client');

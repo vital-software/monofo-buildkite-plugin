@@ -1,6 +1,6 @@
 import nock from 'nock';
-import BuildkiteClient, { GetBuildsOptions } from './client';
 import { fakeBuildkiteBuildsListing, fakeBuildkiteInfo, COMMIT } from '../../test/fixtures';
+import BuildkiteClient, { GetBuildsOptions } from './client';
 
 describe('BuildkiteClient', () => {
   describe('getLastSuccessfulBuild()', () => {
