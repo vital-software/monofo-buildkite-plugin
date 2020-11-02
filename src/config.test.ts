@@ -8,7 +8,7 @@ describe('getConfig()', () => {
   });
 
   it('reads pipeline files and returns an array of config files - simple', async () => {
-    process.chdir(path.resolve(__dirname, '../test/projects/simple'));
+    process.chdir(path.resolve(__dirname, '../test/projects/kitchen-sink'));
     const config = await getConfigs();
 
     expect(config).toHaveLength(7);
