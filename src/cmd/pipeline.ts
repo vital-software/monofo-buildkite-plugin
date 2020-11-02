@@ -4,7 +4,7 @@ import { CommandModule } from 'yargs';
 import getConfigs, { getBuildkiteInfo } from '../config';
 import { getBaseBuild, matchConfigs } from '../diff';
 import { diff } from '../git';
-import { mergePipelines } from '../pipeline';
+import merge from '../merge';
 
 const log = debug('monofo:cmd:pipeline');
 
@@ -33,7 +33,7 @@ const cmd: CommandModule = {
             return Promise.resolve(fallback(e, configs));
           });
       })
-      .then(mergePipelines)
+      .then(merge)
       .then(safeDump)
       .then((v) => {
         process.stdout.write(`${v}\n`);
