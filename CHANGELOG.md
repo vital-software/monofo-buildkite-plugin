@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/vital-software/monofo/compare/v1.4.0...v1.5.0) (2020-11-02)
+
+
+### Features
+
+* allow controlling included/excluded steps with PIPELINE_(NO_)RUN ([8e2a0e5](https://github.com/vital-software/monofo/commit/8e2a0e52fa251e8103bc8f7962842b7ccd2675fb))
+
 # [1.4.0](https://github.com/vital-software/monofo/compare/v1.3.0...v1.4.0) (2020-11-02)
 
 
