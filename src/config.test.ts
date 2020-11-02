@@ -12,7 +12,7 @@ describe('getConfig()', () => {
     const config = await getConfigs();
 
     expect(config).toHaveLength(9);
-    expect(config.map((c) => c.name)).toStrictEqual([
+    expect(config.map((c) => c.monorepo.name)).toStrictEqual([
       'changed',
       'dependedon',
       'excluded',

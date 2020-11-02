@@ -28,10 +28,10 @@ function thrw<T>(e: Error): T {
 }
 
 /**
- * Whether we could read the name and monorepo info out of the config file
+ * Whether we could read the monorepo info out of the config file
  */
 function isConfig(c: ConfigFile): c is Config {
-  return (c as Config).name?.length > 0 && typeof (c as Config).monorepo === 'object';
+  return typeof (c as Config).monorepo === 'object';
 }
 
 /**
@@ -83,7 +83,7 @@ async function readConfig(config: ConfigFile): Promise<ConfigFile> {
       throw new Error('TODO: monofo cannot cope with env being an array yet (split to object)');
     }
 
-    const name = monorepo.name || nameFromFilename(config);
+    const name = monorepo?.name || nameFromFilename(config);
 
     if (!name) {
       log(`Skipping ${config.path} because it has no pipeline name`);
@@ -97,9 +97,9 @@ async function readConfig(config: ConfigFile): Promise<ConfigFile> {
 
     return {
       ...config,
-      name,
       monorepo: {
         ...monorepo,
+        name,
         expects: strings(monorepo.expects),
         produces: strings(monorepo.produces),
         matches: strings(monorepo.matches),
@@ -120,7 +120,7 @@ async function readConfig(config: ConfigFile): Promise<ConfigFile> {
  * independent of location on the filesystem
  */
 function sort(configs: Config[]): Config[] {
-  const byName = Object.fromEntries(configs.map((c) => [c.name, c]));
+  const byName = Object.fromEntries(configs.map((c) => [c.monorepo.name, c]));
   const byProducerOf = Object.fromEntries(configs.flatMap((c) => c.monorepo.produces.map((p) => [p, c])));
 
   const sorted = toposort.array(
@@ -131,13 +131,13 @@ function sort(configs: Config[]): Config[] {
         // the producer of an expected artifact must happen before the current config
         ...c.monorepo.expects.map((expected): [string, string] => {
           return byProducerOf[expected]
-            ? [byProducerOf[expected].name, c.name]
+            ? [byProducerOf[expected].monorepo.name, c.monorepo.name]
             : thrw(new Error(`Could not find a component that produces "${expected}"`));
         }),
         // configs we depend_on must happen before the current config
         ...c.monorepo.depends_on.map((dependency): [string, string] => {
           return byName[dependency]
-            ? [dependency, c.name]
+            ? [dependency, c.monorepo.name]
             : thrw(new Error(`Could not find a config named "pipeline.${dependency}.yml"`));
         }),
       ];
