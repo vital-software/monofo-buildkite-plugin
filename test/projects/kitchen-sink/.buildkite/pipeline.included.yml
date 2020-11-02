@@ -1,0 +1,8 @@
+monorepo:
+  # This does NOT match, but this pipeline is included with PIPELINE_RUN_INCLUDED=1
+  matches:
+    - "included/no-match"
+
+steps:
+  - command: echo "included" > included
+    key: included

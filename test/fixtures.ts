@@ -15,6 +15,10 @@ export function fakeProcess(): NodeJS.ProcessEnv {
     BUILDKITE_PIPELINE_SLUG: PIPELINE,
     BUILDKITE_SOURCE: 'webhook',
     BUILDKITE_API_ACCESS_TOKEN: '1234567890abcdefabc1298398f9812389',
+
+    // Example values of including a component named 'included', and excluding one called 'excluded'
+    PIPELINE_RUN_INCLUDED: 'true',
+    PIPELINE_NO_RUN_EXCLUDED: 'true',
   };
 }
 

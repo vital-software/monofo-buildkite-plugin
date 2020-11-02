@@ -35,7 +35,7 @@ describe('monofo pipeline', () => {
     return expect(out).rejects.toThrowError('No pipeline files');
   });
 
-  it('can be executed with simple configuration on the default branch', async () => {
+  it('can be executed with configuration on the default branch', async () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, '../../test/projects/kitchen-sink'));
 
@@ -45,11 +45,12 @@ describe('monofo pipeline', () => {
       .then((p) => {
         expect(p).toBeDefined();
         expect(p.steps.map((s) => s.command)).toStrictEqual([
-          "echo 'inject for: bar, qux'",
+          "echo 'inject for: excluded, bar, qux'",
           'echo "changed" > changed',
           'echo "dependedon" > dependedon',
           'echo "foo1" > foo1',
           "echo 'bar was replaced'",
+          'echo "included" > included',
           'echo "baz1"',
           'echo "unreferenced" > unref',
         ]);
