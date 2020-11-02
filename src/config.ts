@@ -115,13 +115,16 @@ async function readConfig(config: ConfigFile): Promise<ConfigFile> {
 
 /**
  * Indexes the configs by the artifacts each produces, and the depends_on list, and sorts them into dependency order
+ *
+ * We presort by name (which might not just come from the file name any longer). This makes toposort tie-breaker order
+ * independent of location on the filesystem
  */
 function sort(configs: Config[]): Config[] {
   const byName = Object.fromEntries(configs.map((c) => [c.name, c]));
   const byProducerOf = Object.fromEntries(configs.flatMap((c) => c.monorepo.produces.map((p) => [p, c])));
 
   const sorted = toposort.array(
-    Object.keys(byName),
+    Object.keys(byName).sort(),
     configs.flatMap((c) => {
       // The constraints on ordering are:
       return [
