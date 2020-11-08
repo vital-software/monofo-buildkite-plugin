@@ -6,6 +6,9 @@
   - [Buildkite API Access Token](#buildkite-api-access-token)
 - [Advanced Usage](#advanced-usage)
   - [Controlling what is included](#controlling-what-is-included)
+    - [PIPELINE_RUN_ALL](#pipeline_run_all)
+    - [PIPELINE_RUN_ONLY](#pipeline_run_only)
+    - [PIPELINE_RUN_\*, PIPELINE_NO_RUN_\*](#pipeline_run_-pipeline_no_run_)
   - [Pipeline file changes match themselves](#pipeline-file-changes-match-themselves)
   - [Phony deps](#phony-deps)
   - [Depends On](#depends-on)
@@ -79,9 +82,21 @@ _agent_ token.
 
 ### Controlling what is included
 
+These rules are applied in the order listed here.
+
+#### PIPELINE_RUN_ALL
+
 If you set the environment variable `PIPELINE_RUN_ALL=1`, all parts of the
 pipeline will be output; this is a good way to "force a full build", or disable
 monofo temporarily.
+
+#### PIPELINE_RUN_ONLY
+
+If you set `PIPELINE_RUN_ONLY=component-name`, that component will be included,
+and others excluded, regardless of matches. Pipeline-level `depends_on` will
+still be respected.
+
+#### PIPELINE_RUN_\*, PIPELINE_NO_RUN_\*
 
 If you set `PIPELINE_RUN_<COMPONENT_NAME>=1`, that component will be included,
 even if it wouldn't ordinarily. And if you set `PIPELINE_NO_RUN_<COMPONENT_NAME>`

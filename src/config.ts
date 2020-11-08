@@ -192,6 +192,7 @@ declare global {
       BUILDKITE_SOURCE: string;
       BUILDKITE_API_ACCESS_TOKEN: string;
       PIPELINE_RUN_ALL?: string;
+      PIPELINE_RUN_ONLY?: string;
     }
   }
 }

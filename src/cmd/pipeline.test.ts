@@ -88,6 +88,29 @@ describe('monofo pipeline', () => {
       });
   });
 
+  it('can be executed with a PIPELINE_RUN_ONLY environment variable', async () => {
+    process.env = fakeProcess({ PIPELINE_RUN_ONLY: 'bar' });
+    process.chdir(path.resolve(__dirname, '../../test/projects/kitchen-sink'));
+
+    const args: Arguments<unknown> = { $0: '', _: [] };
+    await ((pipeline.handler(args) as unknown) as Promise<string>)
+      .then((o) => (safeLoad(o) as unknown) as Pipeline)
+      .then((p) => {
+        expect(p).toBeDefined();
+        expect(p.steps.map((s) => s.command)).toStrictEqual([
+          "echo 'inject for: changed, dependedon, excluded, foo, included, qux, baz, unreferenced'",
+          'echo "bar1" | tee bar1',
+          'echo "bar2" | tee bar2',
+        ]);
+        const { plugins } = p.steps[0];
+        expect(plugins ? plugins[0]['artifacts#v1.3.0'] : null).toStrictEqual({
+          build: BUILD_ID,
+          download: ['foo1', 'qux1', 'baz1'],
+          upload: ['foo1', 'qux1', 'baz1'],
+        });
+      });
+  });
+
   it('can be executed with crossdeps alone', async () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, '../../test/projects/crossdeps'));
