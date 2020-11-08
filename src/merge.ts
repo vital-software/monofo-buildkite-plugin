@@ -1,6 +1,6 @@
 import debug from 'debug';
 import _ from 'lodash';
-import { getMergeDecision, updateDecisionsForDependsOn } from './decide';
+import { getAllDecisions } from './decide';
 import { ARTIFACT_INJECTION_STEP_KEY, artifactInjectionSteps, nothingToDoSteps } from './steps';
 
 const log = debug('monofo:merge');
@@ -60,16 +60,7 @@ function toPipeline(steps: Step[]): Pipeline {
  */
 export default function mergePipelines(results: ConfigWithChanges[]): Pipeline {
   log(`Merging ${results.length} pipelines`);
-
-  const decisions: ConfigWithDecision[] = results.map((r) => {
-    return {
-      ...r,
-      ...getMergeDecision(r),
-    } as ConfigWithDecision;
-  });
-
-  // Mutate for depends_on
-  updateDecisionsForDependsOn(decisions);
+  const decisions: ConfigWithDecision[] = getAllDecisions(results);
 
   // Announce decisions
   decisions.forEach((config) => {

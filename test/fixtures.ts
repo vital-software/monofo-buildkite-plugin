@@ -6,7 +6,7 @@ export const BRANCH = 'main';
 export const COMMIT = 'f993bd4d8d59b9c70c8092d327c6ac1c6a263b1f';
 export const BUILD_ID = 'f62a1b4d-10f9-4790-bc1c-e2c3a0c80983';
 
-export function fakeProcess(): NodeJS.ProcessEnv {
+export function fakeProcess(merge: Record<string, string> = {}): NodeJS.ProcessEnv {
   return {
     BUILDKITE_BRANCH: BRANCH,
     BUILDKITE_COMMIT: COMMIT,
@@ -19,6 +19,8 @@ export function fakeProcess(): NodeJS.ProcessEnv {
     // Example values of including a component named 'included', and excluding one called 'excluded'
     PIPELINE_RUN_INCLUDED: 'true',
     PIPELINE_NO_RUN_EXCLUDED: 'true',
+
+    ...merge,
   };
 }
 

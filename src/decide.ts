@@ -34,6 +34,10 @@ export function getMergeDecision(config: ConfigWithChanges): IncludeDecision {
     return decide(true, `been forced to by ${overrideIncludeKey}`);
   }
 
+  if (process.env?.PIPELINE_RUN_ONLY) {
+    return decide(config.monorepo.name === process.env?.PIPELINE_RUN_ONLY, 'PIPELINE_RUN_ONLY was specified');
+  }
+
   if (!config.buildId) {
     return decide(true, 'no previous successful build, fallback');
   }
@@ -67,4 +71,18 @@ export function updateDecisionsForDependsOn(configs: ConfigWithDecision[]): void
         dependency.reason = `been pulled in by a depends_on from ${from}`;
       }
     });
+}
+
+export function getAllDecisions(configs: ConfigWithChanges[]): ConfigWithDecision[] {
+  const decisions: ConfigWithDecision[] = configs.map((r) => {
+    return {
+      ...r,
+      ...getMergeDecision(r),
+    } as ConfigWithDecision;
+  });
+
+  // Mutate for depends_on
+  updateDecisionsForDependsOn(decisions);
+
+  return decisions;
 }
