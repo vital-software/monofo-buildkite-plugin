@@ -22,7 +22,7 @@ export function getMergeDecision(config: ConfigWithChanges): IncludeDecision {
     return decide(true, 'been forced to by PIPELINE_RUN_ALL');
   }
 
-  const envVarName = config.monorepo.name.toLocaleUpperCase().replace('-', '_');
+  const envVarName = config.monorepo.name.toLocaleUpperCase().replace(/-/g, '_');
 
   const overrideExcludeKey = `PIPELINE_NO_RUN_${envVarName}`;
   if (process.env[overrideExcludeKey]) {
