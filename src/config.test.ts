@@ -9,10 +9,9 @@ describe('getConfig()', () => {
 
   it('reads pipeline files and returns an array of config files - simple', async () => {
     process.chdir(path.resolve(__dirname, '../test/projects/kitchen-sink'));
-    const config = await getConfigs();
-
-    expect(config).toHaveLength(9);
-    expect(config.map((c) => c.monorepo.name)).toStrictEqual([
+    const configNames = (await getConfigs()).map((c) => c.monorepo.name);
+    expect(configNames).toHaveLength(10);
+    expect(configNames).toStrictEqual([
       'changed',
       'dependedon',
       'excluded',
@@ -21,6 +20,7 @@ describe('getConfig()', () => {
       'included',
       'qux',
       'baz',
+      'some-long-name',
       'unreferenced',
     ]);
   });

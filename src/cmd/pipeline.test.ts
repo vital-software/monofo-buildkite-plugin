@@ -45,7 +45,7 @@ describe('monofo pipeline', () => {
       .then((p) => {
         expect(p).toBeDefined();
         expect(p.steps.map((s) => s.command)).toStrictEqual([
-          "echo 'inject for: excluded, bar, qux'",
+          "echo 'inject for: excluded, bar, qux, some-long-name'",
           'echo "changed" > changed',
           'echo "dependedon" > dependedon',
           'echo "foo1" > foo1',
@@ -89,7 +89,11 @@ describe('monofo pipeline', () => {
   });
 
   it('can be executed with a PIPELINE_RUN_ONLY environment variable', async () => {
-    process.env = fakeProcess({ PIPELINE_RUN_ONLY: 'bar' });
+    process.env = fakeProcess({
+      PIPELINE_RUN_ONLY: 'bar',
+      PIPELINE_RUN_SOME_LONG_NAME: '1',
+      PIPELINE_NO_RUN_INCLUDED: '1',
+    });
     process.chdir(path.resolve(__dirname, '../../test/projects/kitchen-sink'));
 
     const args: Arguments<unknown> = { $0: '', _: [] };
@@ -101,6 +105,7 @@ describe('monofo pipeline', () => {
           "echo 'inject for: changed, dependedon, excluded, foo, included, qux, baz, unreferenced'",
           'echo "bar1" | tee bar1',
           'echo "bar2" | tee bar2',
+          'echo "some-long-name" > some-long-name',
         ]);
         const { plugins } = p.steps[0];
         expect(plugins ? plugins[0]['artifacts#v1.3.0'] : null).toStrictEqual({

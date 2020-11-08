@@ -32,10 +32,15 @@ describe('matchConfigs', () => {
   it('matches changed files against configs', async () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, '../test/projects/kitchen-sink'));
-    const result = matchConfigs('foo', await getConfigs(), ['foo/abc.js', 'foo/README.md', 'bar/abc.ts', 'baz/abc.ts']);
+    const changes = matchConfigs('foo', await getConfigs(), [
+      'foo/abc.js',
+      'foo/README.md',
+      'bar/abc.ts',
+      'baz/abc.ts',
+    ]).map((r) => r.changes);
 
-    expect(result).toHaveLength(9);
-    expect(result.map((r) => r.changes)).toStrictEqual([
+    expect(changes).toHaveLength(10);
+    expect(changes).toStrictEqual([
       [],
       [],
       ['foo/README.md'],
@@ -44,6 +49,7 @@ describe('matchConfigs', () => {
       [],
       [],
       ['baz/abc.ts'],
+      [],
       ['foo/abc.js', 'foo/README.md', 'bar/abc.ts', 'baz/abc.ts'],
     ]);
   });
