@@ -1,6 +1,6 @@
 {
   "name": "monofo",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "Buildkite pipeline helper",
   "author": "Dominic Scheirlinck <dominic@vitaler.com>",
   "bin": {

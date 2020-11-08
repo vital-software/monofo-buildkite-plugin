@@ -1,3 +1,10 @@
+## [1.6.1](https://github.com/vital-software/monofo/compare/v1.6.0...v1.6.1) (2020-11-08)
+
+
+### Bug Fixes
+
+* replace all dashes ([6eef45e](https://github.com/vital-software/monofo/commit/6eef45e7d5e2486064f82f180b1657f02585a929))
+
 # [1.6.0](https://github.com/vital-software/monofo/compare/v1.5.0...v1.6.0) (2020-11-02)
 
 
