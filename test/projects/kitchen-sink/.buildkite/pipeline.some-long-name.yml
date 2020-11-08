@@ -1,0 +1,5 @@
+monorepo: {}
+
+steps:
+  - command: 'echo "some-long-name" > some-long-name'
+    key: some-long-name
