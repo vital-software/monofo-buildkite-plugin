@@ -1,0 +1,7 @@
+monorepo:
+  pure: true
+  matches: foo.txt
+  produces: foo
+
+steps:
+  - command: echo "foo" > foo
