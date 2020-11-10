@@ -3,6 +3,7 @@ import _ from 'lodash';
 import minimatch from 'minimatch';
 import BuildkiteClient from './buildkite/client';
 import { mergeBase, revList } from './git';
+import hashChanges from './hash';
 import { count } from './util';
 
 const log = debug('monofo:diff');
@@ -103,13 +104,32 @@ function matchingChanges(matchList: string[], changedFiles: string[]): string[] 
   );
 }
 
-export function matchConfigs(buildId: string, configs: Config[], changedFiles: string[]): ConfigWithChanges[] {
+export async function matchConfigs(
+  buildId: string,
+  configs: Config[],
+  changedFiles: string[]
+): Promise<ConfigWithChanges[]> {
   log(`Found ${count(changedFiles, 'changed file')}: ${changedFiles.join(', ')}`);
 
-  return configs.map((config) => {
-    const matches = [...config.monorepo.matches, config.path];
-    const changes = matchingChanges(matches, changedFiles);
-    log(`Found ${count(changes, 'matching change')} for ${config.monorepo.name} (${JSON.stringify(matches)})`);
-    return { ...config, buildId, changes };
-  });
+  return Promise.all(
+    configs.map((config) => {
+      const matches = [...config.monorepo.matches, config.path];
+      const changes = matchingChanges(matches, changedFiles);
+
+      log(`Found ${count(changes, 'matching change')} for ${config.monorepo.name} (${JSON.stringify(matches)})`);
+
+      const hash: Promise<string | undefined> = config.monorepo.pure
+        ? hashChanges(changes)
+        : Promise.resolve(undefined);
+
+      return hash.then(
+        (contentHash?: string): ConfigWithChanges => ({
+          ...config,
+          buildId,
+          changes,
+          contentHash,
+        })
+      );
+    })
+  );
 }

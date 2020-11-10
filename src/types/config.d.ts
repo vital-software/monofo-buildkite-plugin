@@ -29,6 +29,11 @@ interface ConfigWithChanges extends Config {
    * everything.
    */
   buildId?: string;
+
+  /**
+   * A content hash of this config's matches'
+   */
+  contentHash: string | undefined;
 }
 
 interface IncludeDecision {
