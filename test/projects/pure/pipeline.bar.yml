@@ -1,0 +1,8 @@
+monorepo:
+  pure: true
+  matches: bar.txt
+  produces: bar
+  expects: foo
+
+steps:
+  - command: echo "bar" > bar
