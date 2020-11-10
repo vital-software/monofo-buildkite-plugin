@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/vital-software/monofo/compare/v1.6.1...v1.7.0) (2020-11-10)
+
+
+### Features
+
+* add PIPELINE_RUN_ONLY support ([3ab3cd6](https://github.com/vital-software/monofo/commit/3ab3cd6f953f0b4bf9bb3c048f5e38f7b764c830))
+
 ## [1.6.1](https://github.com/vital-software/monofo/compare/v1.6.0...v1.6.1) (2020-11-08)
 
 
