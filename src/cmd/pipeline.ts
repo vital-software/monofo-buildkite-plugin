@@ -9,7 +9,7 @@ import merge from '../merge';
 const log = debug('monofo:cmd:pipeline');
 
 function fallback(_e: Error, configs: Config[]): ConfigWithChanges[] {
-  return configs.map((c) => ({ ...c, changes: ['fallback'], buildId: undefined }));
+  return configs.map((c) => ({ ...c, changes: ['fallback'], buildId: undefined, contentHash: undefined }));
 }
 
 const cmd: CommandModule = {
