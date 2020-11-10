@@ -106,6 +106,7 @@ async function readConfig(config: ConfigFile): Promise<ConfigFile> {
         depends_on: strings(monorepo.depends_on),
         excluded_steps: monorepo.excluded_steps || [],
         excluded_env: monorepo.excluded_env || {},
+        pure: monorepo.pure || false,
       },
       steps,
       env,

@@ -11,6 +11,7 @@ interface MonorepoConfig {
   depends_on: string[];
   excluded_steps: Record<string, unknown>[];
   excluded_env: Record<string, string>;
+  pure: boolean;
 }
 
 interface Config extends ConfigFile, Pipeline {
