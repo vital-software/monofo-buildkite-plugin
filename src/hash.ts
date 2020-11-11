@@ -6,58 +6,51 @@ const log = debug('monofo:hash');
 
 export const EMPTY_HASH = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
 
-type ConfigFilePath = string;
-type ContentHash = string | undefined;
-type Manifest = Record<ConfigFilePath, ContentHash>;
+export class FileHasher {
+  /**
+   * Memoization of path to promise of hash value (may still be in progress)
+   */
+  private readonly fileCache: Record<string, Promise<string>> = {};
 
-/**
- * Per-process cache of content hashes, so we only ever need to hash a file once
- */
-const hashCache: Manifest = {};
+  public async hashOne(pathToFile: string): Promise<string> {
+    if (!(pathToFile in this.fileCache)) {
+      try {
+        this.fileCache[pathToFile] = FileHasher.contentHashOfFile(pathToFile);
+      } catch (e) {
+        log('Failed to hash file, using fallback value', e);
+        this.fileCache[pathToFile] = Promise.resolve(EMPTY_HASH); // Cache the negative result too
+      }
+    }
 
-async function hashFile(configFilePath: ConfigFilePath): Promise<ContentHash> {
-  const hash = crypto.createHash('sha256');
-  const readStream = fs.createReadStream(configFilePath, { encoding: 'utf8', highWaterMark: 1024 });
-
-  for await (const chunk of readStream) {
-    hash.update(chunk);
+    return this.fileCache[pathToFile];
   }
 
-  return hash.digest('hex');
-}
+  public async hashMany(pathToFiles: string[]): Promise<string> {
+    const hash = crypto.createHash('sha256');
 
-async function getHashForFile(configFilePath: ConfigFilePath): Promise<ContentHash> {
-  if (hashCache[configFilePath]) {
-    return hashCache[configFilePath];
+    hash.update(
+      (
+        await Promise.all(
+          pathToFiles.sort().map(async (matchingFile) => {
+            return this.hashOne(matchingFile).then((h: string) => [matchingFile, h] as [string, string]);
+          })
+        )
+      )
+        .map((n) => n.join(','))
+        .join(';')
+    );
+
+    return hash.digest('hex');
   }
 
-  let hash: ContentHash;
+  private static async contentHashOfFile(pathToFile: string): Promise<string> {
+    const hash = crypto.createHash('sha256');
+    const readStream = fs.createReadStream(pathToFile, { encoding: 'utf8' });
 
-  try {
-    hash = await hashFile(configFilePath);
-    hashCache[configFilePath] = hash;
-  } catch (e) {
-    log('Failed to hash file, using fallback value', e);
-    hash = EMPTY_HASH;
+    for await (const chunk of readStream) {
+      hash.update(chunk);
+    }
+
+    return hash.digest('hex');
   }
-
-  return hash;
-}
-
-function getHashForManifest(manifest: Manifest): ContentHash {
-  const hash = crypto.createHash('sha256');
-
-  for (const [f, h] of Object.entries(manifest)) {
-    hash.update(`${f}: ${h || EMPTY_HASH}\n`);
-  }
-
-  return hash.digest('hex');
-}
-
-export async function hashFiles(files: ConfigFilePath[]): Promise<ContentHash> {
-  const manifest: Manifest = await Promise.all(
-    files.map((c) => getHashForFile(c).then((h: ContentHash) => [c, h] as [ConfigFilePath, ContentHash]))
-  ).then((c) => Object.fromEntries(c));
-
-  return getHashForManifest(manifest);
 }
