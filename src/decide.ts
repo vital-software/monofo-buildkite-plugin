@@ -1,4 +1,5 @@
 import Config from './config';
+import { FileHasher } from './hash';
 import { count } from './util';
 
 /**
@@ -71,9 +72,20 @@ export function updateDecisionsForDependsOn(configs: Config[]): void {
  * Mutates the config objects to account for pure caching
  */
 export function updateDecisionsForPureCache(configs: Config[]): void {
-  const _possibleCacheHits = configs.filter((c) => c.monorepo.pure && c.included);
+  const cacheConfigs = configs.filter((c) => c.monorepo.pure && c.included);
 
-  console.log(_possibleCacheHits);
+  if (cacheConfigs.length === 0) {
+    return;
+  }
+
+  const hasher = new FileHasher();
+
+  const updates = cacheConfigs.map(async (config) => {
+    const hash = await config.getContentHash(hasher);
+
+    return Promise.resolve();
+  });
+
   // update the build ID to point at the cache hit
 }
 

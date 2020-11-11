@@ -5,12 +5,13 @@
     "moduleResolution": "node",
     "declaration": true,
     "inlineSourceMap": true,
-    "noUnusedLocals": true,
+    "noUnusedLocals": false,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "resolveJsonModule": true
   },
   "include": ["src/**/*.ts", "test/**/*.ts", "bin/*.js"],
   "extends": "@tsconfig/node12/tsconfig.json"

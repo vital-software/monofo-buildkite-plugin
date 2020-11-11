@@ -147,4 +147,18 @@ describe('monofo pipeline', () => {
         expect(p.steps.map((s) => s.key)).toStrictEqual(['foo1Key', 'foo2Key', 'foo3Key']);
       });
   });
+
+  it('can be executed with pure components', async () => {
+    process.env = fakeProcess();
+    process.chdir(path.resolve(__dirname, '../projects/pure'));
+
+    const args: Arguments<unknown> = { $0: '', _: [] };
+    await ((pipeline.handler(args) as unknown) as Promise<string>)
+      .then((o) => (safeLoad(o) as unknown) as Pipeline)
+      .then((p) => {
+        expect(p).toBeDefined();
+        expect(p.steps).toHaveLength(2);
+        expect(p.steps.map((s) => s.key)).toStrictEqual(['fooKey', 'bazKey']);
+      });
+  });
 });

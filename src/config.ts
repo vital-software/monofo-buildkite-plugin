@@ -8,6 +8,7 @@ import _ from 'lodash';
 import minimatch from 'minimatch';
 import toposort from 'toposort';
 import ConfigFile, { strings } from './config-file';
+import { FileHasher } from './hash';
 
 const log = debug('monofo:config');
 const glob = promisify(globAsync);
@@ -76,6 +77,10 @@ export default class Config {
 
   public setBuildId(buildId: string): void {
     this.buildId = buildId;
+  }
+
+  public async getContentHash(hasher: FileHasher): Promise<string> {
+    return hasher.hashMany(await this.getMatchingFiles());
   }
 
   /**

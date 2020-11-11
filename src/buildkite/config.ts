@@ -34,6 +34,7 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace NodeJS {
     interface ProcessEnv {
+      BUILDKITE_BUILD_ID: string;
       BUILDKITE_BRANCH: string;
       BUILDKITE_COMMIT: string;
       BUILDKITE_ORGANIZATION_SLUG: string;

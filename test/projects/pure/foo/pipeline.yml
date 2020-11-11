@@ -1,6 +1,7 @@
 monorepo:
+  name: foo
   pure: true
-  matches: foo.txt
+  matches: foo/README.md
   produces: foo
 
 steps:

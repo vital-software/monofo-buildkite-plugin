@@ -8,21 +8,21 @@ export const EMPTY_HASH = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca4959
 
 export class FileHasher {
   /**
-   * Memoization of path to promise of hash value (may still be in progress)
+   * Static memoization of path to promise of hash value (may still be in progress)
    */
-  private readonly fileCache: Record<string, Promise<string>> = {};
+  private static fileCache: Record<string, Promise<string>> = {};
 
   public async hashOne(pathToFile: string): Promise<string> {
-    if (!(pathToFile in this.fileCache)) {
+    if (!(pathToFile in FileHasher.fileCache)) {
       try {
-        this.fileCache[pathToFile] = FileHasher.contentHashOfFile(pathToFile);
+        FileHasher.fileCache[pathToFile] = FileHasher.contentHashOfFile(pathToFile);
       } catch (e) {
         log('Failed to hash file, using fallback value', e);
-        this.fileCache[pathToFile] = Promise.resolve(EMPTY_HASH); // Cache the negative result too
+        FileHasher.fileCache[pathToFile] = Promise.resolve(EMPTY_HASH); // Cache the negative result too
       }
     }
 
-    return this.fileCache[pathToFile];
+    return FileHasher.fileCache[pathToFile];
   }
 
   public async hashMany(pathToFiles: string[]): Promise<string> {

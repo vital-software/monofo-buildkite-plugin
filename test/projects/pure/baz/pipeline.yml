@@ -1,0 +1,9 @@
+monorepo:
+  name: baz
+  pure: true
+  matches: baz/abc.ts
+  produces: baz
+  expects: foo
+
+steps:
+  - command: echo "baz" > baz

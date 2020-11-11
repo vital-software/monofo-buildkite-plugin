@@ -2,7 +2,9 @@ import debug from 'debug';
 import _ from 'lodash';
 import Config from './config';
 import { updateDecisions } from './decide';
-import { ARTIFACT_INJECTION_STEP_KEY, artifactInjectionSteps, nothingToDoSteps } from './steps';
+import { ARTIFACT_INJECTION_STEP_KEY, artifactInjectionSteps } from './steps/artifact-injection';
+import { nothingToDoSteps } from './steps/nothing-to-do';
+import { recordSuccessSteps } from './steps/record-success';
 
 const log = debug('monofo:merge');
 
@@ -55,7 +57,7 @@ function toPipeline(steps: Step[]): Pipeline {
   return { env: {}, steps };
 }
 
-export default function mergePipelines(configs: Config[]): Pipeline {
+export default async function mergePipelines(configs: Config[]): Promise<Pipeline> {
   log(`Merging ${configs.length} pipelines`);
 
   updateDecisions(configs);
@@ -71,6 +73,7 @@ export default function mergePipelines(configs: Config[]): Pipeline {
     toPipeline(artifactSteps),
     ...replaceExcludedKeys(configs, artifactSteps.length > 0).map(toMerge),
     toPipeline(nothingToDoSteps(configs)),
+    toPipeline(await recordSuccessSteps(configs)),
     (dst: unknown, src: unknown) => (_.isArray(dst) ? dst.concat(src) : undefined)
   ) as Pipeline;
 }
