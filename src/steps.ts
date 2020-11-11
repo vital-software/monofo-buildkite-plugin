@@ -1,11 +1,12 @@
 import debug from 'debug';
+import Config from './config';
 
 const log = debug('monofo:steps');
 
 export const ARTIFACT_INJECTION_STEP_KEY = 'monorepo-inject-artifacts';
 const ARTIFACT_INJECTION_STEP_LABEL = `:crystal_ball:`;
 
-export function artifactInjectionSteps(configs: ConfigWithDecision[]): Step[] {
+export function artifactInjectionSteps(configs: Config[]): Step[] {
   const names = configs.filter((c) => !c.included).map((c) => c.monorepo.name);
   const produces = configs
     .filter((c) => !c.included)
@@ -13,8 +14,8 @@ export function artifactInjectionSteps(configs: ConfigWithDecision[]): Step[] {
     .filter((artifact) => !artifact.startsWith('.phony/'));
   const { buildId } = configs[0];
 
-  if (names.length < 1 || produces.length < 1 || !buildId) {
-    log("Not adding inject artifacts step: doesn't seem to be needed");
+  if (names.length < 1 || produces.length < 1) {
+    log("Not adding inject artifacts step: doesn't seem to be needed by any steps");
     return [];
   }
 
@@ -48,7 +49,7 @@ const NOTHING_TO_DO_STEP_LABEL = `:white_check_mark: :shrug: Nothing to do`;
  *
  * @todo add a block step, ask the user if they want to do a full build?
  */
-export function nothingToDoSteps(configs: ConfigWithDecision[]): Step[] {
+export function nothingToDoSteps(configs: Config[]): Step[] {
   if (configs.find((v) => v.included)) {
     return [];
   }

@@ -1,4 +1,4 @@
-import { getBuildkiteInfo } from '../src/config';
+import { getBuildkiteInfo } from '../src/buildkite/config';
 
 export const ORG = 'dominics';
 export const PIPELINE = 'monofo';

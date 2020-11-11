@@ -2,13 +2,13 @@ import * as crypto from 'crypto';
 import * as fs from 'fs';
 import debug from 'debug';
 
-type ConfigFilePath = string;
-type ContentHash = string;
-type Manifest = Record<ConfigFilePath, ContentHash>;
-
 const log = debug('monofo:hash');
 
 export const EMPTY_HASH = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
+
+type ConfigFilePath = string;
+type ContentHash = string | undefined;
+type Manifest = Record<ConfigFilePath, ContentHash>;
 
 /**
  * Per-process cache of content hashes, so we only ever need to hash a file once
@@ -31,7 +31,7 @@ async function getHashForFile(configFilePath: ConfigFilePath): Promise<ContentHa
     return hashCache[configFilePath];
   }
 
-  let hash: string;
+  let hash: ContentHash;
 
   try {
     hash = await hashFile(configFilePath);
@@ -48,15 +48,15 @@ function getHashForManifest(manifest: Manifest): ContentHash {
   const hash = crypto.createHash('sha256');
 
   for (const [f, h] of Object.entries(manifest)) {
-    hash.update(`${f}: ${h}\n`);
+    hash.update(`${f}: ${h || EMPTY_HASH}\n`);
   }
 
   return hash.digest('hex');
 }
 
-export default async function hashChanges(changes: ConfigFilePath[]): Promise<string> {
+export async function hashFiles(files: ConfigFilePath[]): Promise<ContentHash> {
   const manifest: Manifest = await Promise.all(
-    changes.map((c) => getHashForFile(c).then((h: ContentHash) => [c, h] as [ConfigFilePath, ContentHash]))
+    files.map((c) => getHashForFile(c).then((h: ContentHash) => [c, h] as [ConfigFilePath, ContentHash]))
   ).then((c) => Object.fromEntries(c));
 
   return getHashForManifest(manifest);

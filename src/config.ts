@@ -1,103 +1,141 @@
 import { promises as fs } from 'fs';
-import { join, basename } from 'path';
+import { join } from 'path';
 import { promisify } from 'util';
 import debug from 'debug';
 import globAsync from 'glob';
 import { safeLoad } from 'js-yaml';
 import _ from 'lodash';
+import minimatch from 'minimatch';
 import toposort from 'toposort';
+import ConfigFile, { strings } from './config-file';
 
-const glob = promisify(globAsync);
 const log = debug('monofo:config');
+const glob = promisify(globAsync);
 
-const PIPELINE_FILE = /^pipeline\.(?<name>.*)\.yml$/;
-const PIPELINE_FILE_GLOB = '**/pipeline*.yml';
-const PIPELINE_FILE_IGNORE_GLOB = ['**/node_modules/**'];
-const BUILDKITE_REQUIRED_ENV = [
-  'BUILDKITE_BRANCH',
-  'BUILDKITE_COMMIT',
-  'BUILDKITE_ORGANIZATION_SLUG',
-  'BUILDKITE_PIPELINE_DEFAULT_BRANCH',
-  'BUILDKITE_PIPELINE_SLUG',
-  'BUILDKITE_SOURCE',
-  'BUILDKITE_API_ACCESS_TOKEN',
-];
-
-function thrw<T>(e: Error): T {
-  throw e;
+interface MonorepoConfig {
+  name: string;
+  expects: string[];
+  produces: string[];
+  matches: string[];
+  depends_on: string[];
+  excluded_steps: Record<string, unknown>[];
+  excluded_env: Record<string, string>;
+  pure: boolean;
 }
 
 /**
- * Whether we could read the monorepo info out of the config file
+ * Value object representing a parsed YAML pipeline configuration, with associated metadata and decision information
  */
-function isConfig(c: ConfigFile): c is Config {
-  return typeof (c as Config).monorepo === 'object';
-}
+export default class Config {
+  /**
+   * @protected Is constructed by Config.read(configFile), try Config.getAll() instead
+   */
+  protected constructor(
+    public readonly file: ConfigFile,
+    public readonly monorepo: MonorepoConfig,
+    public steps: Step[],
+    public readonly env: Record<string, string>
+  ) {}
 
-/**
- * Searches for all pipeline files anywhere in the current working directory, and returns their file locations
- */
-async function getConfigFiles(): Promise<ConfigFile[]> {
-  const cwd = process.cwd();
+  /**
+   * Base build we're comparing against, if one can be found. If one can't, we'll enter fallback mode and run
+   * everything.
+   */
+  public buildId?: string;
 
-  try {
-    const pipelines = await glob(PIPELINE_FILE_GLOB, {
-      dot: true,
-      cwd,
-      ignore: PIPELINE_FILE_IGNORE_GLOB,
-    });
+  /**
+   * Set of changes that match the configuration
+   */
+  public changes: string[] = [];
 
-    return pipelines.map((path) => {
-      return {
-        basePath: cwd,
-        path,
-      };
-    });
-  } catch (e) {
-    log(e);
-    return [];
+  /**
+   * Whether this config is currently considered for inclusion in the final pipeline output
+   */
+  public included?: boolean = false;
+
+  /**
+   * Reason for inclusion/exclusion
+   *
+   * Should fit into the sentence: "Foo has been included/excluded because it has {REASON}"
+   */
+  public reason = 'no matching changes';
+
+  public decide(included: boolean, reason: string): void {
+    this.included = included;
+    this.reason = reason;
   }
-}
 
-function strings(v: undefined | string[] | string): string[] {
-  if (!v || v.length <= 0) {
-    return [];
+  public mapSteps(mapFn: (s: Step) => Step): void {
+    this.steps = this.steps.map(mapFn);
   }
-  if (_.isArray(v)) {
-    return v;
+
+  public useFallback(): void {
+    this.changes = ['fallback'];
+    this.buildId = undefined;
   }
-  return [String(v)];
-}
 
-function nameFromFilename(config: ConfigFile): string | undefined {
-  const match = PIPELINE_FILE.exec(basename(config.path));
-  return match?.groups?.name || undefined;
-}
+  public setBuildId(buildId: string): void {
+    this.buildId = buildId;
+  }
 
-async function readConfig(config: ConfigFile): Promise<ConfigFile> {
-  return fs.readFile(join(config.basePath, config.path)).then((buf) => {
-    const { monorepo, steps, env } = (safeLoad(buf.toString()) as unknown) as Config;
+  /**
+   * Returns all files that match the pipeline, wether they have changes or not
+   */
+  public async getMatchingFiles(): Promise<string[]> {
+    const cwd = process.cwd();
+
+    const files: Promise<string[]> = Promise.all(
+      this.monorepo.matches.map(async (pattern) => {
+        return glob(pattern, {
+          matchBase: true,
+          cwd,
+          dot: true,
+        });
+      })
+    ).then((r) => r.flat());
+
+    return files;
+  }
+
+  public updateMatchingChanges(changedFiles: string[]): void {
+    if (!changedFiles || changedFiles.length < 1) {
+      this.changes = [];
+      return;
+    }
+
+    this.changes = [...this.monorepo.matches, this.file.path].flatMap((pattern) =>
+      minimatch.match(changedFiles, pattern, {
+        matchBase: true,
+        dot: true,
+      })
+    );
+  }
+
+  public static async read(file: ConfigFile): Promise<Config | undefined> {
+    const buffer = await fs.readFile(join(file.basePath, file.path));
+
+    const { monorepo, steps, env } = (safeLoad(buffer.toString()) as unknown) as Config;
 
     if (_.isArray(env)) {
       // Fail noisily rather than missing the merge of the env vars
       throw new Error('TODO: monofo cannot cope with env being an array yet (split to object)');
     }
 
-    const name = monorepo?.name || nameFromFilename(config);
+    const name = monorepo?.name || file.nameFromFilename();
 
     if (!name) {
-      log(`Skipping ${config.path} because it has no pipeline name`);
-      return Promise.resolve(config);
+      log(`Skipping ${file.path} because it has no pipeline name`);
+      return Promise.resolve(undefined);
     }
 
     if (!monorepo || typeof monorepo !== 'object') {
       log(`Skipping ${name} because it has no monorepo configuration`);
-      return config;
+      return undefined;
     }
 
-    return {
-      ...config,
-      monorepo: {
+    return new Config(
+      file,
+      {
         ...monorepo,
         name,
         expects: strings(monorepo.expects),
@@ -109,91 +147,65 @@ async function readConfig(config: ConfigFile): Promise<ConfigFile> {
         pure: monorepo.pure || false,
       },
       steps,
-      env,
-    };
-  });
-}
-
-/**
- * Indexes the configs by the artifacts each produces, and the depends_on list, and sorts them into dependency order
- *
- * We presort by name (which might not just come from the file name any longer). This makes toposort tie-breaker order
- * independent of location on the filesystem
- */
-function sort(configs: Config[]): Config[] {
-  const byName = Object.fromEntries(configs.map((c) => [c.monorepo.name, c]));
-  const byProducerOf = Object.fromEntries(configs.flatMap((c) => c.monorepo.produces.map((p) => [p, c])));
-
-  const sorted = toposort.array(
-    Object.keys(byName).sort(),
-    configs.flatMap((c) => {
-      // The constraints on ordering are:
-      return [
-        // the producer of an expected artifact must happen before the current config
-        ...c.monorepo.expects.map((expected): [string, string] => {
-          return byProducerOf[expected]
-            ? [byProducerOf[expected].monorepo.name, c.monorepo.name]
-            : thrw(new Error(`Could not find a component that produces "${expected}"`));
-        }),
-        // configs we depend_on must happen before the current config
-        ...c.monorepo.depends_on.map((dependency): [string, string] => {
-          return byName[dependency]
-            ? [dependency, c.monorepo.name]
-            : thrw(new Error(`Could not find a config named "pipeline.${dependency}.yml"`));
-        }),
-      ];
-    })
-  );
-
-  log(`Will apply pipelines in order: [${sorted.join(', ')}]`);
-  return sorted.map((name) => byName[name]);
-}
-
-/**
- * Reads pipeline.foo.yml files from .buildkite/*, parses them, and returns them as Config objects in the right order
- * to be processed
- */
-export default async function getConfigs(): Promise<Config[]> {
-  return getConfigFiles()
-    .then((configs) => Promise.all(configs.map(readConfig)))
-    .then((configs) => sort(configs.filter(isConfig)));
-}
-
-export function getBuildkiteInfo(e: NodeJS.ProcessEnv = process.env): BuildkiteEnvironment {
-  if (typeof e !== 'object') {
-    throw new Error('Invalid configuration source object');
+      env
+    );
   }
 
-  BUILDKITE_REQUIRED_ENV.forEach((req) => {
-    if (!e[req]) {
-      throw new Error(`Expected to find ${req} env var`);
+  /**
+   * Indexes the configs by the artifacts each produces, and the depends_on list, and sorts them into dependency order
+   *
+   * We presort by name (which might not just come from the file name any longer). This makes toposort tie-breaker order
+   * independent of location on the filesystem
+   */
+  public static sort(configs: Config[]): Config[] {
+    function thrw<T>(e: Error): T {
+      throw e;
     }
-  });
 
-  return {
-    // We probably actually want the Github default branch, but close enough:
-    defaultBranch: e.BUILDKITE_PIPELINE_DEFAULT_BRANCH,
-    org: e.BUILDKITE_ORGANIZATION_SLUG,
-    pipeline: e.BUILDKITE_PIPELINE_SLUG,
-    branch: e.BUILDKITE_BRANCH,
-    commit: e.BUILDKITE_COMMIT,
-    source: e.BUILDKITE_SOURCE,
-  };
-}
+    const byName = Object.fromEntries(configs.map((c) => [c.monorepo.name, c]));
+    const byProducerOf = Object.fromEntries(configs.flatMap((c) => c.monorepo.produces.map((p) => [p, c])));
 
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace NodeJS {
-    interface ProcessEnv {
-      BUILDKITE_BRANCH: string;
-      BUILDKITE_COMMIT: string;
-      BUILDKITE_ORGANIZATION_SLUG: string;
-      BUILDKITE_PIPELINE_DEFAULT_BRANCH: string;
-      BUILDKITE_PIPELINE_SLUG: string;
-      BUILDKITE_SOURCE: string;
-      BUILDKITE_API_ACCESS_TOKEN: string;
-      PIPELINE_RUN_ALL?: string;
-      PIPELINE_RUN_ONLY?: string;
-    }
+    const sorted = toposort.array(
+      Object.keys(byName).sort(),
+      configs.flatMap((c) => {
+        // The constraints on ordering are:
+        return [
+          // the producer of an expected artifact must happen before the current config
+          ...c.monorepo.expects.map((expected): [string, string] => {
+            return byProducerOf[expected]
+              ? [byProducerOf[expected].monorepo.name, c.monorepo.name]
+              : thrw(new Error(`Could not find a component that produces "${expected}"`));
+          }),
+          // configs we depend_on must happen before the current config
+          ...c.monorepo.depends_on.map((dependency): [string, string] => {
+            return byName[dependency]
+              ? [dependency, c.monorepo.name]
+              : thrw(new Error(`Could not find a config named "pipeline.${dependency}.yml"`));
+          }),
+        ];
+      })
+    );
+
+    log(`Will apply pipelines in order: [${sorted.join(', ')}]`);
+    return sorted.map((name) => byName[name]);
+  }
+
+  /**
+   * Reads pipeline.foo.yml files from .buildkite/*, parses them, and returns them as Config objects in the right order
+   * to be processed
+   */
+  public static async getAll(cwd: string = process.cwd()): Promise<Config[]> {
+    const files: ConfigFile[] = await ConfigFile.search(cwd);
+    const results = await Promise.all(files.map((f) => Config.read(f)));
+    return Config.sort(results.filter((c) => c) as Config[]);
+  }
+
+  /**
+   * Mutates the given configs to a fallback configuration
+   * @param _e An error that caused the fallback, if there is one? Unused
+   * @param configs
+   */
+  public static configureFallback(_e: Error, configs: Config[]): void {
+    return configs.forEach((c) => c.useFallback());
   }
 }

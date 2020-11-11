@@ -1,5 +1,5 @@
 import { CommandModule } from 'yargs';
-import { getBuildkiteInfo } from '../config';
+import { getBuildkiteInfo } from '../buildkite/config';
 import { getBaseBuild } from '../diff';
 
 const cmd: CommandModule = {

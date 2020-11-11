@@ -1,9 +1,8 @@
 import debug from 'debug';
 import _ from 'lodash';
-import minimatch from 'minimatch';
 import BuildkiteClient from './buildkite/client';
+import Config from './config';
 import { mergeBase, revList } from './git';
-import hashChanges from './hash';
 import { count } from './util';
 
 const log = debug('monofo:diff');
@@ -88,48 +87,15 @@ export async function getBaseBuild(info: BuildkiteEnvironment): Promise<Buildkit
   return info.branch === info.defaultBranch ? getBaseBuildForDefaultBranch(info) : getBaseBuildForFeatureBranch(info);
 }
 
-/**
- * Returns whether any of the changed files match any of the given patterns
- */
-function matchingChanges(matchList: string[], changedFiles: string[]): string[] {
-  if (!matchList || matchList.length < 1 || !changedFiles || changedFiles.length < 1) {
-    return [];
-  }
-
-  return matchList.flatMap((pattern) =>
-    minimatch.match(changedFiles, pattern, {
-      matchBase: true,
-      dot: true,
-    })
-  );
-}
-
-export async function matchConfigs(
-  buildId: string,
-  configs: Config[],
-  changedFiles: string[]
-): Promise<ConfigWithChanges[]> {
+export function matchConfigs(buildId: string, configs: Config[], changedFiles: string[]): void {
   log(`Found ${count(changedFiles, 'changed file')}: ${changedFiles.join(', ')}`);
 
-  return Promise.all(
-    configs.map((config) => {
-      const matches = [...config.monorepo.matches, config.path];
-      const changes = matchingChanges(matches, changedFiles);
+  configs.forEach((config) => {
+    config.setBuildId(buildId);
+    config.updateMatchingChanges(changedFiles);
 
-      log(`Found ${count(changes, 'matching change')} for ${config.monorepo.name} (${JSON.stringify(matches)})`);
-
-      const hash: Promise<string | undefined> = config.monorepo.pure
-        ? hashChanges(changes)
-        : Promise.resolve(undefined);
-
-      return hash.then(
-        (contentHash?: string): ConfigWithChanges => ({
-          ...config,
-          buildId,
-          changes,
-          contentHash,
-        })
-      );
-    })
-  );
+    if (config.changes.length > 1) {
+      log(`Found ${count(config.changes, 'matching change')} for ${config.monorepo.name}`);
+    }
+  });
 }

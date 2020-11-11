@@ -1,15 +1,15 @@
 import path from 'path';
-import getConfigs from './config';
+import Config from './config';
 
 describe('getConfig()', () => {
   it('reads pipeline files and returns an array of config files - empty', async () => {
     process.chdir(__dirname);
-    expect(await getConfigs()).toHaveLength(0);
+    expect(await Config.getAll()).toHaveLength(0);
   });
 
   it('reads pipeline files and returns an array of config files - simple', async () => {
     process.chdir(path.resolve(__dirname, '../test/projects/kitchen-sink'));
-    const configNames = (await getConfigs()).map((c) => c.monorepo.name);
+    const configNames = (await Config.getAll()).map((c) => c.monorepo.name);
     expect(configNames).toHaveLength(10);
     expect(configNames).toStrictEqual([
       'changed',

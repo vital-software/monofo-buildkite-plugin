@@ -1,16 +1,13 @@
 import debug from 'debug';
 import { safeDump } from 'js-yaml';
 import { CommandModule } from 'yargs';
-import getConfigs, { getBuildkiteInfo } from '../config';
+import { getBuildkiteInfo } from '../buildkite/config';
+import Config from '../config';
 import { getBaseBuild, matchConfigs } from '../diff';
 import { diff } from '../git';
-import merge from '../merge';
+import mergePipelines from '../merge';
 
 const log = debug('monofo:cmd:pipeline');
-
-function fallback(_e: Error, configs: Config[]): ConfigWithChanges[] {
-  return configs.map((c) => ({ ...c, changes: ['fallback'], buildId: undefined, contentHash: undefined }));
-}
 
 const cmd: CommandModule = {
   command: 'pipeline',
@@ -19,7 +16,7 @@ const cmd: CommandModule = {
   builder: {},
 
   handler(): Promise<string> {
-    return getConfigs()
+    return Config.getAll()
       .then((c) =>
         c.length > 0 ? c : Promise.reject(new Error(`No pipeline files to process (cwd: ${process.cwd()})`))
       )
@@ -30,10 +27,10 @@ const cmd: CommandModule = {
           )
           .catch((e) => {
             log('Failed to find base commit or diff changes, falling back to do a full build');
-            return Promise.resolve(fallback(e, configs));
-          });
+            return Promise.resolve(Config.configureFallback(e, configs));
+          })
+          .then(() => mergePipelines(configs));
       })
-      .then(merge)
       .then(safeDump)
       .then((v) => {
         process.stdout.write(`${v}\n`);
