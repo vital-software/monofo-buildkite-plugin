@@ -1,8 +1,7 @@
 import AWS from 'aws-sdk';
 import { Arguments, CommandModule } from 'yargs';
+import { getBuildkiteInfo } from '../buildkite/config';
 import { CacheMetadataRepository } from '../cache-metadata';
-
-const SEVEN_DAYS_SECS = 7 * 24 * 60 * 60;
 
 interface RecordSuccessArgs {
   component: string;
@@ -27,17 +26,16 @@ const cmd: CommandModule = {
 
   async handler(args): Promise<void> {
     const { component, contentHash } = args as Arguments<RecordSuccessArgs>;
-    const buildId = process.env.BUILDKITE_BUILD_ID;
+    const { buildId, pipeline } = getBuildkiteInfo();
 
     const ddb = new AWS.DynamoDB();
     const metadata = new CacheMetadataRepository(ddb);
 
     process.stdout.write(`Recording success of ${component}\n`);
     await metadata.put({
-      component,
       contentHash,
       buildId,
-      expiresAt: Date.now() / 1000 + SEVEN_DAYS_SECS,
+      component: `${pipeline}/${component}`,
     });
     process.stdout.write(`Done!\n`);
   },

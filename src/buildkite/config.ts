@@ -1,4 +1,5 @@
 const BUILDKITE_REQUIRED_ENV = [
+  'BUILDKITE_BUILD_ID',
   'BUILDKITE_BRANCH',
   'BUILDKITE_COMMIT',
   'BUILDKITE_ORGANIZATION_SLUG',
@@ -20,6 +21,7 @@ export function getBuildkiteInfo(e: NodeJS.ProcessEnv = process.env): BuildkiteE
   });
 
   return {
+    buildId: e.BUILDKITE_BUILD_ID,
     // We probably actually want the Github default branch, but close enough:
     defaultBranch: e.BUILDKITE_PIPELINE_DEFAULT_BRANCH,
     org: e.BUILDKITE_ORGANIZATION_SLUG,

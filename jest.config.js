@@ -13,6 +13,7 @@ const config = {
   modulePaths: ['<rootDir>/src/', '<rootDir>/test/', '<rootDir>/node_modules/'],
   testRegex: '.*\\.test.ts$',
   roots: ["<rootDir>/src", "<rootDir>/test"],
+  setupFiles: ["<rootDir>/test/setup.ts"],
 };
 
 module.exports = config;

@@ -2,7 +2,7 @@ import { version } from '../../package.json';
 import Config from '../config';
 import { FileHasher } from '../hash';
 
-export const RECORD_SUCCESS_STEP_KEY = 'monorepo-record-success-';
+export const RECORD_SUCCESS_STEP_KEY = 'record-success-';
 const RECORD_SUCCESS_STEP_LABEL = `:up:`;
 
 function getSelfCommandLine(): string {

@@ -1,9 +1,36 @@
-import AWS from 'aws-sdk';
+import { AWSError } from 'aws-sdk';
 import debug from 'debug';
 import { CommandModule } from 'yargs';
-import { CacheMetadataRepository } from '../cache-metadata';
+import { CACHE_METADATA_TABLE_DEFINITION, CACHE_METADATA_TABLE_NAME } from '../cache-metadata';
+import { service } from '../dynamodb';
 
 const log = debug('monofo:cmd:install');
+
+async function createTable(): Promise<void> {
+  try {
+    await service.createTable(CACHE_METADATA_TABLE_DEFINITION).promise();
+  } catch (e) {
+    if ((e as AWSError).code === 'ResourceInUseException') {
+      log('Received ResourceInUseException because table likely already exists, continuing');
+      return;
+    }
+
+    throw e;
+  }
+}
+
+async function tableExists(): Promise<boolean> {
+  try {
+    await service.describeTable({ TableName: CACHE_METADATA_TABLE_NAME }).promise();
+    return true;
+  } catch (e) {
+    if ((e as AWSError).code === 'ResourceNotFoundException') {
+      return false;
+    }
+
+    throw e;
+  }
+}
 
 const cmd: CommandModule = {
   command: 'install',
@@ -12,11 +39,8 @@ const cmd: CommandModule = {
   builder: {},
 
   async handler(): Promise<void> {
-    const ddb = new AWS.DynamoDB();
-    const metadata = new CacheMetadataRepository(ddb);
-
-    if (!(await metadata.tableExists())) {
-      await metadata.createTable();
+    if (!(await tableExists())) {
+      await createTable();
       log('Table was installed');
     } else {
       log('Found existing table, already installed');
