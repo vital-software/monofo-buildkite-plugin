@@ -1,14 +1,5 @@
+import Config from './config';
 import { count } from './util';
-
-const decide = (included: boolean, reason: string): IncludeDecision => ({
-  included,
-  reason,
-});
-
-export interface IncludeDecision {
-  included: boolean;
-  reason: string;
-}
 
 /**
  * If a config has changes, its steps are merged into the final build. Otherwise, it is excluded, and its excluded_steps
@@ -17,46 +8,49 @@ export interface IncludeDecision {
  *  - An env var named PIPELINE_RUN_<NAME>, where NAME is the UPPER_SNAKE_CASE version of the component pipeline name,
  *    set to any value, indicates that step should run
  */
-export function getMergeDecision(config: ConfigWithChanges): IncludeDecision {
+export function updateDecision(config: Config): void {
   if (process.env.PIPELINE_RUN_ALL) {
-    return decide(true, 'been forced to by PIPELINE_RUN_ALL');
+    config.decide(true, 'been forced to by PIPELINE_RUN_ALL');
+    return;
   }
 
   const envVarName = config.monorepo.name.toLocaleUpperCase().replace(/-/g, '_');
 
   const overrideExcludeKey = `PIPELINE_NO_RUN_${envVarName}`;
   if (process.env[overrideExcludeKey]) {
-    return decide(false, `been forced NOT to by ${overrideExcludeKey}`);
+    config.decide(false, `been forced NOT to by ${overrideExcludeKey}`);
+    return;
   }
 
   const overrideIncludeKey = `PIPELINE_RUN_${envVarName}`;
   if (process.env[overrideIncludeKey]) {
-    return decide(true, `been forced to by ${overrideIncludeKey}`);
+    config.decide(true, `been forced to by ${overrideIncludeKey}`);
+    return;
   }
 
   if (process.env?.PIPELINE_RUN_ONLY) {
-    return decide(config.monorepo.name === process.env?.PIPELINE_RUN_ONLY, 'PIPELINE_RUN_ONLY was specified');
+    config.decide(config.monorepo.name === process.env?.PIPELINE_RUN_ONLY, 'PIPELINE_RUN_ONLY was specified');
+    return;
   }
 
   if (!config.buildId) {
-    return decide(true, 'no previous successful build, fallback');
+    config.decide(true, 'no previous successful build, fallback');
+    return;
   }
 
   // At this point, we know it has a config.buildId we can grab artifacts from
   if (config.changes.length > 0) {
-    return decide(true, `${count(config.changes, 'matching change')}: ${config.changes.join(', ')}`);
+    config.decide(true, `${count(config.changes, 'matching change')}: ${config.changes.join(', ')}`);
   }
-
-  return decide(false, 'no matching changes');
 }
 
 /**
- * Mutates the config objects within ConfigWithDecision to account for transitive dependencies between pipelines
+ * Mutates the config objects within Config to account for transitive dependencies between pipelines
  *
  * Expects the provided configs to be sorted in topological order already, and to have their initial decisions (e.g.
  * around matches) to be filled in first. The configs in the provided array are mutated by reference.
  */
-export function updateDecisionsForDependsOn(configs: ConfigWithDecision[]): void {
+export function updateDecisionsForDependsOn(configs: Config[]): void {
   const byName = Object.fromEntries(configs.map((c) => [c.monorepo.name, c]));
 
   configs
@@ -73,16 +67,10 @@ export function updateDecisionsForDependsOn(configs: ConfigWithDecision[]): void
     });
 }
 
-export function getAllDecisions(configs: ConfigWithChanges[]): ConfigWithDecision[] {
-  const decisions: ConfigWithDecision[] = configs.map((r) => {
-    return {
-      ...r,
-      ...getMergeDecision(r),
-    } as ConfigWithDecision;
+export function updateDecisions(configs: Config[]): void {
+  configs.forEach((config) => {
+    updateDecision(config);
   });
 
-  // Mutate for depends_on
-  updateDecisionsForDependsOn(decisions);
-
-  return decisions;
+  updateDecisionsForDependsOn(configs);
 }
