@@ -1,7 +1,7 @@
 {
   "name": "monofo",
   "version": "1.7.0",
-  "description": "Buildkite pipeline helper",
+  "description": "Dynamic Buildkite pipeline generator for monorepos",
   "author": "Dominic Scheirlinck <dominic@vitaler.com>",
   "bin": {
     "monofo": "./bin/monofo.js"

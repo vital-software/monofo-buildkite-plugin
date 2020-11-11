@@ -1,7 +1,7 @@
-import { AWSError } from 'aws-sdk';
+import AWS from 'aws-sdk';
 import debug from 'debug';
 import { CommandModule } from 'yargs';
-import { db, METADATA_TABLE_NAME as TableName } from '../aws';
+import { CacheMetadataRepository } from '../cache-metadata';
 
 const log = debug('monofo:cmd:uninstall');
 
@@ -12,16 +12,9 @@ const cmd: CommandModule = {
   builder: {},
 
   async handler(): Promise<void> {
-    try {
-      await db.deleteTable({ TableName }).promise();
-    } catch (e) {
-      if ((e as AWSError).code === 'ResourceNotFoundException') {
-        log('Could not find table to remove: probably already uninstalled');
-        return;
-      }
-
-      throw e;
-    }
+    const ddb = new AWS.DynamoDB();
+    const metadata = new CacheMetadataRepository(ddb);
+    await metadata.deleteTable();
   },
 };
 

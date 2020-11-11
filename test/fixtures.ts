@@ -8,6 +8,7 @@ export const BUILD_ID = 'f62a1b4d-10f9-4790-bc1c-e2c3a0c80983';
 
 export function fakeProcess(merge: Record<string, string> = {}): NodeJS.ProcessEnv {
   return {
+    BUILDKITE_BUILD_ID: BUILD_ID,
     BUILDKITE_BRANCH: BRANCH,
     BUILDKITE_COMMIT: COMMIT,
     BUILDKITE_ORGANIZATION_SLUG: ORG,
