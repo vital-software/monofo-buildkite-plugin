@@ -194,7 +194,7 @@ export default class Config {
    * Reads pipeline.foo.yml files from .buildkite/*, parses them, and returns them as Config objects in the right order
    * to be processed
    */
-  public static async getAll(cwd: string = process.cwd()): Promise<Config[]> {
+  public static async getAll(cwd: string): Promise<Config[]> {
     const files: ConfigFile[] = await ConfigFile.search(cwd);
     const results = await Promise.all(files.map((f) => Config.read(f)));
     return Config.sort(results.filter((c) => c) as Config[]);

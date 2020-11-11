@@ -2,13 +2,13 @@ import path from 'path';
 import { safeLoad } from 'js-yaml';
 import { mocked } from 'ts-jest/utils';
 import { Arguments } from 'yargs';
-import execSync from '../../test/cmd/exec';
-import { BUILD_ID, COMMIT, fakeProcess } from '../../test/fixtures';
-import { mergeBase, diff, revList } from '../git';
-import * as pipeline from './pipeline';
+import * as pipeline from '../../src/cmd/pipeline';
+import { mergeBase, diff, revList } from '../../src/git';
+import { BUILD_ID, COMMIT, fakeProcess } from '../fixtures';
+import execSync from './exec';
 
-jest.mock('../git');
-jest.mock('../buildkite/client');
+jest.mock('../../src/git');
+jest.mock('../../src/buildkite/client');
 
 const mockMergeBase = mergeBase as jest.Mock<Promise<string>>;
 mockMergeBase.mockImplementation(() => Promise.resolve('foo'));
@@ -37,7 +37,7 @@ describe('monofo pipeline', () => {
 
   it('can be executed with configuration on the default branch', async () => {
     process.env = fakeProcess();
-    process.chdir(path.resolve(__dirname, '../../test/projects/kitchen-sink'));
+    process.chdir(path.resolve(__dirname, '../projects/kitchen-sink'));
 
     const args: Arguments<unknown> = { $0: '', _: [] };
     await ((pipeline.handler(args) as unknown) as Promise<string>)
@@ -67,7 +67,7 @@ describe('monofo pipeline', () => {
 
   it('can be executed with simple configuration and skipped parts on the default branch', async () => {
     process.env = fakeProcess();
-    process.chdir(path.resolve(__dirname, '../../test/projects/skipped'));
+    process.chdir(path.resolve(__dirname, '../projects/skipped'));
 
     const args: Arguments<unknown> = { $0: '', _: [] };
     await ((pipeline.handler(args) as unknown) as Promise<string>)
@@ -94,7 +94,7 @@ describe('monofo pipeline', () => {
       PIPELINE_RUN_SOME_LONG_NAME: '1',
       PIPELINE_NO_RUN_INCLUDED: '1',
     });
-    process.chdir(path.resolve(__dirname, '../../test/projects/kitchen-sink'));
+    process.chdir(path.resolve(__dirname, '../projects/kitchen-sink'));
 
     const args: Arguments<unknown> = { $0: '', _: [] };
     await ((pipeline.handler(args) as unknown) as Promise<string>)
@@ -118,7 +118,7 @@ describe('monofo pipeline', () => {
 
   it('can be executed with crossdeps alone', async () => {
     process.env = fakeProcess();
-    process.chdir(path.resolve(__dirname, '../../test/projects/crossdeps'));
+    process.chdir(path.resolve(__dirname, '../projects/crossdeps'));
 
     const args: Arguments<unknown> = { $0: '', _: [] };
     await ((pipeline.handler(args) as unknown) as Promise<string>)
@@ -136,7 +136,7 @@ describe('monofo pipeline', () => {
 
   it('can be executed with flexible structure', async () => {
     process.env = fakeProcess();
-    process.chdir(path.resolve(__dirname, '../../test/projects/flexible-structure'));
+    process.chdir(path.resolve(__dirname, '../projects/flexible-structure'));
 
     const args: Arguments<unknown> = { $0: '', _: [] };
     await ((pipeline.handler(args) as unknown) as Promise<string>)
