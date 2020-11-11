@@ -16,7 +16,7 @@ const cmd: CommandModule = {
   builder: {},
 
   handler(): Promise<string> {
-    return Config.getAll()
+    return Config.getAll(process.cwd())
       .then((c) =>
         c.length > 0 ? c : Promise.reject(new Error(`No pipeline files to process (cwd: ${process.cwd()})`))
       )

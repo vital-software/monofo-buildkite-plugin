@@ -1,12 +1,12 @@
 import path from 'path';
-import { fakeProcess } from '../test/fixtures';
-import { FileHasher } from './hash';
+import { FileHasher } from '../src/hash';
+import { fakeProcess } from './fixtures';
 
 describe('class FileHasher', () => {
   describe('hashOne()', () => {
     it('receives changes and hashes file contents', async () => {
       process.env = fakeProcess();
-      process.chdir(path.resolve(__dirname, '../test/projects/pure'));
+      process.chdir(path.resolve(__dirname, './projects/pure'));
 
       const hasher = new FileHasher();
 

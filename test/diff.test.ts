@@ -1,13 +1,13 @@
 import path from 'path';
 import { mocked } from 'ts-jest/utils';
-import { COMMIT, fakeProcess } from '../test/fixtures';
-import { getBuildkiteInfo } from './buildkite/config';
-import Config from './config';
-import { getBaseBuild, matchConfigs } from './diff';
-import { mergeBase, revList } from './git';
+import { getBuildkiteInfo } from '../src/buildkite/config';
+import Config from '../src/config';
+import { getBaseBuild, matchConfigs } from '../src/diff';
+import { mergeBase, revList } from '../src/git';
+import { COMMIT, fakeProcess } from './fixtures';
 
-jest.mock('./git');
-jest.mock('./buildkite/client');
+jest.mock('../src/git');
+jest.mock('../src/buildkite/client');
 
 const mockRevList = mocked(revList, true);
 mockRevList.mockImplementation(() => Promise.resolve([COMMIT]));
@@ -32,8 +32,8 @@ describe('matchConfigs', () => {
 
   it('matches changed files against configs', async () => {
     process.env = fakeProcess();
-    process.chdir(path.resolve(__dirname, '../test/projects/kitchen-sink'));
-    const configs = await Config.getAll();
+    process.chdir(path.resolve(__dirname, './projects/kitchen-sink'));
+    const configs = await Config.getAll(process.cwd());
     matchConfigs('foo', configs, ['foo/abc.js', 'foo/README.md', 'bar/abc.ts', 'baz/abc.ts']);
     const changes = configs.map((r) => r.changes);
 

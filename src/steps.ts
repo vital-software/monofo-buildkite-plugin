@@ -6,6 +6,9 @@ const log = debug('monofo:steps');
 export const ARTIFACT_INJECTION_STEP_KEY = 'monorepo-inject-artifacts';
 const ARTIFACT_INJECTION_STEP_LABEL = `:crystal_ball:`;
 
+/**
+ * @todo Should group into parallel steps by build ID?
+ */
 export function artifactInjectionSteps(configs: Config[]): Step[] {
   const names = configs.filter((c) => !c.included).map((c) => c.monorepo.name);
   const produces = configs

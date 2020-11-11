@@ -45,7 +45,7 @@ export function updateDecision(config: Config): void {
 }
 
 /**
- * Mutates the config objects within Config to account for transitive dependencies between pipelines
+ * Mutates the config objects to account for transitive dependencies between pipelines
  *
  * Expects the provided configs to be sorted in topological order already, and to have their initial decisions (e.g.
  * around matches) to be filled in first. The configs in the provided array are mutated by reference.
@@ -67,10 +67,22 @@ export function updateDecisionsForDependsOn(configs: Config[]): void {
     });
 }
 
+/**
+ * Mutates the config objects to account for pure caching
+ */
+export function updateDecisionsForPureCache(configs: Config[]): void {
+  const _possibleCacheHits = configs.filter((c) => c.monorepo.pure && c.included);
+
+  console.log(_possibleCacheHits);
+  // update the build ID to point at the cache hit
+}
+
 export function updateDecisions(configs: Config[]): void {
   configs.forEach((config) => {
     updateDecision(config);
   });
 
   updateDecisionsForDependsOn(configs);
+
+  updateDecisionsForPureCache(configs);
 }

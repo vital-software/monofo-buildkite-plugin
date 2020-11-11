@@ -1,12 +1,12 @@
 import path from 'path';
 import { Arguments } from 'yargs';
-import execSync from '../../test/cmd/exec';
-import { fakeProcess, COMMIT } from '../../test/fixtures';
-import { mergeBase, diff, revList } from '../git';
-import baseCommit from './base-commit';
+import baseCommit from '../../src/cmd/base-commit';
+import { mergeBase, diff, revList } from '../../src/git';
+import { fakeProcess, COMMIT } from '../fixtures';
+import execSync from './exec';
 
-jest.mock('../git');
-jest.mock('../buildkite/client');
+jest.mock('../../src/git');
+jest.mock('../../src/buildkite/client');
 
 const mockMergeBase = mergeBase as jest.Mock<Promise<string>>;
 mockMergeBase.mockImplementation(() => Promise.resolve(COMMIT));
@@ -39,7 +39,7 @@ describe('cmd base-commit', () => {
 
   it('can be executed with simple configuration', async () => {
     process.env = fakeProcess();
-    process.chdir(path.resolve(__dirname, '../../test/projects/kitchen-sink'));
+    process.chdir(path.resolve(__dirname, '../projects/kitchen-sink'));
 
     const args: Arguments<unknown> = { $0: '', _: [] };
     return expect(baseCommit.handler(args)).resolves.toBe(COMMIT);
