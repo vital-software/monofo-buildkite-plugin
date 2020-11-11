@@ -2,6 +2,7 @@
  * Our own internal value instance that collects environment variable values
  */
 interface BuildkiteEnvironment {
+  buildId: string;
   branch: string;
   commit: string;
   defaultBranch: string;

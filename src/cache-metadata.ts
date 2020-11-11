@@ -5,15 +5,41 @@ import debug from 'debug';
 
 const log = debug('monofo:cache-metadata');
 
+const SEVEN_DAYS_SECS = 7 * 24 * 60 * 60;
+
 export interface CacheMetadata {
   contentHash: string;
   component: string;
   buildId: string;
-  expiresAt: int;
 }
 
 export const CACHE_METADATA_TABLE_NAME = 'monofo_cache_metadata';
 const TableName = CACHE_METADATA_TABLE_NAME;
+
+export const CACHE_METADATA_TABLE_DEFINITION = {
+  TableName,
+  BillingMode: 'PAY_PER_REQUEST',
+  AttributeDefinitions: [
+    {
+      AttributeName: 'contentHash',
+      AttributeType: 'S',
+    },
+    {
+      AttributeName: 'component',
+      AttributeType: 'S',
+    },
+  ],
+  KeySchema: [
+    {
+      AttributeName: 'contentHash',
+      KeyType: 'HASH',
+    },
+    {
+      AttributeName: 'component',
+      KeyType: 'RANGE',
+    },
+  ],
+};
 
 export class CacheMetadataRepository {
   private readonly client: DocumentClient;
@@ -46,72 +72,8 @@ export class CacheMetadataRepository {
     await this.client
       .put({
         TableName,
-        Item: item,
+        Item: { ...item, expiresAt: Date.now() / 1000 + SEVEN_DAYS_SECS },
       })
       .promise();
-  }
-
-  public async createTable(): Promise<void> {
-    try {
-      await this.service
-        .createTable({
-          TableName,
-          BillingMode: 'PAY_PER_REQUEST',
-          AttributeDefinitions: [
-            {
-              AttributeName: 'contentHash',
-              AttributeType: 'S',
-            },
-            {
-              AttributeName: 'component',
-              AttributeType: 'S',
-            },
-          ],
-          KeySchema: [
-            {
-              AttributeName: 'contentHash',
-              KeyType: 'HASH',
-            },
-            {
-              AttributeName: 'component',
-              KeyType: 'RANGE',
-            },
-          ],
-        })
-        .promise();
-    } catch (e) {
-      if ((e as AWSError).code === 'ResourceInUseException') {
-        log('Received ResourceInUseException because table likely already exists, continuing');
-        return;
-      }
-
-      throw e;
-    }
-  }
-
-  public async tableExists(): Promise<boolean> {
-    try {
-      await this.service.describeTable({ TableName }).promise();
-      return true;
-    } catch (e) {
-      if ((e as AWSError).code === 'ResourceNotFoundException') {
-        return false;
-      }
-
-      throw e;
-    }
-  }
-
-  public async deleteTable(): Promise<void> {
-    try {
-      await this.service.deleteTable({ TableName }).promise();
-    } catch (e) {
-      if ((e as AWSError).code === 'ResourceNotFoundException') {
-        log('Could not find table to remove: probably already uninstalled');
-        return;
-      }
-
-      throw e;
-    }
   }
 }

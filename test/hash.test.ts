@@ -11,10 +11,14 @@ describe('class FileHasher', () => {
       const hasher = new FileHasher();
 
       // Hashes are consistent
-      expect(await hasher.hashMany(['foo.txt', 'bar.txt'])).toBe(await hasher.hashMany(['foo.txt', 'bar.txt']));
+      expect(await hasher.hashMany(['foo/README.md', 'baz/abc.ts'])).toBe(
+        await hasher.hashMany(['foo/README.md', 'baz/abc.ts'])
+      );
 
       // And order independent
-      expect(await hasher.hashMany(['foo.txt', 'bar.txt'])).toBe(await hasher.hashMany(['bar.txt', 'foo.txt']));
+      expect(await hasher.hashMany(['foo/README.md', 'baz/abc.ts'])).toBe(
+        await hasher.hashMany(['baz/abc.ts', 'foo/README.md'])
+      );
     });
   });
 });

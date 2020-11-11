@@ -157,8 +157,13 @@ describe('monofo pipeline', () => {
       .then((o) => (safeLoad(o) as unknown) as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
-        expect(p.steps).toHaveLength(2);
-        expect(p.steps.map((s) => s.key)).toStrictEqual(['fooKey', 'bazKey']);
+        expect(p.steps).toHaveLength(4);
+        expect(p.steps.map((s) => s.key)).toStrictEqual([
+          'anon-step-1',
+          'anon-step-2',
+          'record-success-foo',
+          'record-success-baz',
+        ]);
       });
   });
 });
