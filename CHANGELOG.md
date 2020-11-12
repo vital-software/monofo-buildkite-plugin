@@ -1,3 +1,15 @@
+# [1.9.0](https://github.com/vital-software/monofo/compare/v1.8.0...v1.9.0) (2020-11-12)
+
+
+### Bug Fixes
+
+* **deps:** update dependency aws-sdk to v2.790.0 ([a571ba4](https://github.com/vital-software/monofo/commit/a571ba4d0ac2cbb69585c787d76d6562b43b8058))
+
+
+### Features
+
+* copy artifacts in parallel ([fbaa33e](https://github.com/vital-software/monofo/commit/fbaa33e245dfe7be31aa6e1f9d2962b454b373cd))
+
 # [1.8.0](https://github.com/vital-software/monofo/compare/v1.7.0...v1.8.0) (2020-11-12)
 
 
