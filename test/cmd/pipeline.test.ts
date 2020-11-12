@@ -189,7 +189,7 @@ describe('monofo pipeline', () => {
       repo.put({
         buildId: BUILD_ID_2,
         component: `pure-hit/foo`,
-        contentHash: '5fb5c231a169d279de4ce622b02ae72245f04f63dd4bcea2eaa3c64e33ad2766',
+        contentHash: '0ffe034c45380e93a2f65d67d8c286a237b00285233c91b778ba70f860c7b54a',
       }),
       repo.put({
         buildId: BUILD_ID_3,
