@@ -4,6 +4,10 @@
   "timezone": "Pacific/Auckland",
   "packageRules": [
     {
+      "packageNames": ["aws-sdk"],
+      "extends": ["schedule:monthly"]
+    },
+    {
       "packagePatterns": ["^eslint"],
       "groupName": "eslint packages"
     },
