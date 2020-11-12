@@ -1,3 +1,10 @@
+## [1.9.3](https://github.com/vital-software/monofo/compare/v1.9.2...v1.9.3) (2020-11-12)
+
+
+### Performance Improvements
+
+* cache glob stat calls and limit hash concurrency ([4ff1077](https://github.com/vital-software/monofo/commit/4ff1077755770c054f44abc56e59465abccb08af))
+
 ## [1.9.2](https://github.com/vital-software/monofo/compare/v1.9.1...v1.9.2) (2020-11-12)
 
 
