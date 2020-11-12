@@ -1,3 +1,10 @@
+# [1.9.0-alpha.2](https://github.com/vital-software/monofo/compare/v1.9.0-alpha.1...v1.9.0-alpha.2) (2020-11-12)
+
+
+### Bug Fixes
+
+* add missing part to command ([3dbfb70](https://github.com/vital-software/monofo/commit/3dbfb70bc864fc11bb8da761bd8f451cf6923f62))
+
 # [1.9.0-alpha.1](https://github.com/vital-software/monofo/compare/v1.8.0...v1.9.0-alpha.1) (2020-11-12)
 
 
