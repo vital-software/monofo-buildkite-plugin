@@ -66,7 +66,7 @@ export class CacheMetadataRepository {
       })
       .promise();
 
-    log('Got result', res);
+    log('Got result', res?.Responses?.[TableName] || []);
     return (res?.Responses?.[TableName] as CacheMetadata[]) || [];
   }
 
