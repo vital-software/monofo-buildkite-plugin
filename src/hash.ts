@@ -1,6 +1,7 @@
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 import debug from 'debug';
+import { count, plurals } from './util';
 
 const log = debug('monofo:hash');
 
@@ -12,26 +13,27 @@ export class FileHasher {
    */
   private static fileCache: Record<string, Promise<string>> = {};
 
-  public async hashOne(pathToFile: string): Promise<string> {
-    if (!(pathToFile in FileHasher.fileCache)) {
+  public async hashOne(path: string): Promise<string> {
+    if (!(path in FileHasher.fileCache)) {
       try {
-        FileHasher.fileCache[pathToFile] = FileHasher.contentHashOfFile(pathToFile);
+        FileHasher.fileCache[path] = FileHasher.contentHashOfFile(path);
       } catch (e) {
         log('Failed to hash file, using fallback value', e);
-        FileHasher.fileCache[pathToFile] = Promise.resolve(EMPTY_HASH); // Cache the negative result too
+        FileHasher.fileCache[path] = Promise.resolve(EMPTY_HASH); // Cache the negative result too
       }
     }
 
-    return FileHasher.fileCache[pathToFile];
+    return FileHasher.fileCache[path];
   }
 
-  public async hashMany(pathToFiles: string[]): Promise<string> {
+  public async hashMany(paths: string[]): Promise<string> {
+    log(`Hashing ${count(paths, 'path')}`);
     const hash = crypto.createHash('sha256');
 
     hash.update(
       (
         await Promise.all(
-          pathToFiles.sort().map(async (matchingFile) => {
+          paths.sort().map(async (matchingFile) => {
             return this.hashOne(matchingFile).then((h: string) => [matchingFile, h] as [string, string]);
           })
         )
