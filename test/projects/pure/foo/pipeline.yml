@@ -1,7 +1,9 @@
 monorepo:
   name: foo
   pure: true
-  matches: foo/README.md
+  matches:
+    - foo/ # test matching dirs directly (they're not checksummed)
+    - foo/README.md
   produces: foo
 
 steps:
