@@ -5,7 +5,7 @@ import Config from '../config';
 import { FileHasher } from '../hash';
 
 export const RECORD_SUCCESS_STEP_KEY = 'record-success-';
-const RECORD_SUCCESS_STEP_LABEL = `:up:`;
+const RECORD_SUCCESS_STEP_LABEL = `:ok:`;
 
 function anonymousKey(step: CommandStep | Step): string {
   const hash = crypto.createHash('md5');
