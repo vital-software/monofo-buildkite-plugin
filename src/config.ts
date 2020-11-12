@@ -92,23 +92,22 @@ export default class Config {
     return `${pipeline}/${this.monorepo.name}`;
   }
 
+  private matches(): string[] {
+    return [...this.monorepo.matches, this.file.path];
+  }
+
   /**
    * Returns all files that match the pipeline, wether they have changes or not
    */
   public async getMatchingFiles(): Promise<string[]> {
-    const cwd = process.cwd();
-
-    const files: Promise<string[]> = Promise.all(
-      this.monorepo.matches.map(async (pattern) => {
+    return Promise.all(
+      this.matches().map(async (pattern) => {
         return glob(pattern, {
           matchBase: true,
-          cwd,
           dot: true,
         });
       })
     ).then((r) => r.flat());
-
-    return files;
   }
 
   public updateMatchingChanges(changedFiles: string[]): void {
@@ -117,7 +116,7 @@ export default class Config {
       return;
     }
 
-    this.changes = [...this.monorepo.matches, this.file.path].flatMap((pattern) =>
+    this.changes = this.matches().flatMap((pattern) =>
       minimatch.match(changedFiles, pattern, {
         matchBase: true,
         dot: true,

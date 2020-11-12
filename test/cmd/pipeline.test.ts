@@ -184,12 +184,12 @@ describe('monofo pipeline', () => {
       repo.put({
         buildId: BUILD_ID_2,
         component: `pure-hit/foo`,
-        contentHash: '1904e993b2d8495eb313ec12533b80a6aac69cb6d2d0848ee97abcf52a37fa48',
+        contentHash: '5fb5c231a169d279de4ce622b02ae72245f04f63dd4bcea2eaa3c64e33ad2766',
       }),
       repo.put({
         buildId: BUILD_ID_3,
         component: `pure-hit/baz`,
-        contentHash: '612ee26061ea6efacde5dedad2f7da2554e859f3780a7426f5728ac47c11a8c3',
+        contentHash: '766bad0b5b5b268746b73b23fb208c0aab1942f03ee55799e02f781af511010f',
       }),
     ]);
 
