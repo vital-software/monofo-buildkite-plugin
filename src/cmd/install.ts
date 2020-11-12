@@ -82,7 +82,6 @@ async function createTable(): Promise<void> {
 const cmd: CommandModule = {
   command: 'install',
   describe: 'Installs a DynamoDB table to store cache pointers for pure builds',
-  aliases: '$0',
   builder: {},
 
   async handler(): Promise<void> {
