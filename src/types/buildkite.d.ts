@@ -31,7 +31,7 @@ interface Step {
   depends_on?: string | string[];
   key?: string;
   label?: string;
-  plugins?: Record<string, unknown>[] | ArtifactPluginConfig[];
+  plugins?: (Record<string, unknown> | ArtifactPluginConfig)[];
   [others: string]: unknown;
 }
 
