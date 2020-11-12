@@ -81,6 +81,7 @@ export default class Config {
   }
 
   public async getContentHash(hasher: FileHasher): Promise<string> {
+    log(`Getting content hash for ${this.monorepo.name}`);
     return hasher.hashMany(await this.getMatchingFiles());
   }
 
@@ -105,6 +106,7 @@ export default class Config {
         return glob(pattern, {
           matchBase: true,
           dot: true,
+          nodir: true,
         });
       })
     ).then((r) => r.flat());
