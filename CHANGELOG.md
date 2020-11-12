@@ -1,3 +1,10 @@
+# [1.9.0-alpha.1](https://github.com/vital-software/monofo/compare/v1.8.0...v1.9.0-alpha.1) (2020-11-12)
+
+
+### Features
+
+* copy artifacts in parallel ([51d17d3](https://github.com/vital-software/monofo/commit/51d17d369ac7786ac82a7819da1dd9b402921257))
+
 # [1.8.0](https://github.com/vital-software/monofo/compare/v1.7.0...v1.8.0) (2020-11-12)
 
 
