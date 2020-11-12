@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import debug from 'debug';
 import _ from 'lodash';
 import Config from './config';
@@ -62,9 +63,15 @@ export default async function mergePipelines(configs: Config[]): Promise<Pipelin
 
   await updateDecisions(configs);
 
+  const maxLen = Math.min(20, Math.max(...configs.map((c) => c.monorepo.name.length)));
+
   // Announce decisions
   configs.forEach((config) => {
-    log(`${config.monorepo.name} will be ${config.included ? 'INCLUDED' : 'EXCLUDED'} because it has ${config.reason}`);
+    log(
+      `${config.included ? '✅' : '🚫'}  ${chalk.blue(config.monorepo.name.padEnd(maxLen))} will be ${
+        config.included ? chalk.green('included') : chalk.red('excluded')
+      } because it has ${config.reason}`
+    );
   });
 
   const artifactSteps = artifactInjectionSteps(configs);
