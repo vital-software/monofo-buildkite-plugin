@@ -31,7 +31,7 @@ steps:
 
   - label: ":shipit:"
     command: "yarn run release"
-    branches: main
+    branches: main next next-major beta alpha *.x
     plugins:
       - docker-compose#v3.7.0:
           run: node
