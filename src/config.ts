@@ -2,7 +2,7 @@ import { promises as fs } from 'fs';
 import { join } from 'path';
 import { promisify } from 'util';
 import debug from 'debug';
-import globAsync from 'glob';
+import globAsync, { Glob } from 'glob';
 import { safeLoad } from 'js-yaml';
 import _ from 'lodash';
 import minimatch from 'minimatch';
@@ -10,9 +10,16 @@ import toposort from 'toposort';
 import { getBuildkiteInfo } from './buildkite/config';
 import ConfigFile, { strings } from './config-file';
 import { FileHasher } from './hash';
+import { count } from './util';
 
 const log = debug('monofo:config');
 const glob = promisify(globAsync);
+
+// Glob caching
+const symlinks = {};
+const statCache = {};
+const realpathCache = {};
+const cache = {};
 
 interface MonorepoConfig {
   name: string;
@@ -62,6 +69,11 @@ export default class Config {
    */
   public reason = 'no matching changes';
 
+  /**
+   * Memoized list of files that match this config
+   */
+  private matchingFiles?: Promise<string[]> = undefined;
+
   public decide(included: boolean, reason: string): void {
     this.included = included;
     this.reason = reason;
@@ -98,18 +110,31 @@ export default class Config {
   }
 
   /**
-   * Returns all files that match the pipeline, wether they have changes or not
+   * Returns all files that match the pipeline, whether they have changes or not
    */
   public async getMatchingFiles(): Promise<string[]> {
-    return Promise.all(
-      this.matches().map(async (pattern) => {
-        return glob(pattern, {
-          matchBase: true,
-          dot: true,
-          nodir: true,
-        });
-      })
-    ).then((r) => r.flat());
+    if (!this.matchingFiles) {
+      log('Getting matching files');
+      this.matchingFiles = Promise.all(
+        this.matches().map(async (pattern) => {
+          return glob(pattern, {
+            matchBase: true,
+            dot: true,
+            nodir: true,
+            cache,
+            symlinks,
+            statCache,
+            realpathCache,
+          });
+        })
+      ).then((r) => {
+        const flat = r.flat();
+        log(`Found ${count(flat, 'matching file')}`);
+        return flat;
+      });
+    }
+
+    return this.matchingFiles;
   }
 
   public updateMatchingChanges(changedFiles: string[]): void {
