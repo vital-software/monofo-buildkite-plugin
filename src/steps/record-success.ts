@@ -1,3 +1,5 @@
+import crypto from 'crypto';
+import fs from 'fs';
 import { version } from '../../package.json';
 import Config from '../config';
 import { FileHasher } from '../hash';
@@ -9,11 +11,13 @@ function getSelfCommandLine(): string {
   return process.env?.MONOFO_SELF || `npx monofo@${version || 'latest'}`;
 }
 
-let anonymousKeyIndex = 0;
-
-function anonymousKey(): string {
-  anonymousKeyIndex += 1;
-  return `anon-step-${anonymousKeyIndex}`;
+function anonymousKey(step: CommandStep | Step): string {
+  const hash = crypto.createHash('md5');
+  hash.update(`${step.label || ''}:`);
+  hash.update(JSON.stringify(step.depends_on) || ':');
+  hash.update(JSON.stringify(step.plugins) || ':');
+  hash.update(`${(step as CommandStep)?.command || ''}:`);
+  return `anon-step-${hash.digest('hex').slice(0, 12)}`;
 }
 
 /**
@@ -34,7 +38,7 @@ export function recordSuccessSteps(configs: Config[]): Promise<Step[]> {
           const dependsOn = c.steps.map((step) => {
             if (!step.key) {
               // eslint-disable-next-line no-param-reassign
-              step.key = anonymousKey(); // TODO: could move to a validation step when creating pure config
+              step.key = anonymousKey(step); // TODO: could move to a validation step when creating pure config
             }
             return step.key;
           });
