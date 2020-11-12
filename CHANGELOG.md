@@ -1,3 +1,19 @@
+# [1.8.0-alpha.1](https://github.com/vital-software/monofo/compare/v1.7.0...v1.8.0-alpha.1) (2020-11-12)
+
+
+### Bug Fixes
+
+* make sure pipeline changes bust the cache ([52a9cd2](https://github.com/vital-software/monofo/commit/52a9cd2b758f51f734818d8dff4e2b8e0c6d4dbf))
+
+
+### Features
+
+* add record-success step and command ([987d021](https://github.com/vital-software/monofo/commit/987d02196305a288a4a16a63a1fde7379de72e40))
+* added install and uninstall commands to create a DynamoDB table ([5bf63cc](https://github.com/vital-software/monofo/commit/5bf63cc373d8e68456556aafdff5d51f28ba1787))
+* configure ttl on table once it is ready ([10b34cd](https://github.com/vital-software/monofo/commit/10b34cd433b41dec2fcc3d135abf32dbb83d1002))
+* support multiple builds in the artifact injection step ([7c67ffd](https://github.com/vital-software/monofo/commit/7c67ffd21154a70e888352610b57738e615aafd6))
+* use aws-cli to put-item the successful metadata ([d692026](https://github.com/vital-software/monofo/commit/d692026e1828c1a9fa4ca8ae77da96546c26594c))
+
 # [1.7.0](https://github.com/vital-software/monofo/compare/v1.6.1...v1.7.0) (2020-11-10)
 
 
