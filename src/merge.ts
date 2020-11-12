@@ -60,7 +60,7 @@ function toPipeline(steps: Step[]): Pipeline {
 export default async function mergePipelines(configs: Config[]): Promise<Pipeline> {
   log(`Merging ${configs.length} pipelines`);
 
-  updateDecisions(configs);
+  await updateDecisions(configs);
 
   // Announce decisions
   configs.forEach((config) => {

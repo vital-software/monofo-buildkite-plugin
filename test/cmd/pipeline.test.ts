@@ -1,8 +1,11 @@
 import path from 'path';
+import { createTables, startDb, stopDb } from 'jest-dynalite';
 import { safeLoad } from 'js-yaml';
 import { mocked } from 'ts-jest/utils';
 import { Arguments } from 'yargs';
+import { CacheMetadataRepository } from '../../src/cache-metadata';
 import * as pipeline from '../../src/cmd/pipeline';
+import { service } from '../../src/dynamodb';
 import { mergeBase, diff, revList } from '../../src/git';
 import { BUILD_ID, COMMIT, fakeProcess } from '../fixtures';
 import execSync from './exec';
@@ -20,6 +23,10 @@ const mockRevList = mocked(revList, true);
 mockRevList.mockImplementation(() => Promise.resolve([COMMIT]));
 
 describe('monofo pipeline', () => {
+  beforeAll(startDb);
+  beforeAll(createTables);
+  afterAll(stopDb);
+
   it('returns help output', async () => {
     const output = await execSync(pipeline, 'pipeline --help');
     expect(output).toContain('Output a merged pipeline.yml');
@@ -159,8 +166,32 @@ describe('monofo pipeline', () => {
         expect(p).toBeDefined();
         expect(p.steps).toHaveLength(4);
         expect(p.steps.map((s) => s.key)).toStrictEqual([
-          'anon-step-1',
-          'anon-step-2',
+          'anon-step-cb64da0ef06c',
+          'anon-step-bf2e8e001a41',
+          'record-success-foo',
+          'record-success-baz',
+        ]);
+      });
+  });
+
+  it('can be executed with pure components with cache hits', async () => {
+    process.env = fakeProcess({ BUILDKITE_PIPELINE_SLUG: 'pure-hit' });
+    process.chdir(path.resolve(__dirname, '../projects/pure'));
+
+    const repo = new CacheMetadataRepository(service);
+    repo.put({
+      buildId: '',
+    });
+
+    const args: Arguments<unknown> = { $0: '', _: [] };
+    await ((pipeline.handler(args) as unknown) as Promise<string>)
+      .then((o) => (safeLoad(o) as unknown) as Pipeline)
+      .then((p) => {
+        expect(p).toBeDefined();
+        expect(p.steps).toHaveLength(4);
+        expect(p.steps.map((s) => s.key)).toStrictEqual([
+          'anon-step-cb64da0ef06c',
+          'anon-step-bf2e8e001a41',
           'record-success-foo',
           'record-success-baz',
         ]);

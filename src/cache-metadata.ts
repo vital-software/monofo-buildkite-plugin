@@ -1,5 +1,4 @@
-import AWS, { AWSError } from 'aws-sdk';
-import { int } from 'aws-sdk/clients/datapipeline';
+import AWS from 'aws-sdk';
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import debug from 'debug';
 
@@ -7,9 +6,12 @@ const log = debug('monofo:cache-metadata');
 
 const SEVEN_DAYS_SECS = 7 * 24 * 60 * 60;
 
-export interface CacheMetadata {
+export interface CacheMetadataKey {
   contentHash: string;
   component: string;
+}
+
+export interface CacheMetadata extends CacheMetadataKey {
   buildId: string;
 }
 
@@ -48,27 +50,28 @@ export class CacheMetadataRepository {
     this.client = new DocumentClient({ service });
   }
 
-  public async get(contentHash: string, component: string): Promise<CacheMetadata | undefined> {
-    log('Putting cache metadata by key', contentHash, component);
+  public async getAll(keys: CacheMetadataKey[]): Promise<CacheMetadata[]> {
+    if (keys.length < 1) {
+      return Promise.resolve([]);
+    }
 
-    const response = await this.client
-      .get({
-        TableName,
-        Key: {
-          contentHash,
-          component,
+    log('Getting cache metadata for keys', keys);
+    const res = await this.client
+      .batchGet({
+        RequestItems: {
+          [TableName]: {
+            Keys: keys,
+          },
         },
       })
       .promise();
 
-    log('Got response', response);
-
-    return (response.Item as CacheMetadata) || undefined;
+    log('Got result', res);
+    return (res?.Responses?.[TableName] as CacheMetadata[]) || [];
   }
 
   public async put(item: CacheMetadata): Promise<void> {
     log('Putting cache metadata', item);
-
     await this.client
       .put({
         TableName,

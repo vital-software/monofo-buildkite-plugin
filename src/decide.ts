@@ -1,4 +1,8 @@
+/* eslint-disable no-param-reassign */
+
+import { CacheMetadata, CacheMetadataKey, CacheMetadataRepository } from './cache-metadata';
 import Config from './config';
+import { service } from './dynamodb';
 import { FileHasher } from './hash';
 import { count } from './util';
 
@@ -71,7 +75,7 @@ export function updateDecisionsForDependsOn(configs: Config[]): void {
 /**
  * Mutates the config objects to account for pure caching
  */
-export function updateDecisionsForPureCache(configs: Config[]): void {
+export async function updateDecisionsForPureCache(configs: Config[]): Promise<void> {
   const cacheConfigs = configs.filter((c) => c.monorepo.pure && c.included);
 
   if (cacheConfigs.length === 0) {
@@ -79,22 +83,41 @@ export function updateDecisionsForPureCache(configs: Config[]): void {
   }
 
   const hasher = new FileHasher();
+  const repository = new CacheMetadataRepository(service);
 
-  const updates = cacheConfigs.map(async (config) => {
-    const hash = await config.getContentHash(hasher);
+  const keys = await Promise.all(
+    cacheConfigs.map(
+      async (config): Promise<CacheMetadataKey> => ({
+        contentHash: await config.getContentHash(hasher),
+        component: config.getComponent(),
+      })
+    )
+  );
 
-    return Promise.resolve();
+  const foundMetdataByComponent = Object.fromEntries(
+    (await repository.getAll(keys)).map((metadata) => [metadata.component, metadata.buildId])
+  );
+
+  cacheConfigs.forEach((config) => {
+    const buildId = foundMetdataByComponent[config.getComponent()];
+
+    if (!buildId) {
+      config.reason += ` (pure cache missed)`;
+      return;
+    }
+
+    // Apply the cache hit: skip this build, and update the base build ID
+    config.buildId = buildId;
+    config.included = false;
+    config.reason = `already been built previously, in build ${buildId} (pure cache hit)`;
   });
-
-  // update the build ID to point at the cache hit
 }
 
-export function updateDecisions(configs: Config[]): void {
+export async function updateDecisions(configs: Config[]): Promise<void> {
   configs.forEach((config) => {
     updateDecision(config);
   });
 
   updateDecisionsForDependsOn(configs);
-
-  updateDecisionsForPureCache(configs);
+  await updateDecisionsForPureCache(configs);
 }

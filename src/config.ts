@@ -7,6 +7,7 @@ import { safeLoad } from 'js-yaml';
 import _ from 'lodash';
 import minimatch from 'minimatch';
 import toposort from 'toposort';
+import { getBuildkiteInfo } from './buildkite/config';
 import ConfigFile, { strings } from './config-file';
 import { FileHasher } from './hash';
 
@@ -81,6 +82,14 @@ export default class Config {
 
   public async getContentHash(hasher: FileHasher): Promise<string> {
     return hasher.hashMany(await this.getMatchingFiles());
+  }
+
+  /**
+   * Used as a key in global namespaces
+   */
+  public getComponent(): string {
+    const { pipeline } = getBuildkiteInfo();
+    return `${pipeline}/${this.monorepo.name}`;
   }
 
   /**
