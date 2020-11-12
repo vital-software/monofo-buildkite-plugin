@@ -38,6 +38,7 @@
     "js-yaml": "3.14.0",
     "lodash": "4.17.20",
     "minimatch": "3.0.4",
+    "tiny-async-pool": "1.2.0",
     "toposort": "2.0.2",
     "yargs": "16.1.0"
   },
@@ -54,6 +55,7 @@
     "@types/js-yaml": "3.12.5",
     "@types/lodash": "4.14.165",
     "@types/minimatch": "3.0.3",
+    "@types/tiny-async-pool": "1.0.0",
     "@types/toposort": "2.0.3",
     "@types/yargs": "15.0.9",
     "@typescript-eslint/eslint-plugin": "4.7.0",

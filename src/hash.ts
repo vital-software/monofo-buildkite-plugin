@@ -1,11 +1,13 @@
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 import debug from 'debug';
-import { count, plurals } from './util';
+import asyncPool from 'tiny-async-pool';
+import { count } from './util';
 
 const log = debug('monofo:hash');
 
 export const EMPTY_HASH = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
+const CONCURRENCY = Number(process.env?.HASH_CONCURRENCY) || 8;
 
 export class FileHasher {
   /**
@@ -27,20 +29,14 @@ export class FileHasher {
   }
 
   public async hashMany(paths: string[]): Promise<string> {
-    log(`Hashing ${count(paths, 'path')}`);
+    log(`Hashing ${count(paths, 'path')} with concurrency ${CONCURRENCY}`);
     const hash = crypto.createHash('sha256');
 
-    hash.update(
-      (
-        await Promise.all(
-          paths.sort().map(async (matchingFile) => {
-            return this.hashOne(matchingFile).then((h: string) => [matchingFile, h] as [string, string]);
-          })
-        )
-      )
-        .map((n) => n.join(','))
-        .join(';')
+    const manifest = await asyncPool(CONCURRENCY, paths.sort(), async (path: string) =>
+      this.hashOne(path).then((h: string) => [path, h] as [string, string])
     );
+
+    hash.update(manifest.map((n) => n.join(',')).join(';'));
 
     return hash.digest('hex');
   }
