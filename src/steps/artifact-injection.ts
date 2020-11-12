@@ -7,6 +7,13 @@ const log = debug('monofo:steps:artifact-injection');
 export const ARTIFACT_INJECTION_STEP_KEY = 'monorepo-inject-artifacts';
 const ARTIFACT_INJECTION_STEP_LABEL = `:crystal_ball:`;
 
+function copyArtifactCommand(artifact: string, buildId: string): string {
+  return (
+    `# Copy ${artifact} from ${buildId} into current build\n` +
+    `buildkite-agent artifact download '${artifact}' . --build '${buildId}' && buildkite-agent upload '${artifact}' &`
+  );
+}
+//
 /**
  * @todo One step, multiple plugin configs
  */
@@ -24,49 +31,35 @@ export function artifactInjectionSteps(configs: Config[]): Step[] {
     return [];
   }
 
-  const plugins: ArtifactPluginConfig[] = skipped
-    .groupBy((c) => c.buildId)
-    .flatMap((configsForBuild) => {
-      const { buildId } = configsForBuild[0];
+  let command = [`echo 'inject for: ${names.join(', ')}'`];
 
-      if (!buildId) {
-        log('Not adding inject artifacts step: no build ID found');
-        return [];
-      }
+  command = command.concat(
+    skipped
+      .groupBy((c) => c.buildId)
+      .flatMap((configsForBuild) => {
+        const { buildId } = configsForBuild[0];
 
-      const produces = configsForBuild
-        .flatMap((e) => e.monorepo.produces)
-        .filter((artifact) => !artifact.startsWith('.phony/'));
+        if (!buildId) {
+          log('Not adding inject artifacts step: no build ID found');
+          return [];
+        }
 
-      if (produces.length < 1) {
-        return [];
-      }
+        const produces = configsForBuild
+          .flatMap((e) => e.monorepo.produces)
+          .filter((artifact) => !artifact.startsWith('.phony/'));
 
-      return [
-        {
-          'artifacts#v1.3.0': {
-            build: buildId,
-            download: produces,
-            upload: produces,
-          },
-        },
-      ];
-    })
-    .value();
+        return produces.map((artifact) => copyArtifactCommand(artifact, buildId));
+      })
+      .value()
+  );
+
+  command = command.concat([`wait`]);
 
   const step: CommandStep = {
     key: ARTIFACT_INJECTION_STEP_KEY,
     label: ARTIFACT_INJECTION_STEP_LABEL,
-    command: `echo 'inject for: ${names.join(', ')}'`,
-    plugins,
+    command,
   };
 
-  return [
-    {
-      key: ARTIFACT_INJECTION_STEP_KEY,
-      label: ARTIFACT_INJECTION_STEP_LABEL,
-      command: `echo 'inject for: ${names.join(', ')}'`,
-      plugins,
-    } as CommandStep,
-  ];
+  return [step];
 }

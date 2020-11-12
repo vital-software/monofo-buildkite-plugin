@@ -1,6 +1,7 @@
 import path from 'path';
 import { createTables, startDb, stopDb } from 'jest-dynalite';
 import { safeLoad } from 'js-yaml';
+import _ from 'lodash';
 import { mocked } from 'ts-jest/utils';
 import { Arguments } from 'yargs';
 import { CacheMetadataRepository } from '../../src/cache-metadata';
@@ -21,6 +22,21 @@ mockDiff.mockImplementation(() => Promise.resolve(['foo/README.md', 'baz/abc.ts'
 
 const mockRevList = mocked(revList, true);
 mockRevList.mockImplementation(() => Promise.resolve([COMMIT]));
+
+/**
+ * Flattens, but skips additional commands on multiple-command steps
+ */
+function commandSummary(steps: Step[]): string[] {
+  return steps.map((s): string => {
+    const c: string | string[] = (s as CommandStep).command;
+
+    if (_.isArray<string>(c)) {
+      return c.length > 0 ? (_.head(c) as string) : '(no commands)';
+    }
+
+    return c || '(no command)';
+  });
+}
 
 describe('monofo pipeline', () => {
   beforeAll(startDb);
@@ -51,7 +67,7 @@ describe('monofo pipeline', () => {
       .then((o) => (safeLoad(o) as unknown) as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
-        expect(p.steps.map((s) => s.command)).toStrictEqual([
+        expect(commandSummary(p.steps)).toStrictEqual([
           "echo 'inject for: excluded, bar, qux, some-long-name'",
           'echo "changed" > changed',
           'echo "dependedon" > dependedon',
@@ -61,12 +77,6 @@ describe('monofo pipeline', () => {
           'echo "baz1"',
           'echo "unreferenced" > unref',
         ]);
-        const { plugins } = p.steps[0];
-        expect(plugins ? plugins[0]['artifacts#v1.3.0'] : null).toStrictEqual({
-          build: BUILD_ID,
-          download: ['bar1', 'bar2', 'qux1'],
-          upload: ['bar1', 'bar2', 'qux1'],
-        });
         expect(Object.entries(p.env)).toHaveLength(4);
         expect(p.env.BAR_WAS_EXCLUDED).toBe('true');
       });
@@ -81,20 +91,15 @@ describe('monofo pipeline', () => {
       .then((o) => (safeLoad(o) as unknown) as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
-        expect(p.steps.map((s) => s.command)).toStrictEqual([
+        expect(commandSummary(p.steps)).toStrictEqual([
           "echo 'inject for: foo, bar'",
           "echo 'bar was replaced'",
           "echo 'All build parts were skipped'",
         ]);
-        const { plugins } = p.steps[0];
-        expect(plugins ? plugins[0]['artifacts#v1.3.0'] : null).toStrictEqual({
-          build: BUILD_ID,
-          download: ['foo1', 'bar1', 'bar2'],
-          upload: ['foo1', 'bar1', 'bar2'],
-        });
       });
   });
 
+  // In this test, we also assert with details on the inject artifacts step
   it('can be executed with a PIPELINE_RUN_ONLY environment variable', async () => {
     process.env = fakeProcess({
       PIPELINE_RUN_ONLY: 'bar',
@@ -108,18 +113,23 @@ describe('monofo pipeline', () => {
       .then((o) => (safeLoad(o) as unknown) as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
-        expect(p.steps.map((s) => s.command)).toStrictEqual([
-          "echo 'inject for: changed, dependedon, excluded, foo, included, qux, baz, unreferenced'",
-          'echo "bar1" | tee bar1',
-          'echo "bar2" | tee bar2',
-          'echo "some-long-name" > some-long-name',
-        ]);
-        const { plugins } = p.steps[0];
-        expect(plugins ? plugins[0]['artifacts#v1.3.0'] : null).toStrictEqual({
-          build: BUILD_ID,
-          download: ['foo1', 'qux1', 'baz1'],
-          upload: ['foo1', 'qux1', 'baz1'],
-        });
+        expect((p.steps[0] as CommandStep).command).toHaveLength(5);
+        expect((p.steps[0] as CommandStep).command[0]).toContain(
+          "echo 'inject for: changed, dependedon, excluded, foo, included, qux, baz, unreferenced'"
+        );
+        expect((p.steps[0] as CommandStep).command[1]).toContain(
+          'Copy foo1 from f62a1b4d-10f9-4790-bc1c-e2c3a0c80983 into current build'
+        );
+        expect((p.steps[0] as CommandStep).command[2]).toContain(
+          'Copy qux1 from f62a1b4d-10f9-4790-bc1c-e2c3a0c80983 into current build'
+        );
+        expect((p.steps[0] as CommandStep).command[3]).toContain(
+          'Copy baz1 from f62a1b4d-10f9-4790-bc1c-e2c3a0c80983 into current build'
+        );
+        expect((p.steps[0] as CommandStep).command[4]).toBe('wait');
+        expect((p.steps[1] as CommandStep).command).toBe('echo "bar1" | tee bar1');
+        expect((p.steps[2] as CommandStep).command).toBe('echo "bar2" | tee bar2');
+        expect((p.steps[3] as CommandStep).command).toBe('echo "some-long-name" > some-long-name');
       });
   });
 
@@ -200,18 +210,12 @@ describe('monofo pipeline', () => {
         expect(p).toBeDefined();
         expect(p.steps).toHaveLength(2);
         expect(p.steps.map((s) => s.key)).toStrictEqual(['monorepo-inject-artifacts', 'nothing-to-do']);
-        expect(p.steps[0].plugins).toHaveLength(2);
 
-        const { plugins } = p.steps[0];
-
-        if (!plugins) {
-          throw new Error('Expected plugins to be defined');
-        }
-
-        expect(plugins).toHaveLength(2);
-        expect((plugins[0] as ArtifactPluginConfig)['artifacts#v1.3.0'].build).toBe(BUILD_ID_2);
-        expect((plugins[0] as ArtifactPluginConfig)['artifacts#v1.3.0'].download).toContain('foo');
-        expect((plugins[1] as ArtifactPluginConfig)['artifacts#v1.3.0'].build).toBe(BUILD_ID_3);
+        expect((p.steps[0] as CommandStep).command).toHaveLength(4);
+        expect((p.steps[0] as CommandStep).command[0]).toContain("echo 'inject for: foo, baz'");
+        expect((p.steps[0] as CommandStep).command[1]).toContain(`Copy foo from ${BUILD_ID_2} into current build`);
+        expect((p.steps[0] as CommandStep).command[2]).toContain(`Copy baz from ${BUILD_ID_3} into current build`);
+        expect((p.steps[0] as CommandStep).command[3]).toBe('wait');
       });
   });
 });
