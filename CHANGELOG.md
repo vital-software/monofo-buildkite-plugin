@@ -1,3 +1,10 @@
+## [1.9.2](https://github.com/vital-software/monofo/compare/v1.9.1...v1.9.2) (2020-11-12)
+
+
+### Bug Fixes
+
+* don't checksum dirs ([6a074f4](https://github.com/vital-software/monofo/commit/6a074f49f3bc1f6c6cc47caaebfca82627ad9a47))
+
 ## [1.9.1](https://github.com/vital-software/monofo/compare/v1.9.0...v1.9.1) (2020-11-12)
 
 
