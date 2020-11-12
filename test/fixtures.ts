@@ -10,6 +10,8 @@ export const BUILD_ID_3 = 'cafecafe-cafe-cafe-cafe-cafecafecafe';
 
 export function fakeProcess(merge: Record<string, string> = {}): NodeJS.ProcessEnv {
   return {
+    MOCK_DYNAMODB_ENDPOINT: process.env?.MOCK_DYNAMODB_ENDPOINT,
+
     BUILDKITE_BUILD_ID: BUILD_ID,
     BUILDKITE_BRANCH: BRANCH,
     BUILDKITE_COMMIT: COMMIT,

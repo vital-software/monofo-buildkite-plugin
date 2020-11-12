@@ -31,10 +31,18 @@ interface Step {
   depends_on?: string | string[];
   key?: string;
   label?: string;
-  plugins?: Record<string, unknown>[];
+  plugins?: Record<string, unknown>[] | ArtifactPluginConfig[];
   [others: string]: unknown;
 }
 
 interface CommandStep extends Step {
   command: string;
+}
+
+interface ArtifactPluginConfig {
+  'artifacts#v1.3.0': {
+    build: string;
+    upload: string[];
+    download: string[];
+  };
 }

@@ -15,6 +15,7 @@ export function nothingToDoSteps(configs: Config[]): Step[] {
   return [
     {
       label: NOTHING_TO_DO_STEP_LABEL,
+      key: 'nothing-to-do',
       command: `echo 'All build parts were skipped'`,
     } as CommandStep,
   ];
