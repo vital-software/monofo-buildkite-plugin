@@ -20,6 +20,7 @@
     "lint": "eslint \"{src,test}/**/*.ts\"",
     "lint:fix": "run-s \"lint --fix\"",
     "monofo": "./bin/monofo.js",
+    "monofo:with-aws": "aws-vault exec vital-ci -- yarn monofo",
     "release": "semantic-release",
     "test": "jest",
     "test:watch": "run-s \"test --watch\""
