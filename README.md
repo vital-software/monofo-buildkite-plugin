@@ -1,21 +1,23 @@
 # monofo
 
-- [Basic Usage](#basic-usage)
-  - [Splitting pipelines using multiple `pipeline.yml` files](#splitting-pipelines-using-multiple-pipelineyml-files)
+<!-- run: `npx markdown-toc --maxdepth=3 -i README.md` to update -->
+
+<!-- toc -->
+
+- [Basic usage](#basic-usage)
+  * [Splitting pipelines using multiple `pipeline.yml` files](#splitting-pipelines-using-multiple-pipelineyml-files)
+- [Advanced usage](#advanced-usage)
+  * [Caching pipelines against matching files (pure mode)](#caching-pipelines-against-matching-files-pure-mode)
+  * [Controlling what is included](#controlling-what-is-included)
+  * [Phony deps](#phony-deps)
+  * [Depends on (deprecated)](#depends-on-deprecated)
 - [Configuration](#configuration)
-  - [Buildkite API Access Token](#buildkite-api-access-token)
-- [Advanced Features](#advanced-features)
-  - [Pure pipelines](#pure-pipelines)
-  - [Controlling what is included](#controlling-what-is-included)
-    - [PIPELINE_RUN_ALL](#pipeline_run_all)
-    - [PIPELINE_RUN_ONLY](#pipeline_run_only)
-    - [PIPELINE_RUN_\*, PIPELINE_NO_RUN_\*](#pipeline_run_-pipeline_no_run_)
-  - [Pipeline file changes match themselves](#pipeline-file-changes-match-themselves)
-  - [Phony deps](#phony-deps)
-  - [Depends On](#depends-on)
+  * [Buildkite API access token](#buildkite-api-access-token)
+  * [DynamoDB setup](#dynamodb-setup)
 - [CLI](#cli)
 - [Development](#development)
 
+<!-- tocstop -->
 
 A Buildkite dynamic pipeline generator for monorepos. `monofo` lets you split
 your `.buildkite/pipeline.yml` into multiple components, each of which will
@@ -26,16 +28,25 @@ have to split your pipeline and use triggers), while potentially saving heaps of
 time by only building what you need.
 
 
-## Basic Usage
+## Basic usage
 
 Instead of calling `buildkite-agent pipeline upload` in the first step of a
 pipeline, execute `monofo pipeline` which will output the dynamic pipeline on
-stdout.
+stdout. A good example for what to paste into the Step Editor UI in Buildkite
+might be:
 
-```sh
-npx monofo pipeline | buildkite-agent pipeline upload
+```yaml
+steps:
+  - name: ":pipeline: Generate pipeline"
+    command: npx monofo pipeline | buildkite-agent pipeline upload
+    plugins:
+      - seek-oss/aws-sm#v2.2.1: # for example, but your secret management might be e.g. via S3 bucket or "env" file instead
+          env:
+            BUILDKITE_API_ACCESS_TOKEN: "global/buildkite-api-access-token"
 ```
 
+The only required configuration is the `BUILDKITE_API_ACCESS_TOKEN` environment
+variable. See [Configuration](#configuration) for details.
 
 ### Splitting pipelines using multiple `pipeline.yml` files
 
@@ -74,29 +85,16 @@ automatically be considered matching for the `foo` pipeline, without having to
 add that pipeline file to the `matches` array yourself.
 
 
-## Configuration
+## Advanced usage
 
 
-### Buildkite API Access Token
+### Caching pipelines against matching files (pure mode)
 
-When calculating the commit to diff against, monofo uses Buildkite API to look
-up the last successful build of the current branch. To do so, monofo needs a
-Buildkite API access token set as the environment variable
-`BUILDKITE_API_ACCESS_TOKEN`. You'd probably set this in your Buildkite build
-secrets.
-
-The token only needs the `read_builds` scope. We need an _API_ token, not an
-_agent_ token.
-
-
-## Advanced Features
-
-
-### Pure pipelines
-
-You can mark a pipeline as pure by setting the `monorepo.pure` flag to `true`.
-This engages a layer of extra caching based on the content of the files in
-the `matches` globs. For example:
+You can mark a pipeline as pure by setting the `monorepo.pure` flag to `true` -
+this indicates that it doesn't have side-effects other than producing its
+artifacts, and the only inputs it relies on are listed in its `matches`.
+This means an extra layer of caching can be used, based on the
+contents of the files in the `matches` globs. For a specific example:
 
 ```
 monorepo:
@@ -111,22 +109,16 @@ steps:
           upload: output-file.txt
 ```
 
-When we finish the build of this component, we'll remember the contents of
-`input-file.txt`. In any future build where that file has the same contents,
-instead of running the `do-something` command step, we'll just directly download
-`output-file.txt` from the last build that produced it successfully. This
-component of the pipeline ends up skipped.
-
-#### How it works
+When this build finishes, the contents of `input-file.txt` will be hashed.
+In any future build, if that file has the same contents, instead of running
+the `do-something` command step, `output-file.txt` will be directly downloaded
+from the last build that produced it successfully (and injected with the other
+artifacts at the start of the build)
 
 Pure mode uses external metadata to be able to reuse artifacts from previous
-builds efficiently. This takes the form of a DynamoDB table. If you're using
-pure mode, you can `monofo install` to create the needed table (and
-`monofo uninstall` to remove it again should you need to).
-
-After any step that uploads an artifact passes successfully, we update a pointer
-in the metdata from the content hash of the `monorepo.matches` to the current
-build.
+builds efficiently. Content hash to build ID mappings are stored in
+DynamoDB, so if you are using pure mode you will need to do some additional
+configuration. See [DynamoDB Setup](#dynamodb-setup)
 
 
 ### Controlling what is included
@@ -160,11 +152,60 @@ These artifacts are still evaulated when ordering pipeline steps (using
 skipped.
 
 
-### Depends On (deprecated)
+### Depends on (deprecated)
 
 In any component pipeline, you can specify `monorepo.depends_on` as an array of
 pipeline component names (like `foo` for `pipeline.foo.yml`). Those pipelines
 will be included in a build if the pipeline that `depends_on` them is included.
+
+
+## Configuration
+
+The main required piece of configuration is the `BUILDKITE_API_ACCESS_TOKEN`
+
+### Buildkite API access token
+
+When calculating the commit to diff against, monofo uses Buildkite API to look
+up the last successful build of the current branch. To do so, monofo needs a
+Buildkite API access token set as the environment variable
+`BUILDKITE_API_ACCESS_TOKEN`. You'd probably set this in your Buildkite build
+secrets.
+
+The token only needs the `read_builds` scope. We need an _API_ token, not an
+_agent_ token.
+
+### DynamoDB setup
+
+DynamoDB setup is only required if you're intending to use [pure mode](#caching-pipelines-against-matching-files-pure-mode)
+
+For starters, you'll need to run `monofo` as a user that can read and write to
+the `monofo_cache_metadata` DynamoDB table. How to do this depends on your
+own Buildkite stack, but you'd generally attach a policy that looks like this
+to the Buildkite role:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "MonofoCacheMetadataAccess",
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:PutItem",
+        "dynamodb:DeleteTable",
+        "dynamodb:CreateTable",
+        "dynamodb:BatchGetItem"
+      ],
+      "Resource": "arn:aws:dynamodb:*:*:table/monofo_cache_metadata"
+    }
+  ]
+}
+```
+
+Then you should create the DynamoDB table so that it's ready for use. To do
+this, you can use `monofo install` to create the needed table (and
+`monofo uninstall` to remove it again should you need to). Finally, you can test
+ writing to the DynamoDB table using the `monofo record-success` command.
 
 
 ## CLI
