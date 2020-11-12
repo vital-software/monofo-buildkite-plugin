@@ -1,3 +1,10 @@
+# [1.8.0-alpha.2](https://github.com/vital-software/monofo/compare/v1.8.0-alpha.1...v1.8.0-alpha.2) (2020-11-12)
+
+
+### Bug Fixes
+
+* remove extra aliases on new commands ([baab610](https://github.com/vital-software/monofo/commit/baab6101e1808d5bd0cf95a9abbb28bb0b0de297))
+
 # [1.8.0-alpha.1](https://github.com/vital-software/monofo/compare/v1.7.0...v1.8.0-alpha.1) (2020-11-12)
 
 
