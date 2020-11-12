@@ -1,3 +1,10 @@
+## [1.9.1](https://github.com/vital-software/monofo/compare/v1.9.0...v1.9.1) (2020-11-12)
+
+
+### Bug Fixes
+
+* make decisions easier to read ([100c728](https://github.com/vital-software/monofo/commit/100c72809152721d2fc34bb60f6a31dbd2ab4129))
+
 # [1.9.0](https://github.com/vital-software/monofo/compare/v1.8.0...v1.9.0) (2020-11-12)
 
 
