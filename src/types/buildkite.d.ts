@@ -36,7 +36,7 @@ interface Step {
 }
 
 interface CommandStep extends Step {
-  command: string;
+  command: string | string[];
 }
 
 interface ArtifactPluginConfig {
