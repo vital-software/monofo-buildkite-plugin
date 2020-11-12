@@ -22,7 +22,6 @@ async function deleteTable(): Promise<void> {
 const cmd: CommandModule = {
   command: 'uninstall',
   describe: 'Uninstalls the DynamoDB table',
-  aliases: '$0',
   builder: {},
 
   async handler(): Promise<void> {
