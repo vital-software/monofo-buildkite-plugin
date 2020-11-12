@@ -1,15 +1,11 @@
 import crypto from 'crypto';
-import fs from 'fs';
-import { version } from '../../package.json';
+import { getBuildkiteInfo } from '../buildkite/config';
+import { CACHE_METADATA_TABLE_NAME } from '../cache-metadata';
 import Config from '../config';
 import { FileHasher } from '../hash';
 
 export const RECORD_SUCCESS_STEP_KEY = 'record-success-';
 const RECORD_SUCCESS_STEP_LABEL = `:up:`;
-
-function getSelfCommandLine(): string {
-  return process.env?.MONOFO_SELF || `npx monofo@${version || 'latest'}`;
-}
 
 function anonymousKey(step: CommandStep | Step): string {
   const hash = crypto.createHash('md5');
@@ -18,6 +14,20 @@ function anonymousKey(step: CommandStep | Step): string {
   hash.update(JSON.stringify(step.plugins) || ':');
   hash.update(`${(step as CommandStep)?.command || ''}:`);
   return `anon-step-${hash.digest('hex').slice(0, 12)}`;
+}
+
+async function command(config: Config, hasher: FileHasher): Promise<string> {
+  const info = getBuildkiteInfo();
+
+  const item = {
+    contentHash: { S: await config.getContentHash(hasher) },
+    component: { S: config.getComponent() },
+    buildId: { S: info.buildId },
+    expiresAt: { N: String(Date.now() / 1000 + 7 * 24 * 60 * 60) },
+  };
+
+  const shellItem = `'${JSON.stringify(item).replace("'", "'\\''")}'`;
+  return `aws dynamodb put-item --table-name ${CACHE_METADATA_TABLE_NAME} --item ${shellItem}`;
 }
 
 /**
@@ -46,7 +56,7 @@ export function recordSuccessSteps(configs: Config[]): Promise<Step[]> {
           const step = {
             label: RECORD_SUCCESS_STEP_LABEL,
             key: `${RECORD_SUCCESS_STEP_KEY}${c.monorepo.name}`,
-            command: `${getSelfCommandLine()} record-success '${c.monorepo.name}' '${await c.getContentHash(hasher)}'`,
+            command: await command(c, hasher),
             depends_on: dependsOn,
           };
 
