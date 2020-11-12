@@ -94,18 +94,28 @@ _agent_ token.
 
 ### Pure pipelines
 
-You can mark a pipeline as "pure" by setting the pure flag:
+You can mark a pipeline as pure by setting the `monorepo.pure` flag to `true`.
+This engages a layer of extra caching based on the content of the files in
+the `matches` globs. For example:
 
 ```
 monorepo:
   pure: true
-  matches: some-file.txt
-  produces: some-other-file.txt
+  matches: input-file.txt
+  produces: output-file.txt
+
+steps:
+  - command: do-something < input-file.txt > output-file.txt
+    plugins:
+      - artifacts#v1.3.0:
+          upload: output-file.txt
 ```
 
-In this case, the content of the matches is used to produce a hash. If this hash
-has been built before, that pipeline will be skipped, and its artifacts replaced
-by the previously built ones.
+When we finish the build of this component, we'll remember the contents of
+`input-file.txt`. In any future build where that file has the same contents,
+instead of running the `do-something` command step, we'll just directly download
+`output-file.txt` from the last build that produced it successfully. This
+component of the pipeline ends up skipped.
 
 #### How it works
 
@@ -116,9 +126,7 @@ pure mode, you can `monofo install` to create the needed table (and
 
 After any step that uploads an artifact passes successfully, we update a pointer
 in the metdata from the content hash of the `monorepo.matches` to the current
-build. Then, in any future build where the content of the files the match is the
-same, we just immediately replace that whole part of the pipeline with the
-correct artifact.
+build.
 
 
 ### Controlling what is included
