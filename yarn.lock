@@ -5052,10 +5052,10 @@ jest-docblock@^26.0.0:
   dependencies:
     detect-newline "^3.0.0"
 
-jest-dynalite@3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/jest-dynalite/-/jest-dynalite-3.1.0.tgz#d4cc86ff32641b0d6124b730c1615c0dc504794d"
-  integrity sha512-1upHYnj1+ElAlLd910dkuMBIzDO5EjHa28uVP7z3yNPKfnfPRuI/A8XjjdfkzcJI109wibb2F//agUInD62s/w==
+jest-dynalite@3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/jest-dynalite/-/jest-dynalite-3.2.0.tgz#082264fcade9013e151e1df0ca98d32305a5f235"
+  integrity sha512-TYTNKUA1Tr2t1bk+oyeCiu+jDlhkGon6nopdMX4t5ll/Is+aydWsx49zCZyJK6RMaI/7Bls0gQGy1BEmwpKmOA==
   dependencies:
     "@jest/types" "^24.9.0"
     dynalite "^3.0.0"
