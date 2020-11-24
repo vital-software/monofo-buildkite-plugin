@@ -1,3 +1,10 @@
+## [1.9.4](https://github.com/vital-software/monofo/compare/v1.9.3...v1.9.4) (2020-11-24)
+
+
+### Bug Fixes
+
+* **decide:** change the order decisions are applied in ([43ed67f](https://github.com/vital-software/monofo/commit/43ed67fc81ff7d6b3ea71de5d48b9ee2bb56ec77))
+
 ## [1.9.3](https://github.com/vital-software/monofo/compare/v1.9.2...v1.9.3) (2020-11-12)
 
 
