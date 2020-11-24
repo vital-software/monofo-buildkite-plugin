@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 
-import { CacheMetadata, CacheMetadataKey, CacheMetadataRepository } from './cache-metadata';
+import { CacheMetadataKey, CacheMetadataRepository } from './cache-metadata';
 import Config from './config';
 import { service } from './dynamodb';
 import { FileHasher } from './hash';
@@ -8,45 +8,59 @@ import { count } from './util';
 
 /**
  * If a config has changes, its steps are merged into the final build. Otherwise, it is excluded, and its excluded_steps
- * are merged in instead. There are exceptions:
+ * are merged in instead.
+ */
+function updateDecisionsForChanges(configs: Config[]): void {
+  configs.forEach((config) => {
+    if (config.changes.length > 0) {
+      config.decide(true, `${count(config.changes, 'matching change')}: ${config.changes.join(', ')}`);
+    }
+  });
+}
+
+/**
+ * Provides for manually supplied overrides to the inclusion decisions:
  *  - An env var named PIPELINE_RUN_ALL, set to any value, indicates that all steps should run
  *  - An env var named PIPELINE_RUN_<NAME>, where NAME is the UPPER_SNAKE_CASE version of the component pipeline name,
- *    set to any value, indicates that step should run
+ *    set to any value, indicates that step should run - and the opposite for PIPELINE_NO_RUN_<NAME>
+ *  - An env var named PIPELINE_RUN_ONLY, with value of a single pipeline name, indicates only that step should run
  */
-export function updateDecision(config: Config): void {
-  if (process.env.PIPELINE_RUN_ALL) {
-    config.decide(true, 'been forced to by PIPELINE_RUN_ALL');
-    return;
-  }
+function updateDecisionsForEnvVars(configs: Config[]): void {
+  configs.forEach((config) => {
+    if (process.env.PIPELINE_RUN_ALL) {
+      config.decide(true, 'been forced to by PIPELINE_RUN_ALL');
+      return;
+    }
 
-  const envVarName = config.monorepo.name.toLocaleUpperCase().replace(/-/g, '_');
+    const envVarName = config.monorepo.name.toLocaleUpperCase().replace(/-/g, '_');
 
-  const overrideExcludeKey = `PIPELINE_NO_RUN_${envVarName}`;
-  if (process.env[overrideExcludeKey]) {
-    config.decide(false, `been forced NOT to by ${overrideExcludeKey}`);
-    return;
-  }
+    const overrideExcludeKey = `PIPELINE_NO_RUN_${envVarName}`;
+    if (process.env[overrideExcludeKey]) {
+      config.decide(false, `been forced NOT to by ${overrideExcludeKey}`);
+      return;
+    }
 
-  const overrideIncludeKey = `PIPELINE_RUN_${envVarName}`;
-  if (process.env[overrideIncludeKey]) {
-    config.decide(true, `been forced to by ${overrideIncludeKey}`);
-    return;
-  }
+    const overrideIncludeKey = `PIPELINE_RUN_${envVarName}`;
+    if (process.env[overrideIncludeKey]) {
+      config.decide(true, `been forced to by ${overrideIncludeKey}`);
+      return;
+    }
 
-  if (process.env?.PIPELINE_RUN_ONLY) {
-    config.decide(config.monorepo.name === process.env?.PIPELINE_RUN_ONLY, 'PIPELINE_RUN_ONLY was specified');
-    return;
-  }
+    if (process.env?.PIPELINE_RUN_ONLY) {
+      config.decide(config.monorepo.name === process.env?.PIPELINE_RUN_ONLY, 'PIPELINE_RUN_ONLY was specified');
+    }
+  });
+}
 
-  if (!config.buildId) {
-    config.decide(true, 'no previous successful build, fallback');
-    return;
-  }
-
-  // At this point, we know it has a config.buildId we can grab artifacts from
-  if (config.changes.length > 0) {
-    config.decide(true, `${count(config.changes, 'matching change')}: ${config.changes.join(', ')}`);
-  }
+/**
+ * If there is no previous build, we always include the step
+ */
+function updateDecisionsFoFallback(configs: Config[]): void {
+  configs.forEach((config) => {
+    if (!config.buildId) {
+      config.decide(true, 'no previous successful build, fallback to being included');
+    }
+  });
 }
 
 /**
@@ -55,7 +69,7 @@ export function updateDecision(config: Config): void {
  * Expects the provided configs to be sorted in topological order already, and to have their initial decisions (e.g.
  * around matches) to be filled in first. The configs in the provided array are mutated by reference.
  */
-export function updateDecisionsForDependsOn(configs: Config[]): void {
+function updateDecisionsForDependsOn(configs: Config[]): void {
   const byName = Object.fromEntries(configs.map((c) => [c.monorepo.name, c]));
 
   configs
@@ -75,7 +89,7 @@ export function updateDecisionsForDependsOn(configs: Config[]): void {
 /**
  * Mutates the config objects to account for pure caching
  */
-export async function updateDecisionsForPureCache(configs: Config[]): Promise<void> {
+async function updateDecisionsForPureCache(configs: Config[]): Promise<void> {
   const cacheConfigs = configs.filter((c) => c.monorepo.pure && c.included);
 
   if (cacheConfigs.length === 0) {
@@ -114,10 +128,9 @@ export async function updateDecisionsForPureCache(configs: Config[]): Promise<vo
 }
 
 export async function updateDecisions(configs: Config[]): Promise<void> {
-  configs.forEach((config) => {
-    updateDecision(config);
-  });
-
+  updateDecisionsForChanges(configs);
   updateDecisionsForDependsOn(configs);
   await updateDecisionsForPureCache(configs);
+  updateDecisionsForEnvVars(configs);
+  updateDecisionsFoFallback(configs);
 }
