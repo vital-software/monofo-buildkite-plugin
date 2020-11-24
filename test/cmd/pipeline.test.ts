@@ -214,4 +214,37 @@ describe('monofo pipeline', () => {
         expect(inject[3]).toBe('wait');
       });
   });
+
+  it('can be executed with pure components with cache hits, but PIPELINE_RUN_ALL forces them to run', async () => {
+    process.env = fakeProcess({ BUILDKITE_PIPELINE_SLUG: 'pure-hit', PIPELINE_RUN_ALL: '1' });
+    process.chdir(path.resolve(__dirname, '../projects/pure'));
+
+    const repo = new CacheMetadataRepository(service);
+
+    await Promise.all([
+      repo.put({
+        buildId: BUILD_ID_2,
+        component: `pure-hit/foo`,
+        contentHash: '0ffe034c45380e93a2f65d67d8c286a237b00285233c91b778ba70f860c7b54a',
+      }),
+      repo.put({
+        buildId: BUILD_ID_3,
+        component: `pure-hit/baz`,
+        contentHash: '766bad0b5b5b268746b73b23fb208c0aab1942f03ee55799e02f781af511010f',
+      }),
+    ]);
+
+    const args: Arguments<unknown> = { $0: '', _: [] };
+    await ((pipeline.handler(args) as unknown) as Promise<string>)
+      .then((o) => (safeLoad(o) as unknown) as Pipeline)
+      .then((p) => {
+        expect(p).toBeDefined();
+        expect(p.steps.map((s) => s.key)).toStrictEqual([
+          'anon-step-cb64da0ef06c',
+          'anon-step-bf2e8e001a41',
+          'record-success-foo',
+          'record-success-baz',
+        ]);
+      });
+  });
 });
