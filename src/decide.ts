@@ -21,15 +21,18 @@ function updateDecisionsForChanges(configs: Config[]): void {
 /**
  * Provides for manually supplied overrides to the inclusion decisions:
  *  - An env var named PIPELINE_RUN_ALL, set to any value, indicates that all steps should run
+ *  - An env var named PIPELINE_RUN_ONLY, with value of a single pipeline name, indicates only that step should run
  *  - An env var named PIPELINE_RUN_<NAME>, where NAME is the UPPER_SNAKE_CASE version of the component pipeline name,
  *    set to any value, indicates that step should run - and the opposite for PIPELINE_NO_RUN_<NAME>
- *  - An env var named PIPELINE_RUN_ONLY, with value of a single pipeline name, indicates only that step should run
  */
 function updateDecisionsForEnvVars(configs: Config[]): void {
   configs.forEach((config) => {
     if (process.env.PIPELINE_RUN_ALL) {
       config.decide(true, 'been forced to by PIPELINE_RUN_ALL');
-      return;
+    }
+
+    if (process.env?.PIPELINE_RUN_ONLY) {
+      config.decide(config.monorepo.name === process.env?.PIPELINE_RUN_ONLY, 'PIPELINE_RUN_ONLY specified');
     }
 
     const envVarName = config.monorepo.name.toLocaleUpperCase().replace(/-/g, '_');
@@ -37,17 +40,11 @@ function updateDecisionsForEnvVars(configs: Config[]): void {
     const overrideExcludeKey = `PIPELINE_NO_RUN_${envVarName}`;
     if (process.env[overrideExcludeKey]) {
       config.decide(false, `been forced NOT to by ${overrideExcludeKey}`);
-      return;
     }
 
     const overrideIncludeKey = `PIPELINE_RUN_${envVarName}`;
     if (process.env[overrideIncludeKey]) {
       config.decide(true, `been forced to by ${overrideIncludeKey}`);
-      return;
-    }
-
-    if (process.env?.PIPELINE_RUN_ONLY) {
-      config.decide(config.monorepo.name === process.env?.PIPELINE_RUN_ONLY, 'PIPELINE_RUN_ONLY was specified');
     }
   });
 }

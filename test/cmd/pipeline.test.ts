@@ -104,7 +104,6 @@ describe('monofo pipeline', () => {
     process.env = fakeProcess({
       PIPELINE_RUN_ONLY: 'bar',
       PIPELINE_RUN_SOME_LONG_NAME: '1',
-      PIPELINE_NO_RUN_INCLUDED: '1',
     });
     process.chdir(path.resolve(__dirname, '../projects/kitchen-sink'));
 
@@ -114,9 +113,10 @@ describe('monofo pipeline', () => {
       .then((p) => {
         expect(p).toBeDefined();
         expect(commandSummary(p.steps)).toStrictEqual([
-          "echo 'inject for: changed, dependedon, excluded, foo, included, qux, baz, unreferenced'",
+          "echo 'inject for: changed, dependedon, excluded, foo, qux, baz, unreferenced'",
           'echo "bar1" | tee bar1',
           'echo "bar2" | tee bar2',
+          'echo "included" > included',
           'echo "some-long-name" > some-long-name',
         ]);
 
@@ -125,6 +125,33 @@ describe('monofo pipeline', () => {
         expect(inject[2]).toContain('Copy qux1 from f62a1b4d-10f9-4790-bc1c-e2c3a0c80983 into current build');
         expect(inject[3]).toContain('Copy baz1 from f62a1b4d-10f9-4790-bc1c-e2c3a0c80983 into current build');
         expect(inject[4]).toBe('wait');
+      });
+  });
+
+  it('can be executed with both PIPELINE_RUN_ALL and PIPELINE_NO_RUN_TASK', async () => {
+    process.env = fakeProcess({
+      PIPELINE_RUN_ALL: '1',
+      PIPELINE_NO_RUN_FOO: '1',
+      PIPELINE_NO_RUN_BAR: '1',
+    });
+    process.chdir(path.resolve(__dirname, '../projects/kitchen-sink'));
+
+    const args: Arguments<unknown> = { $0: '', _: [] };
+    await ((pipeline.handler(args) as unknown) as Promise<string>)
+      .then((o) => (safeLoad(o) as unknown) as Pipeline)
+      .then((p) => {
+        expect(p).toBeDefined();
+        expect(commandSummary(p.steps)).toStrictEqual([
+          "echo 'inject for: excluded, foo, bar'",
+          'echo "changed" > changed',
+          'echo "dependedon" > dependedon',
+          "echo 'bar was replaced'",
+          'echo "included" > included',
+          'echo "qux1"',
+          'echo "baz1"',
+          'echo "some-long-name" > some-long-name',
+          'echo "unreferenced" > unref',
+        ]);
       });
   });
 
