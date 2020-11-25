@@ -1,3 +1,10 @@
+# [1.10.0](https://github.com/vital-software/monofo/compare/v1.9.4...v1.10.0) (2020-11-25)
+
+
+### Features
+
+* allow mixing PIPELINE_RUN_ALL and PIPELINE_NO_RUN ([421734c](https://github.com/vital-software/monofo/commit/421734c404f19f366036203f23d4846d9648488e))
+
 ## [1.9.4](https://github.com/vital-software/monofo/compare/v1.9.3...v1.9.4) (2020-11-24)
 
 
