@@ -4830,10 +4830,10 @@ jest-docblock@^26.0.0:
   dependencies:
     detect-newline "^3.0.0"
 
-jest-dynalite@3.2.3:
-  version "3.2.3"
-  resolved "https://registry.yarnpkg.com/jest-dynalite/-/jest-dynalite-3.2.3.tgz#eb58f3136da6e6c290cf4b3210c1efa08e5c0b74"
-  integrity sha512-ZtpCRqqJx1MqT88Il/CZ17IQ7sqpxo+V9RSfgnA7MKm5z32vF8jZhiKSN5Z9ObXA+Y2QwWH/v4o2yM93HWSP7A==
+jest-dynalite@3.2.4:
+  version "3.2.4"
+  resolved "https://registry.yarnpkg.com/jest-dynalite/-/jest-dynalite-3.2.4.tgz#0a1767236cb8c6ed8e6f8effc2b738c4c181e41d"
+  integrity sha512-1KSXyvBx2gR/Rlh94Khmn/IJ3EYuwB4+HjlLLCebfQr6PtCQ7ez02h2lxvwE100XNDAeqFS2rFsjUbSKr+fM1w==
   dependencies:
     dynalite "^3.0.0"
 
