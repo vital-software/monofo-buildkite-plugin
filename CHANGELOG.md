@@ -1,3 +1,12 @@
+## [1.10.2](https://github.com/vital-software/monofo/compare/v1.10.1...v1.10.2) (2021-02-03)
+
+
+### Bug Fixes
+
+* **deps:** update dependency debug to v4.3.1 ([1a8bb4b](https://github.com/vital-software/monofo/commit/1a8bb4bce16f3a38342eeb2199d63c0af2bb3b40))
+* **deps:** update dependency got to v11.8.1 ([9d1c11e](https://github.com/vital-software/monofo/commit/9d1c11ef6e2ba10e19ad8f2f497556c9086526c4))
+* **deps:** update dependency yargs to v16.2.0 ([3301b96](https://github.com/vital-software/monofo/commit/3301b964a677742d4659b78f55189d2d1ebf4ab7))
+
 ## [1.10.1](https://github.com/vital-software/monofo/compare/v1.10.0...v1.10.1) (2021-02-03)
 
 
