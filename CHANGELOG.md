@@ -1,3 +1,10 @@
+## [1.10.1](https://github.com/vital-software/monofo/compare/v1.10.0...v1.10.1) (2021-02-03)
+
+
+### Bug Fixes
+
+* **deps:** update dependency aws-sdk to v2.831.0 ([29ab158](https://github.com/vital-software/monofo/commit/29ab158f10ced19f62807e0d9769833e517d337a))
+
 # [1.10.0](https://github.com/vital-software/monofo/compare/v1.9.4...v1.10.0) (2020-11-25)
 
 
