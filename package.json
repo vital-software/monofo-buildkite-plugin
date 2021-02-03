@@ -40,7 +40,7 @@
     "minimatch": "3.0.4",
     "tiny-async-pool": "1.2.0",
     "toposort": "2.0.2",
-    "yargs": "16.1.0"
+    "yargs": "16.2.0"
   },
   "devDependencies": {
     "@commitlint/cli": "11.0.0",
@@ -57,7 +57,7 @@
     "@types/minimatch": "3.0.3",
     "@types/tiny-async-pool": "1.0.0",
     "@types/toposort": "2.0.3",
-    "@types/yargs": "15.0.12",
+    "@types/yargs": "16.0.0",
     "@typescript-eslint/eslint-plugin": "4.14.0",
     "@typescript-eslint/parser": "4.14.0",
     "cz-conventional-changelog": "3.3.0",
