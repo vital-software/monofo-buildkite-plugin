@@ -19,7 +19,7 @@ const cmd: CommandModule = {
         required: true
       }),
 
-  async handler(args): Promise<void> {
+  async handler(args): Promise<string> {
     const { componentName } = args as Arguments<ListArgs>;
     const config: Config | undefined = await Config.getOne(process.cwd(), componentName)
 
@@ -30,10 +30,10 @@ const cmd: CommandModule = {
     }
 
     const matching = await config.getMatchingFiles()
+    const output = matching.files.join("\n")
 
-    matching.files.forEach((match) => {
-      process.stdout.write(`${match}\n`);
-    })
+    process.stdout.write(`${output}\n`);
+    return output
   }
 };
 
