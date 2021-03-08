@@ -1,0 +1,5 @@
+monorepo:
+  matches: '**'
+
+steps:
+  - command: echo "match-all" > match-all

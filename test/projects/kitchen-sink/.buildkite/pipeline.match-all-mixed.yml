@@ -1,0 +1,7 @@
+monorepo:
+  matches:
+    - "**/*"
+    - "**"
+
+steps:
+  - command: echo "match-all-mixed" > match-all-mixed
