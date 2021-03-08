@@ -3,7 +3,7 @@ import { join } from 'path';
 import { promisify } from 'util';
 import debug from 'debug';
 import globAsync, { Glob } from 'glob';
-import { safeLoad } from 'js-yaml';
+import { load as loadYaml } from 'js-yaml';
 import _ from 'lodash';
 import minimatch from 'minimatch';
 import toposort from 'toposort';
@@ -154,7 +154,7 @@ export default class Config {
   public static async read(file: ConfigFile): Promise<Config | undefined> {
     const buffer = await fs.readFile(join(file.basePath, file.path));
 
-    const { monorepo, steps, env } = (safeLoad(buffer.toString()) as unknown) as Config;
+    const { monorepo, steps, env } = (loadYaml(buffer.toString()) as unknown) as Config;
 
     if (_.isArray(env)) {
       // Fail noisily rather than missing the merge of the env vars
