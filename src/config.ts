@@ -119,12 +119,13 @@ export default class Config {
    * Includes this file
    */
   private matches(): MatchResult {
-    const matches = this.monorepo.matches === true ? ['**/*'] : [...this.monorepo.matches, this.file.path];
+    const matchesAll = Config.matchesAll(this.monorepo.matches);
 
-    return {
-      matchesAll: Config.matchesAll(this.monorepo.matches),
-      files: [...matches, this.file.path],
-    };
+    if (typeof this.monorepo.matches === 'boolean') {
+      return { files: this.monorepo.matches ? ['**/*'] : [this.file.path], matchesAll };
+    }
+
+    return { files: [...this.monorepo.matches, this.file.path], matchesAll };
   }
 
   /**
