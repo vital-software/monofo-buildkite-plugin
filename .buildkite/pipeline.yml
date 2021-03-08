@@ -35,6 +35,6 @@ steps:
     plugins:
       - docker-compose#v3.7.0:
           run: node
-      - seek-oss/aws-sm#v2.2.1:
+      - seek-oss/aws-sm#v2.3.1:
           env:
             NPM_TOKEN: "global/npm-token"
