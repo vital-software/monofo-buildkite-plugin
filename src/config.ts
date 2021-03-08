@@ -25,11 +25,16 @@ interface MonorepoConfig {
   name: string;
   expects: string[];
   produces: string[];
-  matches: string[];
+  matches: string[] | true;
   depends_on: string[];
   excluded_steps: Record<string, unknown>[];
   excluded_env: Record<string, string>;
   pure: boolean;
+}
+
+interface MatchingFiles {
+  matchesAll: boolean;
+  files: string[];
 }
 
 /**
@@ -72,7 +77,7 @@ export default class Config {
   /**
    * Memoized list of files that match this config
    */
-  private matchingFiles?: Promise<string[]> = undefined;
+  private matchingFiles?: MatchingFiles = undefined;
 
   public decide(included: boolean, reason: string): void {
     this.included = included;
@@ -94,7 +99,7 @@ export default class Config {
 
   public async getContentHash(hasher: FileHasher): Promise<string> {
     log(`Getting content hash for ${this.monorepo.name}`);
-    return hasher.hashMany(await this.getMatchingFiles());
+    return hasher.hashMany((await this.getMatchingFiles()).files);
   }
 
   /**
@@ -105,50 +110,75 @@ export default class Config {
     return `${pipeline}/${this.monorepo.name}`;
   }
 
-  private matches(): string[] {
-    return [...this.monorepo.matches, this.file.path];
+  /**
+   * The list of matches for the config
+   *
+   * Includes this file
+   */
+  private matches(): MatchingFiles {
+    const matches = this.monorepo.matches === true ? ['**/*'] : [...this.monorepo.matches, this.file.path];
+
+    return {
+      matchesAll: Config.matchesAll(this.monorepo.matches),
+      files: [...matches, this.file.path],
+    };
   }
 
   /**
    * Returns all files that match the pipeline, whether they have changes or not
    */
-  public async getMatchingFiles(): Promise<string[]> {
+  public async getMatchingFiles(): Promise<MatchingFiles> {
     if (!this.matchingFiles) {
       log('Getting matching files');
-      this.matchingFiles = Promise.all(
-        this.matches().map(async (pattern) => {
-          return glob(pattern, {
-            matchBase: true,
-            dot: true,
-            nodir: true,
-            cache,
-            symlinks,
-            statCache,
-            realpathCache,
-          });
-        })
-      ).then((r) => {
-        const flat = r.flat();
-        log(`Found ${count(flat, 'matching file')}`);
-        return flat;
-      });
+      const { files, matchesAll } = this.matches();
+
+      this.matchingFiles = {
+        matchesAll,
+        files: await Promise.all(
+          files.map(async (pattern) =>
+            glob(pattern, {
+              matchBase: true,
+              dot: true,
+              nodir: true,
+              cache,
+              symlinks,
+              statCache,
+              realpathCache,
+            })
+          )
+        ).then((r) => {
+          const flat = [...new Set(r.flat())];
+          log(`Found ${count(flat, 'matching file')}`);
+          return flat;
+        }),
+      };
     }
 
     return this.matchingFiles;
   }
 
+  /**
+   * Given a set of changed files, updates the changes property to have the subset
+   * of the changed files that also match the globs for this config
+   *
+   * @param changedFiles
+   */
   public updateMatchingChanges(changedFiles: string[]): void {
     if (!changedFiles || changedFiles.length < 1) {
       this.changes = [];
       return;
     }
 
-    this.changes = this.matches().flatMap((pattern) =>
-      minimatch.match(changedFiles, pattern, {
-        matchBase: true,
-        dot: true,
-      })
-    );
+    this.changes = [
+      ...new Set(
+        this.matches().files.flatMap((pattern) =>
+          minimatch.match(changedFiles, pattern, {
+            matchBase: true,
+            dot: true,
+          })
+        )
+      ),
+    ];
   }
 
   public static async read(file: ConfigFile): Promise<Config | undefined> {
@@ -180,7 +210,7 @@ export default class Config {
         name,
         expects: strings(monorepo.expects),
         produces: strings(monorepo.produces),
-        matches: strings(monorepo.matches),
+        matches: monorepo.matches === true ? ['**/*'] : strings(monorepo.matches),
         depends_on: strings(monorepo.depends_on),
         excluded_steps: monorepo.excluded_steps || [],
         excluded_env: monorepo.excluded_env || {},
@@ -247,5 +277,13 @@ export default class Config {
    */
   public static configureFallback(_e: Error, configs: Config[]): void {
     return configs.forEach((c) => c.useFallback());
+  }
+
+  public static matchesAll(globs: boolean | string[]): boolean {
+    if (typeof globs === 'boolean') {
+      return globs;
+    }
+
+    return globs.indexOf('**') !== -1 || globs.indexOf('**/*') !== -1;
   }
 }
