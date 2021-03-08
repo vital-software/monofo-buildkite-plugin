@@ -1,3 +1,10 @@
+# [1.12.0](https://github.com/vital-software/monofo/compare/v1.11.2...v1.12.0) (2021-03-08)
+
+
+### Features
+
+* add commands to list and hash components ([a894b1b](https://github.com/vital-software/monofo/commit/a894b1bbf6cc0d08f0a8fec2cc3b600b5ac13e43))
+
 ## [1.11.2](https://github.com/vital-software/monofo/compare/v1.11.1...v1.11.2) (2021-03-08)
 
 
