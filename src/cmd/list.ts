@@ -1,6 +1,4 @@
 import { Arguments, CommandModule } from 'yargs';
-import { getBuildkiteInfo } from '../buildkite/config';
-import { getBaseBuild } from '../diff';
 import Config from '../config';
 
 interface ListArgs {

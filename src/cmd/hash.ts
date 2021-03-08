@@ -1,6 +1,4 @@
 import { Arguments, CommandModule } from 'yargs';
-import { getBuildkiteInfo } from '../buildkite/config';
-import { getBaseBuild } from '../diff';
 import Config from '../config';
 import { FileHasher } from '../hash';
 
@@ -10,8 +8,7 @@ interface HashArgs {
 
 const cmd: CommandModule = {
   command: 'hash <componentName>',
-  describe: 'List matching files for different parts of the pipeline',
-  aliases: ['ls'],
+  describe: 'Return the content hash for matching files of a part of the pipeline',
   builder: (yargs) =>
     yargs
       .positional('componentName', {
@@ -20,7 +17,7 @@ const cmd: CommandModule = {
         required: true
       }),
 
-  async handler(args): Promise<void> {
+  async handler(args): Promise<string> {
     const { componentName } = args as Arguments<HashArgs>;
     const config: Config | undefined = await Config.getOne(process.cwd(), componentName)
 
@@ -34,6 +31,7 @@ const cmd: CommandModule = {
     const hash = await config.getContentHash(hasher)
 
     process.stdout.write(`${hash}\n`);
+    return `${hash}\n`
   }
 };
 
