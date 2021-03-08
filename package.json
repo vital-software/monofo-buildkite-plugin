@@ -36,7 +36,7 @@
     "glob": "7.1.6",
     "got": "11.8.1",
     "js-yaml": "4.0.0",
-    "lodash": "4.17.20",
+    "lodash": "4.17.21",
     "minimatch": "3.0.4",
     "tiny-async-pool": "1.2.0",
     "toposort": "2.0.2",
