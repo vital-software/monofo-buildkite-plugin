@@ -32,10 +32,13 @@ interface MonorepoConfig {
   pure: boolean;
 }
 
-interface MatchingFiles {
+export interface MatchResult {
   matchesAll: boolean;
   files: string[];
 }
+
+const EMPTY_MATCH: MatchResult = { files: [], matchesAll: false };
+const FALLBACK_MATCH: MatchResult = { files: ['fallback'], matchesAll: false };
 
 /**
  * Value object representing a parsed YAML pipeline configuration, with associated metadata and decision information
@@ -60,7 +63,7 @@ export default class Config {
   /**
    * Set of changes that match the configuration
    */
-  public changes: string[] = [];
+  public changes: MatchResult = EMPTY_MATCH;
 
   /**
    * Whether this config is currently considered for inclusion in the final pipeline output
@@ -77,7 +80,7 @@ export default class Config {
   /**
    * Memoized list of files that match this config
    */
-  private matchingFiles?: MatchingFiles = undefined;
+  private matchingFiles?: MatchResult = undefined;
 
   public decide(included: boolean, reason: string): void {
     this.included = included;
@@ -89,7 +92,7 @@ export default class Config {
   }
 
   public useFallback(): void {
-    this.changes = ['fallback'];
+    this.changes = FALLBACK_MATCH;
     this.buildId = undefined;
   }
 
@@ -115,7 +118,7 @@ export default class Config {
    *
    * Includes this file
    */
-  private matches(): MatchingFiles {
+  private matches(): MatchResult {
     const matches = this.monorepo.matches === true ? ['**/*'] : [...this.monorepo.matches, this.file.path];
 
     return {
@@ -127,7 +130,7 @@ export default class Config {
   /**
    * Returns all files that match the pipeline, whether they have changes or not
    */
-  public async getMatchingFiles(): Promise<MatchingFiles> {
+  public async getMatchingFiles(): Promise<MatchResult> {
     if (!this.matchingFiles) {
       log('Getting matching files');
       const { files, matchesAll } = this.matches();
@@ -165,20 +168,25 @@ export default class Config {
    */
   public updateMatchingChanges(changedFiles: string[]): void {
     if (!changedFiles || changedFiles.length < 1) {
-      this.changes = [];
+      this.changes = EMPTY_MATCH;
       return;
     }
 
-    this.changes = [
-      ...new Set(
-        this.matches().files.flatMap((pattern) =>
-          minimatch.match(changedFiles, pattern, {
-            matchBase: true,
-            dot: true,
-          })
-        )
-      ),
-    ];
+    const { files, matchesAll } = this.matches();
+
+    this.changes = {
+      matchesAll,
+      files: [
+        ...new Set(
+          files.flatMap((pattern) =>
+            minimatch.match(changedFiles, pattern, {
+              matchBase: true,
+              dot: true,
+            })
+          )
+        ),
+      ],
+    };
   }
 
   public static async read(file: ConfigFile): Promise<Config | undefined> {
