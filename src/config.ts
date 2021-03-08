@@ -52,7 +52,8 @@ export default class Config {
     public readonly monorepo: MonorepoConfig,
     public steps: Step[],
     public readonly env: Record<string, string>
-  ) {}
+  ) {
+  }
 
   /**
    * Base build we're comparing against, if one can be found. If one can't, we'll enter fallback mode and run
@@ -122,7 +123,10 @@ export default class Config {
     const matchesAll = Config.matchesAll(this.monorepo.matches);
 
     if (typeof this.monorepo.matches === 'boolean') {
-      return { files: this.monorepo.matches ? ['**/*'] : [this.file.path], matchesAll };
+      return {
+        files: this.monorepo.matches ? ['**/*'] : [this.file.path],
+        matchesAll
+      };
     }
 
     return { files: [...this.monorepo.matches, this.file.path], matchesAll };
@@ -133,7 +137,7 @@ export default class Config {
    */
   public async getMatchingFiles(): Promise<MatchResult> {
     if (!this.matchingFiles) {
-      log('Getting matching files');
+      log(`Getting matching files for ${this.monorepo.name}`);
       const { files, matchesAll } = this.matches();
 
       this.matchingFiles = {
@@ -147,14 +151,14 @@ export default class Config {
               cache,
               symlinks,
               statCache,
-              realpathCache,
+              realpathCache
             })
           )
         ).then((r) => {
           const flat = [...new Set(r.flat())];
           log(`Found ${count(flat, 'matching file')}`);
           return flat;
-        }),
+        })
       };
     }
 
@@ -182,18 +186,22 @@ export default class Config {
           files.flatMap((pattern) =>
             minimatch.match(changedFiles, pattern, {
               matchBase: true,
-              dot: true,
+              dot: true
             })
           )
-        ),
-      ],
+        )
+      ]
     };
   }
 
   public static async read(file: ConfigFile): Promise<Config | undefined> {
     const buffer = await fs.readFile(join(file.basePath, file.path));
 
-    const { monorepo, steps, env } = (loadYaml(buffer.toString()) as unknown) as Config;
+    const {
+      monorepo,
+      steps,
+      env
+    } = (loadYaml(buffer.toString()) as unknown) as Config;
 
     if (_.isArray(env)) {
       // Fail noisily rather than missing the merge of the env vars
@@ -223,7 +231,7 @@ export default class Config {
         depends_on: strings(monorepo.depends_on),
         excluded_steps: monorepo.excluded_steps || [],
         excluded_env: monorepo.excluded_env || {},
-        pure: monorepo.pure || false,
+        pure: monorepo.pure || false
       },
       steps,
       env
@@ -260,7 +268,7 @@ export default class Config {
             return byName[dependency]
               ? [dependency, c.monorepo.name]
               : thrw(new Error(`Could not find a config named "pipeline.${dependency}.yml"`));
-          }),
+          })
         ];
       })
     );
@@ -270,13 +278,25 @@ export default class Config {
   }
 
   /**
+   * Reads all the config files that can be read, and ignores any that can't be read
+   */
+  private static async readAll(cwd: string): Promise<Config[]> {
+    return (await Promise.all((await ConfigFile.search(cwd)).map((f) => Config.read(f))))
+      .reduce<Config[]>((acc, curr) => curr ? [...acc, curr] : acc, []);
+  }
+
+  /**
    * Reads pipeline.foo.yml files from .buildkite/*, parses them, and returns them as Config objects in the right order
    * to be processed
    */
   public static async getAll(cwd: string): Promise<Config[]> {
-    const files: ConfigFile[] = await ConfigFile.search(cwd);
-    const results = await Promise.all(files.map((f) => Config.read(f)));
+    const results = await Config.readAll(cwd)
     return Config.sort(results.filter((c) => c) as Config[]);
+  }
+
+  public static async getOne(cwd: string, component: string): Promise<Config | undefined> {
+    const results = await Config.readAll(cwd)
+    return results.find((c) => c?.monorepo.name === component);
   }
 
   /**
