@@ -1,3 +1,16 @@
+# [1.11.0](https://github.com/vital-software/monofo/compare/v1.10.3...v1.11.0) (2021-03-08)
+
+
+### Bug Fixes
+
+* **deps:** update dependency lodash to v4.17.21 ([8dbf21a](https://github.com/vital-software/monofo/commit/8dbf21ab43efa2b071506a89eeb7573cec0b4e96))
+
+
+### Features
+
+* support matches: false too ([d4bb208](https://github.com/vital-software/monofo/commit/d4bb208ae56a0a8f6b7d40010622e42a622414b3))
+* **config:** don't list all matching files when matching everything ([fa2b3b9](https://github.com/vital-software/monofo/commit/fa2b3b9372b7543e779462d9edaf3a4b769ae11a))
+
 ## [1.10.3](https://github.com/vital-software/monofo/compare/v1.10.2...v1.10.3) (2021-02-04)
 
 
