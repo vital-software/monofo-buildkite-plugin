@@ -1,6 +1,6 @@
 import path from 'path';
 import { createTables, startDb, stopDb } from 'jest-dynalite';
-import { safeLoad } from 'js-yaml';
+import { load as loadYaml } from 'js-yaml';
 import _ from 'lodash';
 import { mocked } from 'ts-jest/utils';
 import { Arguments } from 'yargs';
@@ -64,7 +64,7 @@ describe('monofo pipeline', () => {
 
     const args: Arguments<unknown> = { $0: '', _: [] };
     await ((pipeline.handler(args) as unknown) as Promise<string>)
-      .then((o) => (safeLoad(o) as unknown) as Pipeline)
+      .then((o) => (loadYaml(o) as unknown) as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
         expect(commandSummary(p.steps)).toStrictEqual([
@@ -91,7 +91,7 @@ describe('monofo pipeline', () => {
 
     const args: Arguments<unknown> = { $0: '', _: [] };
     await ((pipeline.handler(args) as unknown) as Promise<string>)
-      .then((o) => (safeLoad(o) as unknown) as Pipeline)
+      .then((o) => (loadYaml(o) as unknown) as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
         expect(commandSummary(p.steps)).toStrictEqual([
@@ -112,7 +112,7 @@ describe('monofo pipeline', () => {
 
     const args: Arguments<unknown> = { $0: '', _: [] };
     await ((pipeline.handler(args) as unknown) as Promise<string>)
-      .then((o) => (safeLoad(o) as unknown) as Pipeline)
+      .then((o) => (loadYaml(o) as unknown) as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
         expect(commandSummary(p.steps)).toStrictEqual([
@@ -141,7 +141,7 @@ describe('monofo pipeline', () => {
 
     const args: Arguments<unknown> = { $0: '', _: [] };
     await ((pipeline.handler(args) as unknown) as Promise<string>)
-      .then((o) => (safeLoad(o) as unknown) as Pipeline)
+      .then((o) => (loadYaml(o) as unknown) as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
         expect(commandSummary(p.steps)).toStrictEqual([
@@ -167,7 +167,7 @@ describe('monofo pipeline', () => {
 
     const args: Arguments<unknown> = { $0: '', _: [] };
     await ((pipeline.handler(args) as unknown) as Promise<string>)
-      .then((o) => (safeLoad(o) as unknown) as Pipeline)
+      .then((o) => (loadYaml(o) as unknown) as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
         expect(p.steps).toHaveLength(1); // No artifacts step, because only phony artifacts involved
@@ -185,7 +185,7 @@ describe('monofo pipeline', () => {
 
     const args: Arguments<unknown> = { $0: '', _: [] };
     await ((pipeline.handler(args) as unknown) as Promise<string>)
-      .then((o) => (safeLoad(o) as unknown) as Pipeline)
+      .then((o) => (loadYaml(o) as unknown) as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
         expect(p.steps).toHaveLength(3);
@@ -199,7 +199,7 @@ describe('monofo pipeline', () => {
 
     const args: Arguments<unknown> = { $0: '', _: [] };
     await ((pipeline.handler(args) as unknown) as Promise<string>)
-      .then((o) => (safeLoad(o) as unknown) as Pipeline)
+      .then((o) => (loadYaml(o) as unknown) as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
         expect(p.steps).toHaveLength(4);
@@ -233,7 +233,7 @@ describe('monofo pipeline', () => {
 
     const args: Arguments<unknown> = { $0: '', _: [] };
     await ((pipeline.handler(args) as unknown) as Promise<string>)
-      .then((o) => (safeLoad(o) as unknown) as Pipeline)
+      .then((o) => (loadYaml(o) as unknown) as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
         expect(commandSummary(p.steps)).toStrictEqual([
@@ -269,7 +269,7 @@ describe('monofo pipeline', () => {
 
     const args: Arguments<unknown> = { $0: '', _: [] };
     await ((pipeline.handler(args) as unknown) as Promise<string>)
-      .then((o) => (safeLoad(o) as unknown) as Pipeline)
+      .then((o) => (loadYaml(o) as unknown) as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
         expect(p.steps.map((s) => s.key)).toStrictEqual([

@@ -1,5 +1,5 @@
 import debug from 'debug';
-import { safeDump } from 'js-yaml';
+import { dump as dumpYaml } from 'js-yaml';
 import { CommandModule } from 'yargs';
 import { getBuildkiteInfo } from '../buildkite/config';
 import Config from '../config';
@@ -31,7 +31,7 @@ const cmd: CommandModule = {
           })
           .then(() => mergePipelines(configs));
       })
-      .then(safeDump)
+      .then(dumpYaml)
       .then((v) => {
         process.stdout.write(`${v}\n`);
         return v;
