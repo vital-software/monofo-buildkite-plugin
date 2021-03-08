@@ -1,3 +1,10 @@
+## [1.11.1](https://github.com/vital-software/monofo/compare/v1.11.0...v1.11.1) (2021-03-08)
+
+
+### Bug Fixes
+
+* **deps:** update dependency js-yaml to v4 ([1146018](https://github.com/vital-software/monofo/commit/114601827dd9114e5a2e54c3c830d03422bcc477))
+
 # [1.11.0](https://github.com/vital-software/monofo/compare/v1.10.3...v1.11.0) (2021-03-08)
 
 
