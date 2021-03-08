@@ -1,10 +1,14 @@
 /* eslint-disable no-param-reassign */
 
 import { CacheMetadataKey, CacheMetadataRepository } from './cache-metadata';
-import Config from './config';
+import Config, { MatchResult } from './config';
 import { service } from './dynamodb';
 import { FileHasher } from './hash';
 import { count } from './util';
+
+function prettyPrintChangeResult(changes: MatchResult): string {
+  return changes.matchesAll ? 'all files match' : changes.files.join(', ');
+}
 
 /**
  * If a config has changes, its steps are merged into the final build. Otherwise, it is excluded, and its excluded_steps
@@ -12,8 +16,11 @@ import { count } from './util';
  */
 function updateDecisionsForChanges(configs: Config[]): void {
   configs.forEach((config) => {
-    if (config.changes.length > 0) {
-      config.decide(true, `${count(config.changes, 'matching change')}: ${config.changes.join(', ')}`);
+    if (config.changes.files.length > 0) {
+      config.decide(
+        true,
+        `${count(config.changes.files, 'matching change')}: ${prettyPrintChangeResult(config.changes)}`
+      );
     }
   });
 }

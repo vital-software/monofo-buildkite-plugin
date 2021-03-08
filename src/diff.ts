@@ -94,8 +94,8 @@ export function matchConfigs(buildId: string, configs: Config[], changedFiles: s
     config.setBuildId(buildId);
     config.updateMatchingChanges(changedFiles);
 
-    if (config.changes.length > 1) {
-      log(`Found ${count(config.changes, 'matching change')} for ${config.monorepo.name}`);
+    if (config.changes.files.length > 1) {
+      log(`Found ${count(config.changes.files, 'matching change')} for ${config.monorepo.name}`);
     }
   });
 }
