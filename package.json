@@ -54,7 +54,7 @@
     "@types/jest": "26.0.21",
     "@types/js-yaml": "4.0.0",
     "@types/lodash": "4.14.168",
-    "@types/minimatch": "3.0.3",
+    "@types/minimatch": "3.0.4",
     "@types/tiny-async-pool": "1.0.0",
     "@types/toposort": "2.0.3",
     "@types/yargs": "16.0.0",
