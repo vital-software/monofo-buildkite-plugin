@@ -6,11 +6,11 @@ services:
       context: .
       args:
         - NODE_TAG=lts
-    image: quay.io/vital/build-cache:monofo-node-latest
+    image: 239595706494.dkr.ecr.us-west-2.amazonaws.com/build-cache:monofo-node-latest
 
   node-14:
     build:
       context: .
       args:
         - NODE_TAG=14
-    image: quay.io/vital/build-cache:monofo-node-14-latest
+    image: 239595706494.dkr.ecr.us-west-2.amazonaws.com/build-cache:monofo-node-14-latest
