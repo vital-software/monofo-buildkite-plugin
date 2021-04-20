@@ -42,16 +42,26 @@ function replaceExcludedKeys(configs: Config[], hasArtifactStep: boolean): Confi
   return configs;
 }
 
-function toMerge({ steps, env, included, monorepo }: Config): Pipeline {
-  return included
-    ? {
-        env,
-        steps,
-      }
-    : {
-        env: Object.entries(monorepo.excluded_env).length > 0 ? monorepo.excluded_env : {},
-        steps: monorepo.excluded_steps.length > 0 ? monorepo.excluded_steps : [],
-      };
+/**
+ * Gets the base build environment variables - one or more extra env vars that should be included in the built pipeline
+ *
+ * Currently, we use a single base build for all components, so we only export a single env var. But if, in the future,
+ * we get fancier, we should emit one for each component. `MONOFO_${config.envVarName()}_BASE_BUILD_ID`
+ */
+function baseBuildEnvVars(config: Config): Record<string, string | undefined> {
+  return { 'MONOFO_BASE_BUILD_ID': config.buildId || 'unknown' }
+}
+
+function toMerge(config: Config): Pipeline {
+  const { monorepo, included, steps, env } = config
+
+  const excludedEnv = Object.entries(monorepo.excluded_env).length > 0 ? monorepo.excluded_env : {}
+  const excludedSteps = monorepo.excluded_steps.length > 0 ? monorepo.excluded_steps : []
+
+  return {
+    env: Object.assign(baseBuildEnvVars(config), included ? env : excludedEnv),
+    steps: included ? steps : excludedSteps
+  };
 }
 
 function toPipeline(steps: Step[]): Pipeline {

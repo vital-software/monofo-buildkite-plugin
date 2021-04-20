@@ -42,7 +42,7 @@ function updateDecisionsForEnvVars(configs: Config[]): void {
       config.decide(config.monorepo.name === process.env?.PIPELINE_RUN_ONLY, 'PIPELINE_RUN_ONLY specified');
     }
 
-    const envVarName = config.monorepo.name.toLocaleUpperCase().replace(/-/g, '_');
+    const envVarName = config.envVarName();
 
     const overrideExcludeKey = `PIPELINE_NO_RUN_${envVarName}`;
     if (process.env[overrideExcludeKey]) {

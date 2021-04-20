@@ -83,6 +83,10 @@ export default class Config {
    */
   private matchingFiles?: MatchResult = undefined;
 
+  public envVarName(): string {
+    return this.monorepo.name.toLocaleUpperCase().replace(/-/g, '_')
+  }
+
   public decide(included: boolean, reason: string): void {
     this.included = included;
     this.reason = reason;

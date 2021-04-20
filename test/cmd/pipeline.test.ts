@@ -80,7 +80,8 @@ describe('monofo pipeline', () => {
           'echo "baz1"',
           'echo "unreferenced" > unref',
         ]);
-        expect(Object.entries(p.env)).toHaveLength(4);
+        expect(Object.entries(p.env)).toHaveLength(5);
+        expect(p.env.MONOFO_BASE_BUILD_ID).toBe(BUILD_ID);
         expect(p.env.BAR_WAS_EXCLUDED).toBe('true');
       });
   });
