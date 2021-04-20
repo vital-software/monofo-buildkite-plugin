@@ -1,3 +1,16 @@
+# [1.13.0](https://github.com/vital-software/monofo/compare/v1.12.0...v1.13.0) (2021-04-20)
+
+
+### Bug Fixes
+
+* **deps:** update dependency aws-sdk to v2.889.0 ([b7fb4a5](https://github.com/vital-software/monofo/commit/b7fb4a5b34c24038293f85c30b8aa70a8d0cd103))
+* **deps:** update dependency js-yaml to v4.1.0 ([5cc245a](https://github.com/vital-software/monofo/commit/5cc245a53fe78061549f0fb4d7eaafd0083fffaf))
+
+
+### Features
+
+* **core:** set MONOFO_BASE_BUILD_ID env var ([2c43a0a](https://github.com/vital-software/monofo/commit/2c43a0a0b8c3ec210544516745d4a705dcfdde4d)), closes [#158](https://github.com/vital-software/monofo/issues/158)
+
 # [1.12.0](https://github.com/vital-software/monofo/compare/v1.11.2...v1.12.0) (2021-03-08)
 
 
