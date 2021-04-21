@@ -35,7 +35,11 @@ function updateDecisionsForChanges(configs: Config[]): void {
 function updateDecisionsForEnvVars(configs: Config[]): void {
   configs.forEach((config) => {
     if (process.env.PIPELINE_RUN_ALL) {
-      config.decide(true, 'been forced to by PIPELINE_RUN_ALL');
+      if (config.monorepo.matches === false) {
+        config.decide(false, 'opted-out of PIPELINE_RUN_ALL via monorepo.matches === false');
+      } else {
+        config.decide(true, 'been forced to by PIPELINE_RUN_ALL');
+      }
     }
 
     if (process.env?.PIPELINE_RUN_ONLY) {
