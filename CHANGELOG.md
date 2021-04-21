@@ -1,3 +1,11 @@
+# [1.14.0](https://github.com/vital-software/monofo/compare/v1.13.0...v1.14.0) (2021-04-21)
+
+
+### Features
+
+* **config:** make matches: false ignore self-changes to its pipeline ([ca4dbda](https://github.com/vital-software/monofo/commit/ca4dbda563177892f62c3f68bad91e06a3c23649)), closes [#198](https://github.com/vital-software/monofo/issues/198)
+* **decide:** also use matches === false to opt out of PIPELINE_RUN_ALL ([f45541e](https://github.com/vital-software/monofo/commit/f45541e7c67898024fae1b9c133241a0b7dc20fb)), closes [#195](https://github.com/vital-software/monofo/issues/195)
+
 # [1.13.0](https://github.com/vital-software/monofo/compare/v1.12.0...v1.13.0) (2021-04-20)
 
 
