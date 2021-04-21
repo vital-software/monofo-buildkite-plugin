@@ -25,7 +25,7 @@ interface MonorepoConfig {
   name: string;
   expects: string[];
   produces: string[];
-  matches: string[] | true;
+  matches: string[] | boolean;
   depends_on: string[];
   excluded_steps: Record<string, unknown>[];
   excluded_env: Record<string, string>;
@@ -34,11 +34,12 @@ interface MonorepoConfig {
 
 export interface MatchResult {
   matchesAll: boolean;
+  matchesNone: boolean;
   files: string[];
 }
 
-const EMPTY_MATCH: MatchResult = { files: [], matchesAll: false };
-const FALLBACK_MATCH: MatchResult = { files: ['fallback'], matchesAll: false };
+const EMPTY_MATCH: MatchResult = { files: [], matchesAll: false, matchesNone: false };
+const FALLBACK_MATCH: MatchResult = { files: ['fallback'], matchesAll: false, matchesNone: false };
 
 /**
  * Value object representing a parsed YAML pipeline configuration, with associated metadata and decision information
@@ -125,15 +126,18 @@ export default class Config {
    */
   private matches(): MatchResult {
     const matchesAll = Config.matchesAll(this.monorepo.matches);
+    const matchesNone = this.monorepo.matches === false
 
     if (typeof this.monorepo.matches === 'boolean') {
       return {
-        files: this.monorepo.matches ? ['**/*'] : [this.file.path],
-        matchesAll
+        // Note: #198: this.file.path intentionally not included if matches === false
+        files: this.monorepo.matches ? ['**/*'] : [],
+        matchesAll,
+        matchesNone,
       };
     }
 
-    return { files: [...this.monorepo.matches, this.file.path], matchesAll };
+    return { files: [...this.monorepo.matches, this.file.path], matchesAll, matchesNone };
   }
 
   /**
@@ -142,10 +146,11 @@ export default class Config {
   public async getMatchingFiles(): Promise<MatchResult> {
     if (!this.matchingFiles) {
       log(`Getting matching files for ${this.monorepo.name}`);
-      const { files, matchesAll } = this.matches();
+      const { files, matchesAll, matchesNone } = this.matches();
 
       this.matchingFiles = {
         matchesAll,
+        matchesNone,
         files: await Promise.all(
           files.map(async (pattern) =>
             glob(pattern, {
@@ -181,10 +186,11 @@ export default class Config {
       return;
     }
 
-    const { files, matchesAll } = this.matches();
+    const { files, matchesAll, matchesNone } = this.matches();
 
     this.changes = {
       matchesAll,
+      matchesNone,
       files: [
         ...new Set(
           files.flatMap((pattern) =>
@@ -231,7 +237,7 @@ export default class Config {
         name,
         expects: strings(monorepo.expects),
         produces: strings(monorepo.produces),
-        matches: monorepo.matches === true ? ['**/*'] : strings(monorepo.matches),
+        matches: typeof monorepo.matches === 'boolean' ? monorepo.matches : strings(monorepo.matches),
         depends_on: strings(monorepo.depends_on),
         excluded_steps: monorepo.excluded_steps || [],
         excluded_env: monorepo.excluded_env || {},
