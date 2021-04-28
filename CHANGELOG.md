@@ -1,3 +1,10 @@
+## [1.16.1](https://github.com/vital-software/monofo/compare/v1.16.0...v1.16.1) (2021-04-28)
+
+
+### Bug Fixes
+
+* **deps:** update dependency chalk to v4.1.1 ([537904c](https://github.com/vital-software/monofo/commit/537904c3e00d9259eca6aee4f1486b7f35fc5161))
+
 # [1.16.0](https://github.com/vital-software/monofo/compare/v1.15.0...v1.16.0) (2021-04-28)
 
 
