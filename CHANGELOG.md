@@ -1,3 +1,10 @@
+# [1.16.0](https://github.com/vital-software/monofo/compare/v1.15.0...v1.16.0) (2021-04-28)
+
+
+### Features
+
+* **config:** print warning log when invalid attributes are found ([5aeb364](https://github.com/vital-software/monofo/commit/5aeb3646c0df5d2ad2e59472bf92a444b0ed0b69)), closes [#188](https://github.com/vital-software/monofo/issues/188)
+
 # [1.15.0](https://github.com/vital-software/monofo/compare/v1.14.0...v1.15.0) (2021-04-28)
 
 
