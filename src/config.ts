@@ -2,7 +2,7 @@ import { promises as fs } from 'fs';
 import { join } from 'path';
 import { promisify } from 'util';
 import debug from 'debug';
-import globAsync, { Glob } from 'glob';
+import globAsync from 'glob';
 import { load as loadYaml } from 'js-yaml';
 import _ from 'lodash';
 import minimatch from 'minimatch';
@@ -38,6 +38,17 @@ export interface MatchResult {
   files: string[];
 }
 
+const EMPTY_CONFIG: MonorepoConfig = {
+  depends_on: [],
+  excluded_env: {},
+  excluded_steps: [],
+  expects: [],
+  matches: false,
+  produces: [],
+  pure: false,
+  name: 'empty'
+}
+const KNOWN_CONFIG_PROPERTIES = Object.keys(EMPTY_CONFIG)
 const EMPTY_MATCH: MatchResult = { files: [], matchesAll: false, matchesNone: false };
 const FALLBACK_MATCH: MatchResult = { files: ['fallback'], matchesAll: false, matchesNone: false };
 
@@ -228,6 +239,11 @@ export default class Config {
     if (!monorepo || typeof monorepo !== 'object') {
       log(`Skipping ${name} because it has no monorepo configuration`);
       return undefined;
+    }
+
+    const unknown = _.difference(Object.keys(monorepo), KNOWN_CONFIG_PROPERTIES)
+    if (unknown.length > 0) {
+      log(`Found unknown properties on monorepo configuration, continuing anyway: ${JSON.stringify(unknown)}`)
     }
 
     return new Config(
