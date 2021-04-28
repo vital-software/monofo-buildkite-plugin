@@ -1,24 +1,5 @@
 # monofo
 
-<!-- run: `npx markdown-toc --maxdepth=3 -i README.md` to update -->
-
-<!-- toc -->
-
-- [Basic usage](#basic-usage)
-  * [Splitting pipelines using multiple `pipeline.yml` files](#splitting-pipelines-using-multiple-pipelineyml-files)
-- [Advanced usage](#advanced-usage)
-  * [Caching pipelines against matching files (pure mode)](#caching-pipelines-against-matching-files-pure-mode)
-  * [Controlling what is included](#controlling-what-is-included)
-  * [Phony deps](#phony-deps)
-  * [Depends on (deprecated)](#depends-on-deprecated)
-- [Configuration](#configuration)
-  * [Buildkite API access token](#buildkite-api-access-token)
-  * [DynamoDB setup](#dynamodb-setup)
-- [CLI](#cli)
-- [Development](#development)
-
-<!-- tocstop -->
-
 A Buildkite dynamic pipeline generator for monorepos. `monofo` lets you split
 your `.buildkite/pipeline.yml` into multiple components, each of which will
 only be run if it needs to be (based on what's changed since the last build).
@@ -66,10 +47,6 @@ monorepo:
     - foo/**/*.js
 ```
 
-The configuration defines the artifacts that the component build `expects` in
-order to run, and those the build `produces` if successful. (These are used to
-put the components into the correct order.)
-
 The `matches` configuration defines a set of (minimatch) glob-style paths to
 match. If there are any differences on your build that match (when compared to
 a carefully selected base commit), the component build is fully included in the
@@ -85,16 +62,39 @@ automatically be considered matching for the `foo` pipeline, without having to
 add that pipeline file to the `matches` array yourself.
 
 
-## Advanced usage
+## Features
 
+### Get artifacts for skipped components with `expects`/`produces`
 
-### Caching pipelines against matching files (pure mode)
+A pipeline configuration can define the artifacts that the component build `expects` in
+order to run, and those that the build `produces` if successful. For example:
+
+```
+monorepo:
+  expects:  blah.cfg
+  produces: output/foo.zip
+  [...]
+```
+
+These are used:
+
+- to put the component pipelines into a dependency order
+- to know what artifacts should be pulled from a previous build when needed
+  (i.e. when a component pipeline can be skipped)
+
+#### Phony artifacts in `expects`/`produces`
+
+As a special case, any artifact prefixed with `.phony/` is considered to not be
+a real file. These artifacts are still evaluated when _ordering_ pipeline steps,
+but they won't be actually downloaded.
+
+### Repeatable build skipping (`pure` flag)
 
 You can mark a pipeline as pure by setting the `monorepo.pure` flag to `true` -
 this indicates that it doesn't have side-effects other than producing its
 artifacts, and the only inputs it relies on are listed in its `matches`.
 This means an extra layer of caching can be used, based on the
-contents of the files in the `matches` globs. For a specific example:
+contents of the files in the `matches` globs.  For example:
 
 ```
 monorepo:
@@ -120,7 +120,6 @@ builds efficiently. Content hash to build ID mappings are stored in
 DynamoDB, so if you are using pure mode you will need to do some additional
 configuration. See [DynamoDB Setup](#dynamodb-setup)
 
-
 ### Controlling what is included
 
 These rules are applied in the order listed here.
@@ -142,21 +141,6 @@ still be respected.
 If you set `PIPELINE_RUN_<COMPONENT_NAME>=1`, that component will be included,
 even if it wouldn't ordinarily. And if you set `PIPELINE_NO_RUN_<COMPONENT_NAME>`
 that component will never be included, even if it does have matches.
-
-
-### Phony deps
-
-Any artifacts that are prefixed with `.phony/` are considered to not be real.
-These artifacts are still evaulated when ordering pipeline steps (using
-`expects`/`provides`), but they won't be actually downloaded if components are
-skipped.
-
-
-### Depends on (deprecated)
-
-In any component pipeline, you can specify `monorepo.depends_on` as an array of
-pipeline component names (like `foo` for `pipeline.foo.yml`). Those pipelines
-will be included in a build if the pipeline that `depends_on` them is included.
 
 
 ## Configuration
