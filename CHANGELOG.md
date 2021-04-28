@@ -1,3 +1,10 @@
+# [1.15.0](https://github.com/vital-software/monofo/compare/v1.14.0...v1.15.0) (2021-04-28)
+
+
+### Features
+
+* **config:** allow overriding the default branch via MONOFO_DEFAULT_BRANCH ([3ebcafb](https://github.com/vital-software/monofo/commit/3ebcafbc6b093961bfd3419275df0b3eddc4f0d4)), closes [#201](https://github.com/vital-software/monofo/issues/201)
+
 # [1.14.0](https://github.com/vital-software/monofo/compare/v1.13.0...v1.14.0) (2021-04-21)
 
 
