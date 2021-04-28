@@ -215,14 +215,34 @@ export default class Config {
     };
   }
 
-  public static async read(file: ConfigFile): Promise<Config | undefined> {
+  private static async readYaml(file: ConfigFile): Promise<Config> {
     const buffer = await fs.readFile(join(file.basePath, file.path));
 
-    const {
-      monorepo,
-      steps,
-      env
-    } = (loadYaml(buffer.toString()) as unknown) as Config;
+    try {
+      const result = loadYaml(buffer.toString())
+
+      if (typeof result !== 'object') {
+        log(`Expected object for pipeline configuration in ${file.path}, got ${typeof result}, skipping`)
+        return ({} as unknown) as Config
+      }
+
+      return (result as unknown) as Config;
+    } catch (err) {
+      log(`Could not load YAML from ${file.path}, skipping`)
+      return ({} as unknown) as Config
+    }
+  }
+
+  private static logUnknownProperties(monorepo: MonorepoConfig): void {
+    const unknown = _.difference(Object.keys(monorepo), KNOWN_CONFIG_PROPERTIES)
+
+    if (unknown.length > 0) {
+      log(`Found unknown properties on monorepo configuration, continuing anyway: ${JSON.stringify(unknown)}`)
+    }
+  }
+
+  public static async read(file: ConfigFile): Promise<Config | undefined> {
+    const { monorepo, steps, env } = await Config.readYaml(file)
 
     if (_.isArray(env)) {
       // Fail noisily rather than missing the merge of the env vars
@@ -241,10 +261,7 @@ export default class Config {
       return undefined;
     }
 
-    const unknown = _.difference(Object.keys(monorepo), KNOWN_CONFIG_PROPERTIES)
-    if (unknown.length > 0) {
-      log(`Found unknown properties on monorepo configuration, continuing anyway: ${JSON.stringify(unknown)}`)
-    }
+    Config.logUnknownProperties(monorepo)
 
     return new Config(
       file,
