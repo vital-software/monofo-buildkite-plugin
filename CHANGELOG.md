@@ -1,3 +1,10 @@
+## [1.16.2](https://github.com/vital-software/monofo/compare/v1.16.1...v1.16.2) (2021-05-13)
+
+
+### Bug Fixes
+
+* **deps:** update dependency glob to v7.1.7 ([aeaf374](https://github.com/vital-software/monofo/commit/aeaf374cd2f5e1ccd76ab95d78f85fe32f0b14fe))
+
 ## [1.16.1](https://github.com/vital-software/monofo/compare/v1.16.0...v1.16.1) (2021-04-28)
 
 
