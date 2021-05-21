@@ -57,7 +57,7 @@
     "@types/minimatch": "3.0.4",
     "@types/tiny-async-pool": "1.0.0",
     "@types/toposort": "2.0.3",
-    "@types/yargs": "16.0.3",
+    "@types/yargs": "17.0.0",
     "@typescript-eslint/eslint-plugin": "4.24.0",
     "@typescript-eslint/parser": "4.24.0",
     "cz-conventional-changelog": "3.3.0",
