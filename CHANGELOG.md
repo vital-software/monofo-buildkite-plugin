@@ -1,3 +1,11 @@
+## [1.16.5](https://github.com/vital-software/monofo/compare/v1.16.4...v1.16.5) (2021-06-03)
+
+
+### Bug Fixes
+
+* **artifact:** remove the artifact being retransmitted from the local fs ([6c24465](https://github.com/vital-software/monofo/commit/6c24465f137eb7398b30397444623c9b9d101065))
+* **deps:** update dependency aws-sdk to v2.920.0 ([715ca2e](https://github.com/vital-software/monofo/commit/715ca2ebc5d77258f64c98436d4b7581e1f0b643))
+
 ## [1.16.4](https://github.com/vital-software/monofo/compare/v1.16.3...v1.16.4) (2021-05-13)
 
 
