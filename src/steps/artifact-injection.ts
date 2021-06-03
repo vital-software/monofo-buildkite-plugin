@@ -10,7 +10,7 @@ const ARTIFACT_INJECTION_STEP_LABEL = `:crystal_ball:`;
 function copyArtifactCommand(artifact: string, buildId: string): string {
   return (
     `# Copy ${artifact} from ${buildId} into current build\n` +
-    `buildkite-agent artifact download '${artifact}' . --build '${buildId}' && buildkite-agent artifact upload '${artifact}' &`
+    `buildkite-agent artifact download '${artifact}' . --build '${buildId}' && buildkite-agent artifact upload '${artifact}' && rm -rf '${artifact}' &`
   );
 }
 //
