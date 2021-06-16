@@ -66,7 +66,11 @@ function updateDecisionsForEnvVars(configs: Config[]): void {
 function updateDecisionsFoFallback(configs: Config[]): void {
   configs.forEach((config) => {
     if (!config.buildId) {
-      config.decide(true, 'no previous successful build, fallback to being included');
+      if (config.monorepo.matches === false) {
+        config.decide(false, 'no previous successful build, task fallback to being excluded');
+      } else {
+        config.decide(true, 'no previous successful build, fallback to being included');
+      }
     }
   });
 }
