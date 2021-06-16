@@ -1,3 +1,10 @@
+## [1.16.6](https://github.com/vital-software/monofo/compare/v1.16.5...v1.16.6) (2021-06-16)
+
+
+### Bug Fixes
+
+* **config:** fallback for never-matched tasks should be excluded, not included ([41fe694](https://github.com/vital-software/monofo/commit/41fe694bbd4f4675a8f0ce5d6dc931a72a613b20))
+
 ## [1.16.5](https://github.com/vital-software/monofo/compare/v1.16.4...v1.16.5) (2021-06-03)
 
 
