@@ -47,7 +47,7 @@
     "@commitlint/config-conventional": "12.1.4",
     "@semantic-release/changelog": "5.0.1",
     "@semantic-release/git": "9.0.0",
-    "@tsconfig/node12": "1.0.8",
+    "@tsconfig/node12": "1.0.9",
     "@types/bluebird": "3.5.35",
     "@types/debug": "4.1.5",
     "@types/glob": "7.1.3",
