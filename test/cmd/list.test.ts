@@ -18,7 +18,7 @@ describe('monofo list', () => {
     process.chdir(path.resolve(__dirname, '../projects/pure'));
 
     const args: Arguments<unknown> = { $0: '', _: [], componentName: 'foo' };
-    const output = await ((list.handler(args) as unknown) as Promise<string>)
-    expect(output).toContain('foo/README.md')
+    const output = await (list.handler(args) as unknown as Promise<string>);
+    expect(output).toContain('foo/README.md');
   });
 });

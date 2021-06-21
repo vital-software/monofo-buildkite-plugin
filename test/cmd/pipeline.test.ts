@@ -53,7 +53,7 @@ describe('monofo pipeline', () => {
     process.chdir(__dirname);
 
     const args: Arguments<unknown> = { $0: '', _: [] };
-    const out: Promise<string> = (pipeline.handler(args) as unknown) as Promise<string>;
+    const out: Promise<string> = pipeline.handler(args) as unknown as Promise<string>;
 
     return expect(out).rejects.toThrowError('No pipeline files');
   });
@@ -63,8 +63,8 @@ describe('monofo pipeline', () => {
     process.chdir(path.resolve(__dirname, '../projects/kitchen-sink'));
 
     const args: Arguments<unknown> = { $0: '', _: [] };
-    await ((pipeline.handler(args) as unknown) as Promise<string>)
-      .then((o) => (loadYaml(o) as unknown) as Pipeline)
+    await (pipeline.handler(args) as unknown as Promise<string>)
+      .then((o) => loadYaml(o) as unknown as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
         expect(commandSummary(p.steps)).toStrictEqual([
@@ -91,8 +91,8 @@ describe('monofo pipeline', () => {
     process.chdir(path.resolve(__dirname, '../projects/skipped'));
 
     const args: Arguments<unknown> = { $0: '', _: [] };
-    await ((pipeline.handler(args) as unknown) as Promise<string>)
-      .then((o) => (loadYaml(o) as unknown) as Pipeline)
+    await (pipeline.handler(args) as unknown as Promise<string>)
+      .then((o) => loadYaml(o) as unknown as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
         expect(commandSummary(p.steps)).toStrictEqual([
@@ -112,8 +112,8 @@ describe('monofo pipeline', () => {
     process.chdir(path.resolve(__dirname, '../projects/kitchen-sink'));
 
     const args: Arguments<unknown> = { $0: '', _: [] };
-    await ((pipeline.handler(args) as unknown) as Promise<string>)
-      .then((o) => (loadYaml(o) as unknown) as Pipeline)
+    await (pipeline.handler(args) as unknown as Promise<string>)
+      .then((o) => loadYaml(o) as unknown as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
         expect(commandSummary(p.steps)).toStrictEqual([
@@ -141,8 +141,8 @@ describe('monofo pipeline', () => {
     process.chdir(path.resolve(__dirname, '../projects/kitchen-sink'));
 
     const args: Arguments<unknown> = { $0: '', _: [] };
-    await ((pipeline.handler(args) as unknown) as Promise<string>)
-      .then((o) => (loadYaml(o) as unknown) as Pipeline)
+    await (pipeline.handler(args) as unknown as Promise<string>)
+      .then((o) => loadYaml(o) as unknown as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
         expect(commandSummary(p.steps)).toStrictEqual([
@@ -167,8 +167,8 @@ describe('monofo pipeline', () => {
     process.chdir(path.resolve(__dirname, '../projects/crossdeps'));
 
     const args: Arguments<unknown> = { $0: '', _: [] };
-    await ((pipeline.handler(args) as unknown) as Promise<string>)
-      .then((o) => (loadYaml(o) as unknown) as Pipeline)
+    await (pipeline.handler(args) as unknown as Promise<string>)
+      .then((o) => loadYaml(o) as unknown as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
         expect(p.steps).toHaveLength(1); // No artifacts step, because only phony artifacts involved
@@ -185,8 +185,8 @@ describe('monofo pipeline', () => {
     process.chdir(path.resolve(__dirname, '../projects/flexible-structure'));
 
     const args: Arguments<unknown> = { $0: '', _: [] };
-    await ((pipeline.handler(args) as unknown) as Promise<string>)
-      .then((o) => (loadYaml(o) as unknown) as Pipeline)
+    await (pipeline.handler(args) as unknown as Promise<string>)
+      .then((o) => loadYaml(o) as unknown as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
         expect(p.steps).toHaveLength(3);
@@ -199,8 +199,8 @@ describe('monofo pipeline', () => {
     process.chdir(path.resolve(__dirname, '../projects/pure'));
 
     const args: Arguments<unknown> = { $0: '', _: [] };
-    await ((pipeline.handler(args) as unknown) as Promise<string>)
-      .then((o) => (loadYaml(o) as unknown) as Pipeline)
+    await (pipeline.handler(args) as unknown as Promise<string>)
+      .then((o) => loadYaml(o) as unknown as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
         expect(p.steps).toHaveLength(4);
@@ -233,8 +233,8 @@ describe('monofo pipeline', () => {
     ]);
 
     const args: Arguments<unknown> = { $0: '', _: [] };
-    await ((pipeline.handler(args) as unknown) as Promise<string>)
-      .then((o) => (loadYaml(o) as unknown) as Pipeline)
+    await (pipeline.handler(args) as unknown as Promise<string>)
+      .then((o) => loadYaml(o) as unknown as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
         expect(commandSummary(p.steps)).toStrictEqual([
@@ -269,8 +269,8 @@ describe('monofo pipeline', () => {
     ]);
 
     const args: Arguments<unknown> = { $0: '', _: [] };
-    await ((pipeline.handler(args) as unknown) as Promise<string>)
-      .then((o) => (loadYaml(o) as unknown) as Pipeline)
+    await (pipeline.handler(args) as unknown as Promise<string>)
+      .then((o) => loadYaml(o) as unknown as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
         expect(p.steps.map((s) => s.key)).toStrictEqual([

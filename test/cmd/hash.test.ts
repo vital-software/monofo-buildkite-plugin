@@ -18,7 +18,7 @@ describe('monofo hash', () => {
     process.chdir(path.resolve(__dirname, '../projects/pure'));
 
     const args: Arguments<unknown> = { $0: '', _: [], componentName: 'foo' };
-    const output = await ((hash.handler(args) as unknown) as Promise<string>)
-    expect(output).toContain('0ffe034c45380e93a2f65d67d8c286a237b00285233c91b778ba70f860c7b54a')
+    const output = await (hash.handler(args) as unknown as Promise<string>);
+    expect(output).toContain('0ffe034c45380e93a2f65d67d8c286a237b00285233c91b778ba70f860c7b54a');
   });
 });

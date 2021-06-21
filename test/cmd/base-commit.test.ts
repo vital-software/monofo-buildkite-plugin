@@ -32,7 +32,7 @@ describe('cmd base-commit', () => {
     process.chdir(__dirname);
 
     const args: Arguments<unknown> = { $0: '', _: [] };
-    const out: Promise<string> = (baseCommit.handler(args) as unknown) as Promise<string>;
+    const out: Promise<string> = baseCommit.handler(args) as unknown as Promise<string>;
 
     return expect(out).resolves.toBe(COMMIT);
   });

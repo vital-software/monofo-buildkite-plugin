@@ -43,25 +43,23 @@ export function recordSuccessSteps(configs: Config[]): Promise<Step[]> {
   return Promise.all(
     configs
       .filter((c) => c.included && c.monorepo.pure)
-      .flatMap(
-        async (c): Promise<Step[]> => {
-          const dependsOn = c.steps.map((step) => {
-            if (!step.key) {
-              // eslint-disable-next-line no-param-reassign
-              step.key = anonymousKey(step); // TODO: could move to a validation step when creating pure config
-            }
-            return step.key;
-          });
+      .flatMap(async (c): Promise<Step[]> => {
+        const dependsOn = c.steps.map((step) => {
+          if (!step.key) {
+            // eslint-disable-next-line no-param-reassign
+            step.key = anonymousKey(step); // TODO: could move to a validation step when creating pure config
+          }
+          return step.key;
+        });
 
-          const step = {
-            label: RECORD_SUCCESS_STEP_LABEL,
-            key: `${RECORD_SUCCESS_STEP_KEY}${c.monorepo.name}`,
-            command: await command(c, hasher),
-            depends_on: dependsOn,
-          };
+        const step = {
+          label: RECORD_SUCCESS_STEP_LABEL,
+          key: `${RECORD_SUCCESS_STEP_KEY}${c.monorepo.name}`,
+          command: await command(c, hasher),
+          depends_on: dependsOn,
+        };
 
-          return [step];
-        }
-      )
+        return [step];
+      })
   ).then((c) => c.flat());
 }

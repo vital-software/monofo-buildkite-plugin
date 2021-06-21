@@ -33,12 +33,8 @@ describe('getConfig()', () => {
   });
 
   it('reads pipeline files and returns an array of config files - invalid', async () => {
-    const configNames = (await Config.getAll(path.resolve(__dirname, 'projects/invalid'))).map(
-      (c) => c.monorepo.name
-    );
+    const configNames = (await Config.getAll(path.resolve(__dirname, 'projects/invalid'))).map((c) => c.monorepo.name);
     expect(configNames).toHaveLength(1);
-    expect(configNames).toStrictEqual([
-      'invalid',
-    ]);
+    expect(configNames).toStrictEqual(['invalid']);
   });
 });

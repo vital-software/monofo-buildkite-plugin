@@ -46,9 +46,9 @@ const EMPTY_CONFIG: MonorepoConfig = {
   matches: false,
   produces: [],
   pure: false,
-  name: 'empty'
-}
-const KNOWN_CONFIG_PROPERTIES = Object.keys(EMPTY_CONFIG)
+  name: 'empty',
+};
+const KNOWN_CONFIG_PROPERTIES = Object.keys(EMPTY_CONFIG);
 const EMPTY_MATCH: MatchResult = { files: [], matchesAll: false, matchesNone: false };
 const FALLBACK_MATCH: MatchResult = { files: ['fallback'], matchesAll: false, matchesNone: false };
 
@@ -64,8 +64,7 @@ export default class Config {
     public readonly monorepo: MonorepoConfig,
     public steps: Step[],
     public readonly env: Record<string, string>
-  ) {
-  }
+  ) {}
 
   /**
    * Base build we're comparing against, if one can be found. If one can't, we'll enter fallback mode and run
@@ -96,7 +95,7 @@ export default class Config {
   private matchingFiles?: MatchResult = undefined;
 
   public envVarName(): string {
-    return this.monorepo.name.toLocaleUpperCase().replace(/-/g, '_')
+    return this.monorepo.name.toLocaleUpperCase().replace(/-/g, '_');
   }
 
   public decide(included: boolean, reason: string): void {
@@ -137,7 +136,7 @@ export default class Config {
    */
   private matches(): MatchResult {
     const matchesAll = Config.matchesAll(this.monorepo.matches);
-    const matchesNone = this.monorepo.matches === false
+    const matchesNone = this.monorepo.matches === false;
 
     if (typeof this.monorepo.matches === 'boolean') {
       return {
@@ -171,14 +170,14 @@ export default class Config {
               cache,
               symlinks,
               statCache,
-              realpathCache
+              realpathCache,
             })
           )
         ).then((r) => {
           const flat = [...new Set(r.flat())];
           log(`Found ${count(flat, 'matching file')}`);
           return flat;
-        })
+        }),
       };
     }
 
@@ -207,11 +206,11 @@ export default class Config {
           files.flatMap((pattern) =>
             minimatch.match(changedFiles, pattern, {
               matchBase: true,
-              dot: true
+              dot: true,
             })
           )
-        )
-      ]
+        ),
+      ],
     };
   }
 
@@ -219,30 +218,30 @@ export default class Config {
     const buffer = await fs.readFile(join(file.basePath, file.path));
 
     try {
-      const result = loadYaml(buffer.toString())
+      const result = loadYaml(buffer.toString());
 
       if (typeof result !== 'object') {
-        log(`Expected object for pipeline configuration in ${file.path}, got ${typeof result}, skipping`)
-        return ({} as unknown) as Config
+        log(`Expected object for pipeline configuration in ${file.path}, got ${typeof result}, skipping`);
+        return {} as unknown as Config;
       }
 
-      return (result as unknown) as Config;
+      return result as unknown as Config;
     } catch (err) {
-      log(`Could not load YAML from ${file.path}, skipping`)
-      return ({} as unknown) as Config
+      log(`Could not load YAML from ${file.path}, skipping`);
+      return {} as unknown as Config;
     }
   }
 
   private static logUnknownProperties(monorepo: MonorepoConfig): void {
-    const unknown = _.difference(Object.keys(monorepo), KNOWN_CONFIG_PROPERTIES)
+    const unknown = _.difference(Object.keys(monorepo), KNOWN_CONFIG_PROPERTIES);
 
     if (unknown.length > 0) {
-      log(`Found unknown properties on monorepo configuration, continuing anyway: ${JSON.stringify(unknown)}`)
+      log(`Found unknown properties on monorepo configuration, continuing anyway: ${JSON.stringify(unknown)}`);
     }
   }
 
   public static async read(file: ConfigFile): Promise<Config | undefined> {
-    const { monorepo, steps, env } = await Config.readYaml(file)
+    const { monorepo, steps, env } = await Config.readYaml(file);
 
     if (_.isArray(env)) {
       // Fail noisily rather than missing the merge of the env vars
@@ -261,7 +260,7 @@ export default class Config {
       return undefined;
     }
 
-    Config.logUnknownProperties(monorepo)
+    Config.logUnknownProperties(monorepo);
 
     return new Config(
       file,
@@ -274,7 +273,7 @@ export default class Config {
         depends_on: strings(monorepo.depends_on),
         excluded_steps: monorepo.excluded_steps || [],
         excluded_env: monorepo.excluded_env || {},
-        pure: monorepo.pure || false
+        pure: monorepo.pure || false,
       },
       steps,
       env
@@ -311,7 +310,7 @@ export default class Config {
             return byName[dependency]
               ? [dependency, c.monorepo.name]
               : thrw(new Error(`Could not find a config named "pipeline.${dependency}.yml"`));
-          })
+          }),
         ];
       })
     );
@@ -324,8 +323,10 @@ export default class Config {
    * Reads all the config files that can be read, and ignores any that can't be read
    */
   private static async readAll(cwd: string): Promise<Config[]> {
-    return (await Promise.all((await ConfigFile.search(cwd)).map((f) => Config.read(f))))
-      .reduce<Config[]>((acc, curr) => curr ? [...acc, curr] : acc, []);
+    return (await Promise.all((await ConfigFile.search(cwd)).map((f) => Config.read(f)))).reduce<Config[]>(
+      (acc, curr) => (curr ? [...acc, curr] : acc),
+      []
+    );
   }
 
   /**
@@ -333,12 +334,12 @@ export default class Config {
    * to be processed
    */
   public static async getAll(cwd: string): Promise<Config[]> {
-    const results = await Config.readAll(cwd)
-    return Config.sort(results.filter((c) => c) as Config[]);
+    const results = await Config.readAll(cwd);
+    return Config.sort(results.filter((c) => c));
   }
 
   public static async getOne(cwd: string, component: string): Promise<Config | undefined> {
-    const results = await Config.readAll(cwd)
+    const results = await Config.readAll(cwd);
     return results.find((c) => c?.monorepo.name === component);
   }
 
