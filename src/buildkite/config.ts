@@ -24,6 +24,7 @@ export function getBuildkiteInfo(e: NodeJS.ProcessEnv = process.env): BuildkiteE
     buildId: e.BUILDKITE_BUILD_ID,
     // We probably actually want the Github default branch, but close enough:
     defaultBranch: e.MONOFO_DEFAULT_BRANCH || e.BUILDKITE_PIPELINE_DEFAULT_BRANCH,
+    integrationBranch: e.MONOFO_INTEGRATION_BRANCH,
     org: e.BUILDKITE_ORGANIZATION_SLUG,
     pipeline: e.BUILDKITE_PIPELINE_SLUG,
     branch: e.BUILDKITE_BRANCH,
@@ -47,6 +48,7 @@ declare global {
       PIPELINE_RUN_ALL?: string;
       PIPELINE_RUN_ONLY?: string;
       MONOFO_DEFAULT_BRANCH?: string;
+      MONOFO_INTEGRATION_BRANCH?: string;
     }
   }
 }

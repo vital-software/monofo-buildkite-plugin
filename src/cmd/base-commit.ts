@@ -1,13 +1,16 @@
-import { CommandModule } from 'yargs';
 import { getBuildkiteInfo } from '../buildkite/config';
 import { getBaseBuild } from '../diff';
+import { setUpHander } from '../handler';
+import { Command } from '../util';
 
-const cmd: CommandModule = {
+const cmd: Command = {
   command: 'base-commit',
   describe: 'Output a base commit hash, from which the current build should be compared',
   builder: {},
 
-  handler(): Promise<string> {
+  handler(args): Promise<string> {
+    setUpHander(args);
+
     return getBaseBuild(getBuildkiteInfo(process.env))
       .then((b) => {
         process.stdout.write(`${b.commit}\n`);

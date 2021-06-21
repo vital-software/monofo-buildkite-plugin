@@ -8,6 +8,7 @@ import { CacheMetadataRepository } from '../../src/cache-metadata';
 import * as pipeline from '../../src/cmd/pipeline';
 import { service } from '../../src/dynamodb';
 import { mergeBase, diff, revList } from '../../src/git';
+import { BaseArgs } from '../../src/handler';
 import { BUILD_ID, BUILD_ID_2, BUILD_ID_3, COMMIT, fakeProcess } from '../fixtures';
 import execSync from './exec';
 
@@ -38,6 +39,8 @@ function commandSummary(steps: Step[]): string[] {
   });
 }
 
+const EMPTY_ARGUMENTS: Arguments<BaseArgs> = { $0: '', _: [], chdir: undefined, verbose: false };
+
 describe('monofo pipeline', () => {
   beforeAll(startDb);
   beforeAll(createTables);
@@ -52,8 +55,7 @@ describe('monofo pipeline', () => {
     process.env = fakeProcess();
     process.chdir(__dirname);
 
-    const args: Arguments<unknown> = { $0: '', _: [] };
-    const out: Promise<string> = pipeline.handler(args) as unknown as Promise<string>;
+    const out: Promise<string> = pipeline.handler(EMPTY_ARGUMENTS) as unknown as Promise<string>;
 
     return expect(out).rejects.toThrowError('No pipeline files');
   });
@@ -62,8 +64,7 @@ describe('monofo pipeline', () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, '../projects/kitchen-sink'));
 
-    const args: Arguments<unknown> = { $0: '', _: [] };
-    await (pipeline.handler(args) as unknown as Promise<string>)
+    await (pipeline.handler(EMPTY_ARGUMENTS) as unknown as Promise<string>)
       .then((o) => loadYaml(o) as unknown as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
@@ -90,8 +91,7 @@ describe('monofo pipeline', () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, '../projects/skipped'));
 
-    const args: Arguments<unknown> = { $0: '', _: [] };
-    await (pipeline.handler(args) as unknown as Promise<string>)
+    await (pipeline.handler(EMPTY_ARGUMENTS) as unknown as Promise<string>)
       .then((o) => loadYaml(o) as unknown as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
@@ -111,8 +111,7 @@ describe('monofo pipeline', () => {
     });
     process.chdir(path.resolve(__dirname, '../projects/kitchen-sink'));
 
-    const args: Arguments<unknown> = { $0: '', _: [] };
-    await (pipeline.handler(args) as unknown as Promise<string>)
+    await (pipeline.handler(EMPTY_ARGUMENTS) as unknown as Promise<string>)
       .then((o) => loadYaml(o) as unknown as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
@@ -140,8 +139,7 @@ describe('monofo pipeline', () => {
     });
     process.chdir(path.resolve(__dirname, '../projects/kitchen-sink'));
 
-    const args: Arguments<unknown> = { $0: '', _: [] };
-    await (pipeline.handler(args) as unknown as Promise<string>)
+    await (pipeline.handler(EMPTY_ARGUMENTS) as unknown as Promise<string>)
       .then((o) => loadYaml(o) as unknown as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
@@ -166,8 +164,7 @@ describe('monofo pipeline', () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, '../projects/crossdeps'));
 
-    const args: Arguments<unknown> = { $0: '', _: [] };
-    await (pipeline.handler(args) as unknown as Promise<string>)
+    await (pipeline.handler(EMPTY_ARGUMENTS) as unknown as Promise<string>)
       .then((o) => loadYaml(o) as unknown as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
@@ -184,8 +181,7 @@ describe('monofo pipeline', () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, '../projects/flexible-structure'));
 
-    const args: Arguments<unknown> = { $0: '', _: [] };
-    await (pipeline.handler(args) as unknown as Promise<string>)
+    await (pipeline.handler(EMPTY_ARGUMENTS) as unknown as Promise<string>)
       .then((o) => loadYaml(o) as unknown as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
@@ -198,8 +194,7 @@ describe('monofo pipeline', () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, '../projects/pure'));
 
-    const args: Arguments<unknown> = { $0: '', _: [] };
-    await (pipeline.handler(args) as unknown as Promise<string>)
+    await (pipeline.handler(EMPTY_ARGUMENTS) as unknown as Promise<string>)
       .then((o) => loadYaml(o) as unknown as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
@@ -232,8 +227,7 @@ describe('monofo pipeline', () => {
       }),
     ]);
 
-    const args: Arguments<unknown> = { $0: '', _: [] };
-    await (pipeline.handler(args) as unknown as Promise<string>)
+    await (pipeline.handler(EMPTY_ARGUMENTS) as unknown as Promise<string>)
       .then((o) => loadYaml(o) as unknown as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
@@ -268,8 +262,7 @@ describe('monofo pipeline', () => {
       }),
     ]);
 
-    const args: Arguments<unknown> = { $0: '', _: [] };
-    await (pipeline.handler(args) as unknown as Promise<string>)
+    await (pipeline.handler(EMPTY_ARGUMENTS) as unknown as Promise<string>)
       .then((o) => loadYaml(o) as unknown as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();

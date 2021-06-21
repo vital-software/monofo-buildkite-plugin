@@ -9,6 +9,7 @@ interface BuildkiteEnvironment {
   source: string;
   org: string;
   pipeline: string;
+  integrationBranch?: string;
 }
 
 /**

@@ -1,11 +1,20 @@
 import path from 'path';
 import { Arguments } from 'yargs';
 import * as list from '../../src/cmd/list';
+import { BaseArgs } from '../../src/handler';
 import { fakeProcess } from '../fixtures';
 import execSync from './exec';
 
 jest.mock('../../src/git');
 jest.mock('../../src/buildkite/client');
+
+const EXAMPLE_ARGUMENTS: Arguments<BaseArgs> = {
+  $0: '',
+  _: [],
+  chdir: undefined,
+  verbose: false,
+  componentName: 'foo',
+};
 
 describe('monofo list', () => {
   it('returns help output', async () => {
@@ -17,8 +26,7 @@ describe('monofo list', () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, '../projects/pure'));
 
-    const args: Arguments<unknown> = { $0: '', _: [], componentName: 'foo' };
-    const output = await (list.handler(args) as unknown as Promise<string>);
+    const output = await (list.handler(EXAMPLE_ARGUMENTS) as unknown as Promise<string>);
     expect(output).toContain('foo/README.md');
   });
 });

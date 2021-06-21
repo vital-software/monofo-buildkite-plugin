@@ -1,14 +1,15 @@
 import AWS from 'aws-sdk';
-import { Arguments, CommandModule } from 'yargs';
 import { getBuildkiteInfo } from '../buildkite/config';
 import { CacheMetadataRepository } from '../cache-metadata';
+import { setUpHander, BaseArgs } from '../handler';
+import { Command } from '../util';
 
-interface RecordSuccessArgs {
-  componentName: string;
-  contentHash: string;
+interface RecordSuccessArgs extends BaseArgs {
+  componentName?: string;
+  contentHash?: string;
 }
 
-const cmd: CommandModule = {
+const cmd: Command<RecordSuccessArgs> = {
   command: 'record-success <componentName> <contentHash>',
   describe: 'Record success of a component of the build, so that we can skip it next time if possible',
   builder: (yargs) =>
@@ -25,7 +26,10 @@ const cmd: CommandModule = {
       }),
 
   async handler(args): Promise<void> {
-    const { componentName, contentHash } = args as Arguments<RecordSuccessArgs>;
+    setUpHander(args);
+
+    // Required<T>, because .positional() enforces for us (not reflected in type)
+    const { componentName, contentHash } = args as Required<RecordSuccessArgs>;
     const { buildId, pipeline } = getBuildkiteInfo();
 
     const ddb = new AWS.DynamoDB();

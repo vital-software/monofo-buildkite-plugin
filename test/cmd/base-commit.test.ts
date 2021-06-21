@@ -2,6 +2,7 @@ import path from 'path';
 import { Arguments } from 'yargs';
 import baseCommit from '../../src/cmd/base-commit';
 import { mergeBase, diff, revList } from '../../src/git';
+import { BaseArgs } from '../../src/handler';
 import { fakeProcess, COMMIT } from '../fixtures';
 import execSync from './exec';
 
@@ -17,6 +18,8 @@ mockRevList.mockImplementation(() => Promise.resolve([COMMIT]));
 const mockDiff = diff as jest.Mock<Promise<string[]>>;
 mockDiff.mockImplementation(() => Promise.resolve(['foo/README.md', 'baz/abc.ts']));
 
+const emptyArgs: Arguments<BaseArgs> = { $0: '', _: [], chdir: undefined, verbose: false };
+
 describe('cmd base-commit', () => {
   beforeEach(() => {
     process.env = fakeProcess();
@@ -31,8 +34,7 @@ describe('cmd base-commit', () => {
     process.env.BUILDKITE_API_ACCESS_TOKEN = 'fake';
     process.chdir(__dirname);
 
-    const args: Arguments<unknown> = { $0: '', _: [] };
-    const out: Promise<string> = baseCommit.handler(args) as unknown as Promise<string>;
+    const out: Promise<string> = baseCommit.handler(emptyArgs) as unknown as Promise<string>;
 
     return expect(out).resolves.toBe(COMMIT);
   });
@@ -41,7 +43,6 @@ describe('cmd base-commit', () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, '../projects/kitchen-sink'));
 
-    const args: Arguments<unknown> = { $0: '', _: [] };
-    return expect(baseCommit.handler(args)).resolves.toBe(COMMIT);
+    return expect(baseCommit.handler(emptyArgs)).resolves.toBe(COMMIT);
   });
 });

@@ -13,16 +13,16 @@ const log = debug('monofo:diff');
  *  - There's an associated buildkite build that was successful
  *  - The commit was at or before the given commit
  */
-async function getSuitableDefaultBranchBuildAtOrBeforeCommit(
+async function getSuitableIntegrationBranchBuildAtOrBeforeCommit(
   info: BuildkiteEnvironment,
   commit: string
 ): Promise<BuildkiteBuild> {
   const client = new BuildkiteClient(info);
 
   const builds: Promise<BuildkiteBuild[]> = client.getBuilds({
-    branch: info.defaultBranch,
+    branches: info.integrationBranch ? [info.integrationBranch, info.defaultBranch] : [info.defaultBranch],
     state: 'passed',
-    per_page: 100,
+    per_page: 50,
   });
 
   const gitCommits: Promise<string[]> = revList('--first-parent', '-n', '100', commit);
@@ -30,32 +30,32 @@ async function getSuitableDefaultBranchBuildAtOrBeforeCommit(
     all.filter((build) => !build.blocked).map((build) => build.commit)
   );
 
-  return Promise.all([gitCommits, buildkiteCommits])
-    .then((commitLists) => _.intersection<string>(...commitLists))
-    .then((intersection: string[]) => {
-      if (intersection.length < 1) {
-        throw new Error('Could not find any matching successful builds');
+  return Promise.all([gitCommits, buildkiteCommits]).then((commitLists: string[][]) => {
+    const intersection = _.intersection<string>(...commitLists);
+
+    if (intersection.length < 1) {
+      throw new Error('Could not find any matching successful builds');
+    }
+
+    log(`Found ${intersection[0]} as latest successful build of default branch from ${commit} or earlier`);
+    return builds.then((b: BuildkiteBuild[]) => {
+      const build = _.find(b, (v: BuildkiteBuild) => v.commit === intersection[0]);
+
+      if (!build) {
+        return Promise.reject(new Error(`Cannot find build ${intersection[0]}`));
       }
 
-      log(`Found ${intersection[0]} as latest successful build of default branch from ${commit} or earlier`);
-      return builds.then((b: BuildkiteBuild[]) => {
-        const build = _.find(b, (v: BuildkiteBuild) => v.commit === intersection[0]);
-
-        if (!build) {
-          return Promise.reject(new Error(`Cannot find build ${intersection[0]}`));
-        }
-
-        return Promise.resolve(build);
-      });
+      return Promise.resolve(build);
     });
+  });
 }
 
 /**
  * If we are on the main branch, we look for the previous successful build of it
  */
-async function getBaseBuildForDefaultBranch(info: BuildkiteEnvironment): Promise<BuildkiteBuild> {
-  return getSuitableDefaultBranchBuildAtOrBeforeCommit(info, info.commit).catch((e) => {
-    log(`Failed to find successful build for default branch (${info.branch}) via Buildkite API`, e);
+async function getBaseBuildForIntegrationBranch(info: BuildkiteEnvironment): Promise<BuildkiteBuild> {
+  return getSuitableIntegrationBranchBuildAtOrBeforeCommit(info, info.commit).catch((e) => {
+    log(`Failed to find successful build for integration branch (${info.branch}) via Buildkite API`, e);
     throw e;
   });
 }
@@ -67,7 +67,7 @@ async function getBaseBuildForDefaultBranch(info: BuildkiteEnvironment): Promise
 async function getBaseBuildForFeatureBranch(info: BuildkiteEnvironment): Promise<BuildkiteBuild> {
   return mergeBase(`origin/${info.defaultBranch}`, info.commit).then((commit) => {
     log(`Found merge base of ${commit} for current feature branch`);
-    return getSuitableDefaultBranchBuildAtOrBeforeCommit(info, commit).catch((e) => {
+    return getSuitableIntegrationBranchBuildAtOrBeforeCommit(info, commit).catch((e) => {
       log(
         `Failed to find successful build for merge base (${commit}) of feature branch (${info.branch}) via Buildkite API, will use fallback mode. Try bringing your branch up-to-date with ${info.defaultBranch}, if it isn't already?`,
         e
@@ -77,6 +77,10 @@ async function getBaseBuildForFeatureBranch(info: BuildkiteEnvironment): Promise
   });
 }
 
+function isIntegrationBranch(info: BuildkiteEnvironment): boolean {
+  return info.branch === info.defaultBranch || info.branch === info.integrationBranch;
+}
+
 /**
  * The base commit is the commit used to compare a build with
  *
@@ -84,7 +88,7 @@ async function getBaseBuildForFeatureBranch(info: BuildkiteEnvironment): Promise
  * can snarf artifacts)
  */
 export async function getBaseBuild(info: BuildkiteEnvironment): Promise<BuildkiteBuild> {
-  return info.branch === info.defaultBranch ? getBaseBuildForDefaultBranch(info) : getBaseBuildForFeatureBranch(info);
+  return isIntegrationBranch(info) ? getBaseBuildForIntegrationBranch(info) : getBaseBuildForFeatureBranch(info);
 }
 
 export function matchConfigs(buildId: string, configs: Config[], changedFiles: string[]): void {
