@@ -75,7 +75,7 @@
     "npm-run-all": "4.1.5",
     "prettier": "2.3.1",
     "semantic-release": "17.4.4",
-    "ts-jest": "26.5.6",
+    "ts-jest": "27.0.3",
     "typescript": "4.3.4"
   },
   "config": {
