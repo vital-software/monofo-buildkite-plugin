@@ -1,3 +1,10 @@
+## [1.16.7](https://github.com/vital-software/monofo/compare/v1.16.6...v1.16.7) (2021-06-21)
+
+
+### Bug Fixes
+
+* use newer async interface for yargs ([f4e5c02](https://github.com/vital-software/monofo/commit/f4e5c024e70e744fc083c6073e3295664a3b65d9))
+
 ## [1.16.6](https://github.com/vital-software/monofo/compare/v1.16.5...v1.16.6) (2021-06-16)
 
 
