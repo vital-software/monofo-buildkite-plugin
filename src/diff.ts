@@ -8,10 +8,14 @@ import { count } from './util';
 const log = debug('monofo:diff');
 
 /**
- * Finds the most recent build where:
- *  - The commit was an ancestor of the default branch (i.e. a merge commit, or something that landed on main directly)
- *  - There's an associated buildkite build that was successful
- *  - The commit was at or before the given commit
+ * Finds the most recent build of the given branch where:
+ *
+ *   1. There is an associated Buildkite build that is successful, fully applied, and not blocked, for the base build's
+ *       commit
+ *   2. The commit was an ancestor of the integration branch (i.e. the commit was at or before the currently building
+ *       commit on the branch)
+ *
+ * This is the more conservative algorithm compared to getMostRecentBranchBuild below
  */
 async function getSuitableIntegrationBranchBuildAtOrBeforeCommit(
   info: BuildkiteEnvironment,
@@ -51,7 +55,13 @@ async function getSuitableIntegrationBranchBuildAtOrBeforeCommit(
 }
 
 /**
- * If we are on the main branch, we look for the previous successful build of it
+ * Finds the most recent build of the given branch where:
+ *
+ *   1. There is an associated Buildkite build that is successful, fully applied, and not blocked, for the base build's
+ *       commit
+ *
+ * That's the only guarantee. The commit of that build might be quite topolgoically distant. It will exist though (we
+ * check with rev-parse)
  */
 async function getBaseBuildForIntegrationBranch(info: BuildkiteEnvironment): Promise<BuildkiteBuild> {
   return getSuitableIntegrationBranchBuildAtOrBeforeCommit(info, info.commit).catch((e) => {
