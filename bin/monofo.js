@@ -8,13 +8,18 @@ require('yargs')
     description: 'Run with verbose logging',
     default: false,
   })
+  .option('chdir', {
+    alias: 'C',
+    type: 'string',
+    description: 'Directory to change to before executing command',
+    default: undefined,
+  })
   .usage('Monofo provides utilities for dynamically generating monorepo pipelines')
   .epilogue('Visit https://github.com/vital-software/monofo for documentation about this command.')
   .strict(true)
   .commandDir('../build/src/cmd')
   .demandCommand()
-  .onFinishCommand(() => {
-    process.exit(0);
-  })
   .showHelpOnFail(false)
-  .help().argv;
+  .help()
+  .parseAsync()
+  .then(() => process.exit(0));
