@@ -1,9 +1,10 @@
 import { AWSError } from 'aws-sdk';
 import { DescribeTableOutput } from 'aws-sdk/clients/dynamodb';
 import debug from 'debug';
-import { CommandModule } from 'yargs';
 import { CACHE_METADATA_TABLE_DEFINITION, CACHE_METADATA_TABLE_NAME } from '../cache-metadata';
 import { service } from '../dynamodb';
+import { setUpHander } from '../handler';
+import { Command } from '../util';
 
 const log = debug('monofo:cmd:install');
 
@@ -79,12 +80,14 @@ async function createTable(): Promise<void> {
     .promise();
 }
 
-const cmd: CommandModule = {
+const cmd: Command = {
   command: 'install',
   describe: 'Installs a DynamoDB table to store cache pointers for pure builds',
   builder: {},
 
-  async handler(): Promise<void> {
+  async handler(args): Promise<void> {
+    setUpHander(args);
+
     if (!(await describeTable())) {
       await createTable();
       log('Table was installed');

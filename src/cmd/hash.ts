@@ -1,12 +1,14 @@
 import { Arguments, CommandModule } from 'yargs';
 import Config from '../config';
+import { BaseArgs, setUpHander } from '../handler';
 import { FileHasher } from '../hash';
+import { Command } from '../util';
 
-interface HashArgs {
-  componentName: string;
+interface HashArgs extends BaseArgs {
+  componentName?: string;
 }
 
-const cmd: CommandModule = {
+const cmd: Command<HashArgs> = {
   command: 'hash <componentName>',
   describe: 'Return the content hash for matching files of a part of the pipeline',
   builder: (yargs) =>
@@ -17,7 +19,9 @@ const cmd: CommandModule = {
     }),
 
   async handler(args): Promise<string> {
-    const { componentName } = args as Arguments<HashArgs>;
+    setUpHander(args);
+
+    const { componentName } = args as Required<HashArgs>;
     const config: Config | undefined = await Config.getOne(process.cwd(), componentName);
 
     if (!config) {

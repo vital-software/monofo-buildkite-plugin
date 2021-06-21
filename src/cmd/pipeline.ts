@@ -1,21 +1,24 @@
 import debug from 'debug';
 import { dump as dumpYaml } from 'js-yaml';
-import { CommandModule } from 'yargs';
 import { getBuildkiteInfo } from '../buildkite/config';
 import Config from '../config';
 import { getBaseBuild, matchConfigs } from '../diff';
 import { diff } from '../git';
+import { setUpHander } from '../handler';
 import mergePipelines from '../merge';
+import { Command } from '../util';
 
 const log = debug('monofo:cmd:pipeline');
 
-const cmd: CommandModule = {
+const cmd: Command = {
   command: 'pipeline',
   describe: 'Output a merged pipeline.yml',
   aliases: '$0',
   builder: {},
 
-  handler(): Promise<string> {
+  handler(args): Promise<string> {
+    setUpHander(args);
+
     return Config.getAll(process.cwd())
       .then((c) =>
         c.length > 0 ? c : Promise.reject(new Error(`No pipeline files to process (cwd: ${process.cwd()})`))
