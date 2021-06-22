@@ -1,3 +1,16 @@
+# [1.17.0](https://github.com/vital-software/monofo/compare/v1.16.7...v1.17.0) (2021-06-22)
+
+
+### Bug Fixes
+
+* **config:** for matchesAll, it doesn't matter if there are no changes ([1917026](https://github.com/vital-software/monofo/commit/19170266201f99626efd5c8c129b8fde1b674a02))
+
+
+### Features
+
+* implement more lenient approach for integration branches ([ead3de6](https://github.com/vital-software/monofo/commit/ead3de6e9ebad7603bd6296f2aa02fa9d5462604))
+* support multiple branches in Buildkite client ([63ec31b](https://github.com/vital-software/monofo/commit/63ec31b335075226d65e5aad5997f787dbecb556))
+
 ## [1.16.7](https://github.com/vital-software/monofo/compare/v1.16.6...v1.16.7) (2021-06-21)
 
 

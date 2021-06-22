@@ -1,6 +1,6 @@
 {
   "name": "monofo",
-  "version": "1.16.7",
+  "version": "1.17.0",
   "description": "Dynamic Buildkite pipeline generator for monorepos",
   "author": "Dominic Scheirlinck <dominic@vitaler.com>",
   "bin": {
