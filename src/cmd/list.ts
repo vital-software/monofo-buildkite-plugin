@@ -30,7 +30,7 @@ const cmd: Command<ListArgs> = {
     }
 
     const matching = await config.getMatchingFiles();
-    const output = matching.files.join('\n');
+    const output = matching.join('\n');
 
     process.stdout.write(`${output}\n`);
     return output;
