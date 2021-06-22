@@ -95,7 +95,7 @@ async function getMostRecentBranchBuild(
  */
 async function getBaseBuildForDefaultBranch(info: BuildkiteEnvironment): Promise<BuildkiteBuild> {
   return getSuitableBranchBuildAtOrBeforeCommit(info, info.commit, info.defaultBranch).catch((e) => {
-    log(`Failed to find successful build for integration branch (${info.branch}) via Buildkite API`, e);
+    log(`Failed to find successful build for default branch (${info.branch}) via Buildkite API`, e);
     throw e;
   });
 }
@@ -114,7 +114,12 @@ async function getBaseBuildForIntegrationBranch(
   info: BuildkiteEnvironment,
   integrationBranch: string
 ): Promise<BuildkiteBuild> {
-  return (await getMostRecentBranchBuild(info, integrationBranch)) || getBaseBuildForDefaultBranch(info);
+  return getMostRecentBranchBuild(info, integrationBranch)
+    .then((result) => result || getBaseBuildForDefaultBranch(info))
+    .catch((e) => {
+      log(`Failed to find successful build for integration branch (${info.branch}) via Buildkite API`, e);
+      throw e;
+    });
 }
 
 /**
