@@ -14,7 +14,7 @@ describe('getConfig()', () => {
     const configNames = (await Config.getAll(path.resolve(__dirname, 'projects/kitchen-sink'))).map(
       (c) => c.monorepo.name
     );
-    expect(configNames).toHaveLength(13);
+    expect(configNames).toHaveLength(14);
     expect(configNames).toStrictEqual([
       'changed',
       'dependedon',
@@ -23,8 +23,9 @@ describe('getConfig()', () => {
       'bar',
       'included',
       'match-all',
-      'match-all-boolean',
+      'match-all-false',
       'match-all-mixed',
+      'match-all-true',
       'qux',
       'baz',
       'some-long-name',

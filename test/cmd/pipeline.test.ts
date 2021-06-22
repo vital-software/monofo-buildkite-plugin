@@ -68,15 +68,15 @@ describe('monofo pipeline', () => {
       .then((p) => {
         expect(p).toBeDefined();
         expect(commandSummary(p.steps)).toStrictEqual([
-          "echo 'inject for: excluded, bar, qux, some-long-name'",
+          "echo 'inject for: excluded, bar, match-all-false, qux, some-long-name'",
           'echo "changed" > changed',
           'echo "dependedon" > dependedon',
           'echo "foo1" > foo1',
           "echo 'bar was replaced'",
           'echo "included" > included',
           'echo "match-all" > match-all',
-          'echo "match-all-boolean" > match-all-boolean',
           'echo "match-all-mixed" > match-all-mixed',
+          'echo "match-all-true" > match-all-true',
           'echo "baz1"',
           'echo "unreferenced" > unref',
         ]);
@@ -117,7 +117,7 @@ describe('monofo pipeline', () => {
       .then((p) => {
         expect(p).toBeDefined();
         expect(commandSummary(p.steps)).toStrictEqual([
-          "echo 'inject for: changed, dependedon, excluded, foo, match-all, match-all-boolean, match-all-mixed, qux, baz, unreferenced'",
+          "echo 'inject for: changed, dependedon, excluded, foo, match-all, match-all-false, match-all-mixed, match-all-true, qux, baz, unreferenced'",
           'echo "bar1" | tee bar1',
           'echo "bar2" | tee bar2',
           'echo "included" > included',
@@ -146,14 +146,14 @@ describe('monofo pipeline', () => {
       .then((p) => {
         expect(p).toBeDefined();
         expect(commandSummary(p.steps)).toStrictEqual([
-          "echo 'inject for: excluded, foo, bar'",
+          "echo 'inject for: excluded, foo, bar, match-all-false'",
           'echo "changed" > changed',
           'echo "dependedon" > dependedon',
           "echo 'bar was replaced'",
           'echo "included" > included',
           'echo "match-all" > match-all',
-          'echo "match-all-boolean" > match-all-boolean',
           'echo "match-all-mixed" > match-all-mixed',
+          'echo "match-all-true" > match-all-true',
           'echo "qux1"',
           'echo "baz1"',
           'echo "some-long-name" > some-long-name',
