@@ -11,7 +11,7 @@ interface PaginationOptions {
 
 export interface GetBuildsOptions extends PaginationOptions {
   state?: string;
-  branches?: string[];
+  'branch[]'?: string[];
 }
 
 export default class BuildkiteClient {
@@ -45,7 +45,12 @@ export default class BuildkiteClient {
     const url = new URL(this.baseUrl.href);
     url.pathname += '/builds';
 
-    Object.entries({ 'branches[]': options.branches || [this.info.branch], ...options }).forEach(([name, val]) => {
+    const parameters = {
+      ...options,
+      'branch[]': options['branch[]'] ?? [this.info.branch],
+    };
+
+    Object.entries(parameters).forEach(([name, val]) => {
       if (typeof val !== 'undefined') {
         url.searchParams.append(name, String(val));
       }
