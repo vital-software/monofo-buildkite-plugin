@@ -2,8 +2,8 @@ import debug from 'debug';
 import _ from 'lodash';
 import BuildkiteClient from './buildkite/client';
 import Config from './config';
-import { mergeBase, revList } from './git';
-import { count } from './util';
+import { mergeBase, revList, revParse } from './git';
+import { count, filterAsync } from './util';
 
 const log = debug('monofo:diff');
 
@@ -17,14 +17,15 @@ const log = debug('monofo:diff');
  *
  * This is the more conservative algorithm compared to getMostRecentBranchBuild below
  */
-async function getSuitableIntegrationBranchBuildAtOrBeforeCommit(
+async function getSuitableBranchBuildAtOrBeforeCommit(
   info: BuildkiteEnvironment,
-  commit: string
+  commit: string,
+  branch: string
 ): Promise<BuildkiteBuild> {
   const client = new BuildkiteClient(info);
 
   const builds: Promise<BuildkiteBuild[]> = client.getBuilds({
-    branches: info.integrationBranch ? [info.integrationBranch, info.defaultBranch] : [info.defaultBranch],
+    branches: [branch],
     state: 'passed',
     per_page: 50,
   });
@@ -63,21 +64,69 @@ async function getSuitableIntegrationBranchBuildAtOrBeforeCommit(
  * That's the only guarantee. The commit of that build might be quite topolgoically distant. It will exist though (we
  * check with rev-parse)
  */
-async function getBaseBuildForIntegrationBranch(info: BuildkiteEnvironment): Promise<BuildkiteBuild> {
-  return getSuitableIntegrationBranchBuildAtOrBeforeCommit(info, info.commit).catch((e) => {
+async function getMostRecentBranchBuild(
+  info: BuildkiteEnvironment,
+  branch: string
+): Promise<BuildkiteBuild | undefined> {
+  const client = new BuildkiteClient(info);
+
+  const builds: BuildkiteBuild[] = await client.getBuilds({
+    branches: [branch],
+    state: 'passed',
+    per_page: 10,
+  });
+
+  const successful = builds.filter((build) => !build.blocked);
+
+  const withExistingCommits = await filterAsync(successful, async (build) => {
+    return revParse(build.commit)
+      .then(() => true)
+      .catch(() => false);
+  });
+
+  return withExistingCommits.pop();
+}
+
+/**
+ * If we are on the default (i.e. main) branch, we look for the previous successful build of it that matches in git
+ *
+ * This is a two-pronged lookup, where we look for the intersection of successful default branch builds and commits on
+ * the default branch in git, and pick the most topologically recent.
+ */
+async function getBaseBuildForDefaultBranch(info: BuildkiteEnvironment): Promise<BuildkiteBuild> {
+  return getSuitableBranchBuildAtOrBeforeCommit(info, info.commit, info.defaultBranch).catch((e) => {
     log(`Failed to find successful build for integration branch (${info.branch}) via Buildkite API`, e);
     throw e;
   });
 }
 
 /**
- * If we are on a feature branch, we just diff against the merge-base of the current commit and the main branch, and then find a successful build at or before
- * that commit.
+ * If we are on an integration branch, we look for the previous successful build of it
+ *
+ * This is a more risky single-pronged lookup, where we just take Buildkite's word for what the current state of the
+ * environment is, even if the most recently applied commit is topologically distant (because e.g. someone reset back in
+ * time, or to a completely different branch of development).
+ *
+ * So, we look for the most recent successful build of the integration branch, grab its commit, and validate it still
+ * exists on the remote. If this process fails, we fall back to getBaseBuildForDefaultBranch
+ */
+async function getBaseBuildForIntegrationBranch(
+  info: BuildkiteEnvironment,
+  integrationBranch: string
+): Promise<BuildkiteBuild> {
+  return (await getMostRecentBranchBuild(info, integrationBranch)) || getBaseBuildForDefaultBranch(info);
+}
+
+/**
+ * If we are on a feature branch, we look for the previous successful build of the default branch on or before the merge-base of the feature branch
+ *
+ * This is a two-pronged lookup, where we look for the intersection of successful default branch builds and commits on
+ * the default branch in git, and pick the most topologically recent.
  */
 async function getBaseBuildForFeatureBranch(info: BuildkiteEnvironment): Promise<BuildkiteBuild> {
-  return mergeBase(`origin/${info.defaultBranch}`, info.commit).then((commit) => {
+  return mergeBase(`origin/${info.defaultBranch}`, info.commit, info.defaultBranch).then((commit) => {
     log(`Found merge base of ${commit} for current feature branch`);
-    return getSuitableIntegrationBranchBuildAtOrBeforeCommit(info, commit).catch((e) => {
+    return getSuitableBranchBuildAtOrBeforeCommit(info, commit, info.defaultBranch).catch((e) => {
       log(
         `Failed to find successful build for merge base (${commit}) of feature branch (${info.branch}) via Buildkite API, will use fallback mode. Try bringing your branch up-to-date with ${info.defaultBranch}, if it isn't already?`,
         e
@@ -87,10 +136,6 @@ async function getBaseBuildForFeatureBranch(info: BuildkiteEnvironment): Promise
   });
 }
 
-function isIntegrationBranch(info: BuildkiteEnvironment): boolean {
-  return info.branch === info.defaultBranch || info.branch === info.integrationBranch;
-}
-
 /**
  * The base commit is the commit used to compare a build with
  *
@@ -98,7 +143,15 @@ function isIntegrationBranch(info: BuildkiteEnvironment): boolean {
  * can snarf artifacts)
  */
 export async function getBaseBuild(info: BuildkiteEnvironment): Promise<BuildkiteBuild> {
-  return isIntegrationBranch(info) ? getBaseBuildForIntegrationBranch(info) : getBaseBuildForFeatureBranch(info);
+  if (info.branch === info.defaultBranch) {
+    return getBaseBuildForDefaultBranch(info);
+  }
+
+  if (info.branch === info.integrationBranch) {
+    return getBaseBuildForIntegrationBranch(info, info.integrationBranch);
+  }
+
+  return getBaseBuildForFeatureBranch(info);
 }
 
 export function matchConfigs(buildId: string, configs: Config[], changedFiles: string[]): void {
