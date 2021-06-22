@@ -27,7 +27,7 @@ describe('BuildkiteClient', () => {
       const url = client.urlGetBuilds(opts);
 
       expect(url.toString()).toBe(
-        'https://api.buildkite.com/v2/organizations/dominics/pipelines/monofo/builds?branches%5B%5D=main&state=passed'
+        'https://api.buildkite.com/v2/organizations/dominics/pipelines/monofo/builds?state=passed&branch%5B%5D=main'
       );
     });
   });

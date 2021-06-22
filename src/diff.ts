@@ -25,7 +25,7 @@ async function getSuitableBranchBuildAtOrBeforeCommit(
   const client = new BuildkiteClient(info);
 
   const builds: Promise<BuildkiteBuild[]> = client.getBuilds({
-    branches: [branch],
+    'branch[]': [branch],
     state: 'passed',
     per_page: 50,
   });
@@ -71,7 +71,7 @@ async function getMostRecentBranchBuild(
   const client = new BuildkiteClient(info);
 
   const builds: BuildkiteBuild[] = await client.getBuilds({
-    branches: [branch],
+    'branch[]': [branch],
     state: 'passed',
     per_page: 10,
   });
