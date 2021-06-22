@@ -32,12 +32,6 @@ interface MonorepoConfig {
   pure: boolean;
 }
 
-export interface MatchResult {
-  matchesAll: boolean;
-  matchesNone: boolean;
-  files: string[];
-}
-
 const EMPTY_CONFIG: MonorepoConfig = {
   depends_on: [],
   excluded_env: {},
@@ -48,9 +42,10 @@ const EMPTY_CONFIG: MonorepoConfig = {
   pure: false,
   name: 'empty',
 };
+
 const KNOWN_CONFIG_PROPERTIES = Object.keys(EMPTY_CONFIG);
-const EMPTY_MATCH: MatchResult = { files: [], matchesAll: false, matchesNone: false };
-const FALLBACK_MATCH: MatchResult = { files: ['fallback'], matchesAll: false, matchesNone: false };
+
+const FALLBACK_CHANGES = ['fallback'];
 
 /**
  * Value object representing a parsed YAML pipeline configuration, with associated metadata and decision information
@@ -73,9 +68,9 @@ export default class Config {
   public buildId?: string;
 
   /**
-   * Set of changes that match the configuration
+   * Set of files, with changes that match the configuration
    */
-  public changes: MatchResult = EMPTY_MATCH;
+  public changes: string[] = [];
 
   /**
    * Whether this config is currently considered for inclusion in the final pipeline output
@@ -92,7 +87,7 @@ export default class Config {
   /**
    * Memoized list of files that match this config
    */
-  private matchingFiles?: MatchResult = undefined;
+  private matchingFiles?: string[] = undefined;
 
   public envVarName(): string {
     return this.monorepo.name.toLocaleUpperCase().replace(/-/g, '_');
@@ -108,7 +103,7 @@ export default class Config {
   }
 
   public useFallback(): void {
-    this.changes = FALLBACK_MATCH;
+    this.changes = FALLBACK_CHANGES;
     this.buildId = undefined;
   }
 
@@ -118,7 +113,7 @@ export default class Config {
 
   public async getContentHash(hasher: FileHasher): Promise<string> {
     log(`Getting content hash for ${this.monorepo.name}`);
-    return hasher.hashMany((await this.getMatchingFiles()).files);
+    return hasher.hashMany(await this.getMatchingFiles());
   }
 
   /**
@@ -134,54 +129,42 @@ export default class Config {
    *
    * Includes this file
    */
-  private matches(): MatchResult {
-    const matchesAll = Config.matchesAll(this.monorepo.matches);
-    const matchesNone = this.monorepo.matches === false;
-
+  private matchPatterns(): string[] {
     if (typeof this.monorepo.matches === 'boolean') {
-      return {
-        // Note: #198: this.file.path intentionally not included if matches === false
-        files: this.monorepo.matches ? ['**/*'] : [],
-        matchesAll,
-        matchesNone,
-      };
+      return this.monorepo.matches ? ['**/*'] : [];
     }
 
-    return { files: [...this.monorepo.matches, this.file.path], matchesAll, matchesNone };
+    return [...this.monorepo.matches, this.file.path];
   }
 
   /**
    * Returns all files that match the pipeline, whether they have changes or not
    */
-  public async getMatchingFiles(): Promise<MatchResult> {
+  public async getMatchingFiles(): Promise<string[]> {
     if (!this.matchingFiles) {
       log(`Getting matching files for ${this.monorepo.name}`);
-      const { files, matchesAll, matchesNone } = this.matches();
+      const patterns = this.matchPatterns();
 
-      this.matchingFiles = {
-        matchesAll,
-        matchesNone,
-        files: await Promise.all(
-          files.map(async (pattern) =>
-            glob(pattern, {
-              matchBase: true,
-              dot: true,
-              nodir: true,
-              cache,
-              symlinks,
-              statCache,
-              realpathCache,
-            })
-          )
-        ).then((r) => {
-          const flat = [...new Set(r.flat())];
-          log(`Found ${count(flat, 'matching file')}`);
-          return flat;
-        }),
-      };
+      this.matchingFiles = await Promise.all(
+        patterns.map(async (pattern) =>
+          glob(pattern, {
+            matchBase: true,
+            dot: true,
+            nodir: true,
+            cache,
+            symlinks,
+            statCache,
+            realpathCache,
+          })
+        )
+      ).then((r) => {
+        const flat = [...new Set(r.flat())];
+        log(`Found ${count(flat, 'matching file')}`);
+        return flat;
+      });
     }
 
-    return this.matchingFiles;
+    return this.matchingFiles || [];
   }
 
   /**
@@ -191,27 +174,23 @@ export default class Config {
    * @param changedFiles
    */
   public updateMatchingChanges(changedFiles: string[]): void {
-    const { files, matchesAll, matchesNone } = this.matches();
+    const patterns = this.matchPatterns();
 
-    if (!matchesAll && (!changedFiles || changedFiles.length < 1)) {
-      this.changes = EMPTY_MATCH;
+    if (!changedFiles || changedFiles.length < 1) {
+      this.changes = [];
       return;
     }
 
-    this.changes = {
-      matchesAll,
-      matchesNone,
-      files: [
-        ...new Set(
-          files.flatMap((pattern) =>
-            minimatch.match(changedFiles, pattern, {
-              matchBase: true,
-              dot: true,
-            })
-          )
-        ),
-      ],
-    };
+    this.changes = [
+      ...new Set(
+        patterns.flatMap((pattern) =>
+          minimatch.match(changedFiles, pattern, {
+            matchBase: true,
+            dot: true,
+          })
+        )
+      ),
+    ];
   }
 
   private static async readYaml(file: ConfigFile): Promise<Config> {
@@ -350,13 +329,5 @@ export default class Config {
    */
   public static configureFallback(_e: Error, configs: Config[]): void {
     return configs.forEach((c) => c.useFallback());
-  }
-
-  public static matchesAll(globs: boolean | string[]): boolean {
-    if (typeof globs === 'boolean') {
-      return globs;
-    }
-
-    return globs.indexOf('**') !== -1 || globs.indexOf('**/*') !== -1;
   }
 }

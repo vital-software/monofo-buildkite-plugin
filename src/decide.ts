@@ -1,13 +1,19 @@
 /* eslint-disable no-param-reassign */
 
 import { CacheMetadataKey, CacheMetadataRepository } from './cache-metadata';
-import Config, { MatchResult } from './config';
+import Config from './config';
 import { service } from './dynamodb';
 import { FileHasher } from './hash';
 import { count } from './util';
 
-function prettyPrintChangeResult(changes: MatchResult): string {
-  return changes.matchesAll ? 'all files match' : changes.files.join(', ');
+function prettyPrintChangeResult(config: Config): string {
+  if (typeof config.monorepo.matches === 'boolean') {
+    return config.monorepo.matches ? 'all files match' : 'no files match';
+  }
+
+  return config.monorepo.matches.indexOf('**') !== -1 || config.monorepo.matches.indexOf('**/*') !== -1
+    ? 'all files match'
+    : config.changes.join(', ');
 }
 
 /**
@@ -16,11 +22,8 @@ function prettyPrintChangeResult(changes: MatchResult): string {
  */
 function updateDecisionsForChanges(configs: Config[]): void {
   configs.forEach((config) => {
-    if (config.changes.files.length > 0) {
-      config.decide(
-        true,
-        `${count(config.changes.files, 'matching change')}: ${prettyPrintChangeResult(config.changes)}`
-      );
+    if (config.changes.length > 0) {
+      config.decide(true, `${count(config.changes, 'matching change')}: ${prettyPrintChangeResult(config)}`);
     }
   });
 }

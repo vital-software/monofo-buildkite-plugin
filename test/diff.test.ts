@@ -80,7 +80,7 @@ describe('matchConfigs', () => {
       process.chdir(path.resolve(__dirname, './projects/kitchen-sink'));
       const configs = await Config.getAll(process.cwd());
       matchConfigs('foo', configs, changedFiles);
-      const changes = configs.map((r) => r.changes.files);
+      const changes = configs.map((r) => r.changes);
 
       expect(changes).toHaveLength(14);
       expect(changes).toStrictEqual([
@@ -110,7 +110,7 @@ describe('matchConfigs', () => {
       process.chdir(path.resolve(__dirname, './projects/kitchen-sink'));
       const configs = await Config.getAll(process.cwd());
       matchConfigs('foo', configs, changedFiles);
-      const changes = configs.map((r) => r.changes.files);
+      const changes = configs.map((r) => r.changes);
 
       expect(changes).toHaveLength(14);
       expect(changes).toStrictEqual([[], [], [], [], [], [], [], [], [], [], [], [], [], []]);
