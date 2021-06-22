@@ -1,0 +1,5 @@
+monorepo:
+  matches: false
+
+steps:
+  - command: echo "match-all-false" > match-all-false

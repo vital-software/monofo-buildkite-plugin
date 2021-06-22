@@ -30,28 +30,48 @@ describe('matchConfigs', () => {
     expect(typeof matchConfigs).toBe('function');
   });
 
-  it('matches changed files against configs', async () => {
-    process.env = fakeProcess();
-    process.chdir(path.resolve(__dirname, './projects/kitchen-sink'));
-    const configs = await Config.getAll(process.cwd());
-    matchConfigs('foo', configs, ['foo/abc.js', 'foo/README.md', 'bar/abc.ts', 'baz/abc.ts']);
-    const changes = configs.map((r) => r.changes.files);
+  describe('when many changed files', () => {
+    const changedFiles = ['foo/abc.js', 'foo/README.md', 'bar/abc.ts', 'baz/abc.ts'];
 
-    expect(changes).toHaveLength(13);
-    expect(changes).toStrictEqual([
-      [],
-      [],
-      ['foo/README.md'],
-      ['foo/README.md'],
-      [],
-      [],
-      ['foo/abc.js', 'foo/README.md', 'bar/abc.ts', 'baz/abc.ts'],
-      ['foo/abc.js', 'foo/README.md', 'bar/abc.ts', 'baz/abc.ts'],
-      ['foo/abc.js', 'foo/README.md', 'bar/abc.ts', 'baz/abc.ts'],
-      [],
-      ['baz/abc.ts'],
-      [],
-      ['foo/abc.js', 'foo/README.md', 'bar/abc.ts', 'baz/abc.ts'],
-    ]);
+    it('matches changed files against configs', async () => {
+      process.env = fakeProcess();
+      process.chdir(path.resolve(__dirname, './projects/kitchen-sink'));
+      const configs = await Config.getAll(process.cwd());
+      matchConfigs('foo', configs, changedFiles);
+      const changes = configs.map((r) => r.changes.files);
+
+      expect(changes).toHaveLength(14);
+      expect(changes).toStrictEqual([
+        [],
+        [],
+        ['foo/README.md'],
+        ['foo/README.md'],
+        [],
+        [],
+        changedFiles,
+        [],
+        changedFiles,
+        changedFiles,
+        [],
+        ['baz/abc.ts'],
+        [],
+        changedFiles,
+      ]);
+    });
+  });
+
+  describe('when no changed files', () => {
+    const changedFiles: string[] = [];
+
+    it('still matches configs that have matches hard-coded to true', async () => {
+      process.env = fakeProcess();
+      process.chdir(path.resolve(__dirname, './projects/kitchen-sink'));
+      const configs = await Config.getAll(process.cwd());
+      matchConfigs('foo', configs, changedFiles);
+      const changes = configs.map((r) => r.changes.files);
+
+      expect(changes).toHaveLength(14);
+      expect(changes).toStrictEqual([[], [], [], [], [], [], [], [], [], [], [], [], [], []]);
+    });
   });
 });

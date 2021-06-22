@@ -1,5 +1,0 @@
-monorepo:
-  matches: true
-
-steps:
-  - command: echo "match-all-boolean" > match-all-boolean

@@ -1,0 +1,5 @@
+monorepo:
+  matches: true
+
+steps:
+  - command: echo "match-all-true" > match-all-true
