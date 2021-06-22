@@ -191,12 +191,12 @@ export default class Config {
    * @param changedFiles
    */
   public updateMatchingChanges(changedFiles: string[]): void {
-    if (!changedFiles || changedFiles.length < 1) {
+    const { files, matchesAll, matchesNone } = this.matches();
+
+    if (!matchesAll && (!changedFiles || changedFiles.length < 1)) {
       this.changes = EMPTY_MATCH;
       return;
     }
-
-    const { files, matchesAll, matchesNone } = this.matches();
 
     this.changes = {
       matchesAll,
