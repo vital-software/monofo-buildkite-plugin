@@ -1,3 +1,11 @@
+## [1.17.1](https://github.com/vital-software/monofo/compare/v1.17.0...v1.17.1) (2021-06-23)
+
+
+### Bug Fixes
+
+* **client:** fix url parameter mistakes that lead to filtering by branch not working ([56b1a4f](https://github.com/vital-software/monofo/commit/56b1a4f03b9c5122d7088ba3b40d2bcb4754b775))
+* **diff:** use the correct name in default branch log message ([3c9cc36](https://github.com/vital-software/monofo/commit/3c9cc367c618b14dbf5a620269aaccc50c702a37))
+
 # [1.17.0](https://github.com/vital-software/monofo/compare/v1.16.7...v1.17.0) (2021-06-22)
 
 
