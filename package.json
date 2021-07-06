@@ -52,7 +52,7 @@
     "@types/debug": "4.1.6",
     "@types/glob": "7.1.4",
     "@types/jest": "26.0.24",
-    "@types/js-yaml": "4.0.1",
+    "@types/js-yaml": "4.0.2",
     "@types/lodash": "4.14.170",
     "@types/minimatch": "3.0.4",
     "@types/tiny-async-pool": "1.0.0",
