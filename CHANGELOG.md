@@ -1,3 +1,13 @@
+## [1.17.2](https://github.com/vital-software/monofo/compare/v1.17.1...v1.17.2) (2021-09-02)
+
+
+### Bug Fixes
+
+* **deps:** update dependency aws-sdk to v2.981.0 ([2882dc7](https://github.com/vital-software/monofo/commit/2882dc76ac38b10c4acbf74e8f910975d8d0c41c))
+* **deps:** update dependency chalk to v4.1.2 ([9948121](https://github.com/vital-software/monofo/commit/99481213bf19bfde88c163ed6cf9a7880a2fdb13))
+* **deps:** update dependency debug to v4.3.2 ([f80b1da](https://github.com/vital-software/monofo/commit/f80b1dab59f5247a539c003090e48fbc263894e8))
+* **deps:** update dependency yargs to v17.1.1 ([b66014b](https://github.com/vital-software/monofo/commit/b66014b064d0aedc3dfa0e486d49753e86a39b83))
+
 ## [1.17.1](https://github.com/vital-software/monofo/compare/v1.17.0...v1.17.1) (2021-06-23)
 
 
