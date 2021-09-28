@@ -1,3 +1,10 @@
+## [1.17.4](https://github.com/vital-software/monofo/compare/v1.17.3...v1.17.4) (2021-09-28)
+
+
+### Bug Fixes
+
+* **deps:** update dependency yargs to v17.2.1 ([a643ddc](https://github.com/vital-software/monofo/commit/a643ddce9923e960d55c1eb9bd7beefca07595e2))
+
 ## [1.17.3](https://github.com/vital-software/monofo/compare/v1.17.2...v1.17.3) (2021-09-24)
 
 
