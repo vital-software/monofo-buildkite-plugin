@@ -3228,7 +3228,7 @@ duplexer2@~0.1.0:
   dependencies:
     readable-stream "^2.0.2"
 
-dynalite@^3.0.0:
+dynalite@^3.2.1:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/dynalite/-/dynalite-3.2.1.tgz#24f0f8db65ffe910b4e70b5cde3cbbd2203e1381"
   integrity sha512-PgpagYk1ecSzhjGuFMuFHEuWJ0BNddqTrG89ra+Jhs0zgjr/IPoNCmrAdBUumy2Ds2hx8V3aNuLKpPbaGcVwtQ==
@@ -5203,13 +5203,14 @@ jest-docblock@^27.0.6:
   dependencies:
     detect-newline "^3.0.0"
 
-jest-dynalite@3.4.1:
-  version "3.4.1"
-  resolved "https://registry.yarnpkg.com/jest-dynalite/-/jest-dynalite-3.4.1.tgz#463d61b88e6e86a0687d8094fd84ee618dc1241c"
-  integrity sha512-8lFo3/Qmza0yT1kYDrNsjjarGcs1WKFV4u6nBue2xuCWVRg6pW9RiHc7j0efeqqijpRL7HE3e6LmwIHnECnpcA==
+jest-dynalite@3.4.4:
+  version "3.4.4"
+  resolved "https://registry.yarnpkg.com/jest-dynalite/-/jest-dynalite-3.4.4.tgz#55c6d55be066dc6c052b92972846c06bd576ecb2"
+  integrity sha512-I6pPFznseFIWi7ECqmwQ6H5M59qy/9vUNvKWkUlL0GZamyR4jMGmiRNrvFbFTb+w9BOmbhwJCLAgBWlYA5B93w==
   dependencies:
     "@aws/dynamodb-auto-marshaller" "^0.7.1"
-    dynalite "^3.0.0"
+    dynalite "^3.2.1"
+    setimmediate "^1.0.5"
 
 jest-each@^27.2.4:
   version "27.2.4"
@@ -7918,6 +7919,11 @@ set-value@^2.0.0, set-value@^2.0.1:
     is-extendable "^0.1.1"
     is-plain-object "^2.0.3"
     split-string "^3.0.1"
+
+setimmediate@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/setimmediate/-/setimmediate-1.0.5.tgz#290cbb232e306942d7d7ea9b83732ab7856f8285"
+  integrity sha1-KQy7Iy4waULX1+qbg3Mqt4VvgoU=
 
 shebang-command@^1.2.0:
   version "1.2.0"
