@@ -1,0 +1,9 @@
+monorepo:
+  matches: '**'
+
+  # This includes some branches by wildcards, if not excluded by other wildcards
+  branches: 'feature/*-included !feature/*-excluded'
+
+steps:
+  - command: echo "explicit-wildcard-end" > explicit-wildcard-end
+    key: explicit-wildcard-end
