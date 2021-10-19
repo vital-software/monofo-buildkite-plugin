@@ -123,7 +123,7 @@ configuration. See [DynamoDB Setup](#dynamodb-setup)
 ### Branch inclusion/exclusion filters
 If you require more specificity for what branches do or do not run your pipelines,
 there is a branch filter that matches the buildkite step-level branch filtering rules.
-See [Buildkite Branch Configuration](https://buildkite.com/docs/pipelines/branch-configuration)
+See [Buildkite Branch Configuration](https://buildkite.com/docs/pipelines/branch-configuration#branch-pattern-examples)
 
 ```yaml
 monorepo:
