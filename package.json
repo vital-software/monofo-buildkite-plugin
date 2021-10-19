@@ -68,7 +68,7 @@
     "eslint-plugin-jest": "25.2.2",
     "eslint-plugin-prettier": "4.0.0",
     "husky": "7.0.2",
-    "jest": "27.3.0",
+    "jest": "27.3.1",
     "jest-dynalite": "3.4.4",
     "jest-fetch-mock": "3.0.3",
     "nock": "13.1.3",
