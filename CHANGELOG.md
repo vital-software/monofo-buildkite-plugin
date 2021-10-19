@@ -1,3 +1,10 @@
+# [1.18.0](https://github.com/vital-software/monofo/compare/v1.17.4...v1.18.0) (2021-10-19)
+
+
+### Features
+
+* **config:** add pattern matching for branch inclusion/exclusion ([79ad2ad](https://github.com/vital-software/monofo/commit/79ad2ade21ffbb894ad5f509dedeecb002ff4ad4))
+
 ## [1.17.4](https://github.com/vital-software/monofo/compare/v1.17.3...v1.17.4) (2021-09-28)
 
 
