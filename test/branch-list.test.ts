@@ -1,29 +1,29 @@
 import path from 'path';
 import Config from '../src/config';
 
+async function getIncludedPipelinesForBranchName(branchName: string): Promise<string[]> {
+  return (await Config.getAll(path.resolve(__dirname, 'projects/branch-exclusion')))
+    .filter((config) => {
+      return config.includedInBranchList(branchName);
+    })
+    .map((c) => c.monorepo.name);
+}
+
 describe('branchFilter', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it('allows the main branch', async () => {
-    const configNames = (await Config.getAll(path.resolve(__dirname, 'projects/branch-exclusion')))
-      .filter((config) => {
-        return config.includedInBranchList('main');
-      })
-      .map((c) => c.monorepo.name);
+    const pipelineNames = await getIncludedPipelinesForBranchName('main');
 
-    expect(configNames).toStrictEqual(['explicit-all', 'implicit-all', 'implicit-rest']);
+    expect(pipelineNames).toStrictEqual(['explicit-all', 'implicit-all', 'implicit-rest']);
   });
 
   it('allows a random feature branch', async () => {
-    const configNames = (await Config.getAll(path.resolve(__dirname, 'projects/branch-exclusion')))
-      .filter((config) => {
-        return config.includedInBranchList('feature/allowed-feature');
-      })
-      .map((c) => c.monorepo.name);
+    const pipelineNames = await getIncludedPipelinesForBranchName('feature/allowed-feature');
 
-    expect(configNames).toStrictEqual([
+    expect(pipelineNames).toStrictEqual([
       'explicit-all',
       'explicit-exclude-multiple',
       'explicit-include-exclude',
@@ -35,13 +35,9 @@ describe('branchFilter', () => {
   });
 
   it("doesn't allow a excluded feature branch", async () => {
-    const configNames = (await Config.getAll(path.resolve(__dirname, 'projects/branch-exclusion')))
-      .filter((config) => {
-        return config.includedInBranchList('feature/excluded');
-      })
-      .map((c) => c.monorepo.name);
+    const pipelineNames = await getIncludedPipelinesForBranchName('feature/excluded');
 
-    expect(configNames).toStrictEqual([
+    expect(pipelineNames).toStrictEqual([
       'explicit-all',
       'explicit-exclude-multiple',
       'explicit-wildcards',
@@ -51,13 +47,9 @@ describe('branchFilter', () => {
   });
 
   it("doesn't allow a excluded feature branch by wildcard", async () => {
-    const configNames = (await Config.getAll(path.resolve(__dirname, 'projects/branch-exclusion')))
-      .filter((config) => {
-        return config.includedInBranchList('feature/excluded-name');
-      })
-      .map((c) => c.monorepo.name);
+    const pipelineNames = await getIncludedPipelinesForBranchName('feature/excluded-name');
 
-    expect(configNames).toStrictEqual([
+    expect(pipelineNames).toStrictEqual([
       'explicit-all',
       'explicit-exclude-multiple',
       'explicit-include-exclude',
@@ -68,13 +60,9 @@ describe('branchFilter', () => {
   });
 
   it('allows a wildcard-included feature branch', async () => {
-    const configNames = (await Config.getAll(path.resolve(__dirname, 'projects/branch-exclusion')))
-      .filter((config) => {
-        return config.includedInBranchList('feature/name-included');
-      })
-      .map((c) => c.monorepo.name);
+    const pipelineNames = await getIncludedPipelinesForBranchName('feature/name-included');
 
-    expect(configNames).toStrictEqual([
+    expect(pipelineNames).toStrictEqual([
       'explicit-all',
       'explicit-exclude-multiple',
       'explicit-include-exclude',
@@ -87,13 +75,9 @@ describe('branchFilter', () => {
   });
 
   it("doesn't allow a wildcard-excluded feature branch", async () => {
-    const configNames = (await Config.getAll(path.resolve(__dirname, 'projects/branch-exclusion')))
-      .filter((config) => {
-        return config.includedInBranchList('feature/name-excluded');
-      })
-      .map((c) => c.monorepo.name);
+    const pipelineNames = await getIncludedPipelinesForBranchName('feature/name-excluded');
 
-    expect(configNames).toStrictEqual([
+    expect(pipelineNames).toStrictEqual([
       'explicit-all',
       'explicit-exclude-multiple',
       'explicit-include-exclude',
@@ -105,13 +89,9 @@ describe('branchFilter', () => {
   });
 
   it('allows a single feature branch when multiple included', async () => {
-    const configNames = (await Config.getAll(path.resolve(__dirname, 'projects/branch-exclusion')))
-      .filter((config) => {
-        return config.includedInBranchList('feature/include-one');
-      })
-      .map((c) => c.monorepo.name);
+    const pipelineNames = await getIncludedPipelinesForBranchName('feature/include-one');
 
-    expect(configNames).toStrictEqual([
+    expect(pipelineNames).toStrictEqual([
       'explicit-all',
       'explicit-exclude-multiple',
       'explicit-include-exclude',
@@ -124,13 +104,9 @@ describe('branchFilter', () => {
   });
 
   it("doesn't allow a single feature branch when multiple excluded", async () => {
-    const configNames = (await Config.getAll(path.resolve(__dirname, 'projects/branch-exclusion')))
-      .filter((config) => {
-        return config.includedInBranchList('feature/exclude-one');
-      })
-      .map((c) => c.monorepo.name);
+    const pipelineNames = await getIncludedPipelinesForBranchName('feature/exclude-one');
 
-    expect(configNames).toStrictEqual([
+    expect(pipelineNames).toStrictEqual([
       'explicit-all',
       'explicit-include-exclude',
       'explicit-wildcards',
@@ -140,12 +116,8 @@ describe('branchFilter', () => {
   });
 
   it('allows a single branch', async () => {
-    const configNames = (await Config.getAll(path.resolve(__dirname, 'projects/branch-exclusion')))
-      .filter((config) => {
-        return config.includedInBranchList('one');
-      })
-      .map((c) => c.monorepo.name);
+    const pipelineNames = await getIncludedPipelinesForBranchName('one');
 
-    expect(configNames).toStrictEqual(['explicit-all', 'explicit-one', 'implicit-all']);
+    expect(pipelineNames).toStrictEqual(['explicit-all', 'explicit-one', 'implicit-all']);
   });
 });
