@@ -38,7 +38,7 @@ pipeline files can contain their own set of steps and environment variables.
 Next, add a `monorepo` configuration section to the top of each of these
 component pipelines. An example configuration is:
 
-```
+```yaml
 monorepo:
   expects:  blah.cfg
   produces: output/foo.zip
@@ -69,7 +69,7 @@ add that pipeline file to the `matches` array yourself.
 A pipeline configuration can define the artifacts that the component build `expects` in
 order to run, and those that the build `produces` if successful. For example:
 
-```
+```yaml
 monorepo:
   expects:  blah.cfg
   produces: output/foo.zip
@@ -96,7 +96,7 @@ artifacts, and the only inputs it relies on are listed in its `matches`.
 This means an extra layer of caching can be used, based on the
 contents of the files in the `matches` globs.  For example:
 
-```
+```yaml
 monorepo:
   pure: true
   matches: input-file.txt
@@ -119,6 +119,18 @@ Pure mode uses external metadata to be able to reuse artifacts from previous
 builds efficiently. Content hash to build ID mappings are stored in
 DynamoDB, so if you are using pure mode you will need to do some additional
 configuration. See [DynamoDB Setup](#dynamodb-setup)
+
+### Branch inclusion/exclusion filters
+If you require more specificity for what branches do or do not run your pipelines,
+there is a branch filter that matches the buildkite step-level branch filtering rules.
+See [Buildkite Branch Configuration](https://buildkite.com/docs/pipelines/branch-configuration)
+
+```yaml
+monorepo:
+  expects:  blah.cfg
+  produces: output/foo.zip
+  branches: 'main'
+```
 
 ### Controlling what is included
 
@@ -160,7 +172,7 @@ _agent_ token.
 
 ### DynamoDB setup
 
-DynamoDB setup is only required if you're intending to use [pure mode](#caching-pipelines-against-matching-files-pure-mode)
+DynamoDB setup is only required if you're intending to use [pure mode](#repeatable-build-skipping-pure-flag)
 
 For starters, you'll need to run `monofo` as a user that can read and write to
 the `monofo_cache_metadata` DynamoDB table. How to do this depends on your
