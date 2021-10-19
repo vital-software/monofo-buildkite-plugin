@@ -1,0 +1,9 @@
+monorepo:
+  matches: '**'
+
+  # This includes one branch (only) explicitly
+  branches: 'one'
+
+steps:
+  - command: echo "explicit-one" > explicit-one
+    key: explicit-one

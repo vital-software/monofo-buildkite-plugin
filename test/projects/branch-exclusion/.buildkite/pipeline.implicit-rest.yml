@@ -1,0 +1,9 @@
+monorepo:
+  matches: '**'
+
+  # This excludes one branch explicitly, and includes the rest implicitly
+  branches: '!one'
+
+steps:
+  - command: echo "implicit-rest" > implicit-rest
+    key: implicit-rest

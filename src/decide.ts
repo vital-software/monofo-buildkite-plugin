@@ -1,5 +1,6 @@
 /* eslint-disable no-param-reassign */
 
+import { getBuildkiteInfo } from './buildkite/config';
 import { CacheMetadataKey, CacheMetadataRepository } from './cache-metadata';
 import Config from './config';
 import { service } from './dynamodb';
@@ -24,6 +25,19 @@ function updateDecisionsForChanges(configs: Config[]): void {
   configs.forEach((config) => {
     if (config.changes.length > 0) {
       config.decide(true, `${count(config.changes, 'matching change')}: ${prettyPrintChangeResult(config)}`);
+    }
+  });
+}
+
+/**
+ * If a config has excluded the current branch from the allowed branches (either by specifying an explicit allow list
+ * that this branch isn't in, or listing this branch in the blocked list), then it is excluded, and its excluded_steps
+ * are merge in instead
+ */
+function updateDecisionsForBranchList(configs: Config[]): void {
+  configs.forEach((config) => {
+    if (!config.includedInBranchList(getBuildkiteInfo().branch)) {
+      config.decide(false, `a branches configuration which excludes the current branch`);
     }
   });
 }
@@ -146,6 +160,7 @@ export async function updateDecisions(configs: Config[]): Promise<void> {
   updateDecisionsForChanges(configs);
   updateDecisionsForDependsOn(configs);
   await updateDecisionsForPureCache(configs);
+  updateDecisionsForBranchList(configs);
   updateDecisionsForEnvVars(configs);
   updateDecisionsFoFallback(configs);
 }
