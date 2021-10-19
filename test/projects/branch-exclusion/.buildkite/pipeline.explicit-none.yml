@@ -1,0 +1,9 @@
+monorepo:
+  matches: '**'
+
+  # This excludes all branches explicitly because wildcard
+  branches: '!*'
+
+steps:
+  - command: echo "explicit-none" > explicit-none
+    key: explicit-none

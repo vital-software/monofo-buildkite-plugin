@@ -7,6 +7,7 @@ import { load as loadYaml } from 'js-yaml';
 import _ from 'lodash';
 import minimatch from 'minimatch';
 import toposort from 'toposort';
+import { parseBranchList } from './branch-list';
 import { getBuildkiteInfo } from './buildkite/config';
 import ConfigFile, { strings } from './config-file';
 import { FileHasher } from './hash';
@@ -30,6 +31,7 @@ interface MonorepoConfig {
   excluded_steps: Record<string, unknown>[];
   excluded_env: Record<string, string>;
   pure: boolean;
+  branches: string; // "!dev main !other foo*"
 }
 
 const EMPTY_CONFIG: MonorepoConfig = {
@@ -41,6 +43,7 @@ const EMPTY_CONFIG: MonorepoConfig = {
   produces: [],
   pure: false,
   name: 'empty',
+  branches: '',
 };
 
 const KNOWN_CONFIG_PROPERTIES = Object.keys(EMPTY_CONFIG);
@@ -109,6 +112,31 @@ export default class Config {
 
   public setBuildId(buildId: string): void {
     this.buildId = buildId;
+  }
+
+  public includedInBranchList(branch: string): boolean {
+    const { allowed, blocked } = parseBranchList(this.monorepo.branches);
+
+    if (blocked.length) {
+      // If we have a filter on blocked branches, they take priority
+
+      // If our branch matches one of the blocked filters, explicitly block it
+      const matchedBlockedFilters = blocked.filter((item) => item === '!*' || !minimatch(branch, item));
+
+      if (matchedBlockedFilters.length > 0) {
+        return false;
+      }
+    }
+
+    if (!allowed.length) {
+      // If we have no filter, then allow all
+      return true;
+    }
+
+    // If our branch matches one of the allowed filters, allow it
+    const matchedFilters = allowed.filter((item) => item === '*' || minimatch(branch, item));
+
+    return matchedFilters.length > 0;
   }
 
   public async getContentHash(hasher: FileHasher): Promise<string> {
@@ -253,6 +281,7 @@ export default class Config {
         excluded_steps: monorepo.excluded_steps || [],
         excluded_env: monorepo.excluded_env || {},
         pure: monorepo.pure || false,
+        branches: monorepo.branches,
       },
       steps,
       env

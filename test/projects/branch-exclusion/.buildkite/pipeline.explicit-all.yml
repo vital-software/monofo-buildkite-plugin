@@ -1,0 +1,9 @@
+monorepo:
+  matches: '**'
+
+  # This includes all branches explicitly because wildcard
+  branches: '*'
+
+steps:
+  - command: echo "explicit-all" > explicit-all
+    key: explicit-all

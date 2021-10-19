@@ -1,0 +1,8 @@
+monorepo:
+  matches: '**'
+
+  # This includes all branches implicitly because branches not defined
+
+steps:
+  - command: echo "implicit-all" > implicit-all
+    key: implicit-all
