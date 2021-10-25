@@ -5,17 +5,7 @@ import { CacheMetadataKey, CacheMetadataRepository } from './cache-metadata';
 import Config from './config';
 import { service } from './dynamodb';
 import { FileHasher } from './hash';
-import { count } from './util';
-
-function prettyPrintChangeResult(config: Config): string {
-  if (typeof config.monorepo.matches === 'boolean') {
-    return config.monorepo.matches ? 'all files match' : 'no files match';
-  }
-
-  return config.monorepo.matches.indexOf('**') !== -1 || config.monorepo.matches.indexOf('**/*') !== -1
-    ? 'all files match'
-    : config.changes.join(', ');
-}
+import Reason, { ExcludeReasonType, IncludeReasonType } from './reason';
 
 /**
  * If a config has changes, its steps are merged into the final build. Otherwise, it is excluded, and its excluded_steps
@@ -24,7 +14,15 @@ function prettyPrintChangeResult(config: Config): string {
 function updateDecisionsForChanges(configs: Config[]): void {
   configs.forEach((config) => {
     if (config.changes.length > 0) {
-      config.decide(true, `${count(config.changes, 'matching change')}: ${prettyPrintChangeResult(config)}`);
+      let reasonType = IncludeReasonType.FILE_MATCH;
+
+      if (typeof config.monorepo.matches === 'boolean') {
+        reasonType = config.monorepo.matches ? IncludeReasonType.ALL_FILE_MATCH : IncludeReasonType.NO_FILE_MATCH;
+      } else if (config.monorepo.matches.indexOf('**') !== -1 || config.monorepo.matches.indexOf('**/*') !== -1) {
+        reasonType = IncludeReasonType.ALL_FILE_MATCH;
+      }
+
+      config.decide(true, new Reason(reasonType, config.changes));
     }
   });
 }
@@ -37,7 +35,7 @@ function updateDecisionsForChanges(configs: Config[]): void {
 function updateDecisionsForBranchList(configs: Config[]): void {
   configs.forEach((config) => {
     if (!config.includedInBranchList(getBuildkiteInfo().branch)) {
-      config.decide(false, `a branches configuration which excludes the current branch`);
+      config.decide(false, new Reason(ExcludeReasonType.BRANCH));
     }
   });
 }
@@ -53,26 +51,30 @@ function updateDecisionsForEnvVars(configs: Config[]): void {
   configs.forEach((config) => {
     if (process.env.PIPELINE_RUN_ALL) {
       if (config.monorepo.matches === false) {
-        config.decide(false, 'opted-out of PIPELINE_RUN_ALL via monorepo.matches === false');
+        config.decide(false, new Reason(ExcludeReasonType.PIPELINE_RUN_OPT_OUT));
       } else {
-        config.decide(true, 'been forced to by PIPELINE_RUN_ALL');
+        config.decide(true, new Reason(IncludeReasonType.FORCED, ['PIPELINE_RUN_ALL']));
       }
     }
 
     if (process.env?.PIPELINE_RUN_ONLY) {
-      config.decide(config.monorepo.name === process.env?.PIPELINE_RUN_ONLY, 'PIPELINE_RUN_ONLY specified');
+      const included = config.monorepo.name === process.env?.PIPELINE_RUN_ONLY;
+      config.decide(
+        included,
+        new Reason(included ? IncludeReasonType.FORCED : ExcludeReasonType.FORCED, ['PIPELINE_RUN_ONLY'])
+      );
     }
 
     const envVarName = config.envVarName();
 
     const overrideExcludeKey = `PIPELINE_NO_RUN_${envVarName}`;
     if (process.env[overrideExcludeKey]) {
-      config.decide(false, `been forced NOT to by ${overrideExcludeKey}`);
+      config.decide(false, new Reason(ExcludeReasonType.FORCED, [overrideExcludeKey]));
     }
 
     const overrideIncludeKey = `PIPELINE_RUN_${envVarName}`;
     if (process.env[overrideIncludeKey]) {
-      config.decide(true, `been forced to by ${overrideIncludeKey}`);
+      config.decide(true, new Reason(IncludeReasonType.FORCED, [overrideIncludeKey]));
     }
   });
 }
@@ -84,9 +86,9 @@ function updateDecisionsFoFallback(configs: Config[]): void {
   configs.forEach((config) => {
     if (!config.buildId) {
       if (config.monorepo.matches === false) {
-        config.decide(false, 'no previous successful build, task fallback to being excluded');
+        config.decide(false, new Reason(ExcludeReasonType.NO_PREVIOUS_SUCCESSFUL));
       } else {
-        config.decide(true, 'no previous successful build, fallback to being included');
+        config.decide(true, new Reason(IncludeReasonType.NO_PREVIOUS_SUCCESSFUL));
       }
     }
   });
@@ -110,7 +112,7 @@ function updateDecisionsForDependsOn(configs: Config[]): void {
 
       if (dependent.included && !dependency.included) {
         dependency.included = true;
-        dependency.reason = `been pulled in by a depends_on from ${from}`;
+        dependency.reason = new Reason(IncludeReasonType.DEPENDS_ON, [from]);
       }
     });
 }
@@ -145,14 +147,15 @@ async function updateDecisionsForPureCache(configs: Config[]): Promise<void> {
     const buildId = foundMetdataByComponent[config.getComponent()];
 
     if (!buildId) {
-      config.reason += ` (pure cache missed)`;
+      config.reason.pureCacheHit = false;
       return;
     }
 
     // Apply the cache hit: skip this build, and update the base build ID
     config.buildId = buildId;
     config.included = false;
-    config.reason = `already been built previously, in build ${buildId} (pure cache hit)`;
+    config.reason.previousBuild = buildId;
+    config.reason.pureCacheHit = true;
   });
 }
 

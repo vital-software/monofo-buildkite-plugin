@@ -11,6 +11,7 @@ import { parseBranchList } from './branch-list';
 import { getBuildkiteInfo } from './buildkite/config';
 import ConfigFile, { strings } from './config-file';
 import { FileHasher } from './hash';
+import Reason, { ExcludeReasonType } from './reason';
 import { count } from './util';
 
 const log = debug('monofo:config');
@@ -85,7 +86,7 @@ export default class Config {
    *
    * Should fit into the sentence: "Foo has been included/excluded because it has {REASON}"
    */
-  public reason = 'no matching changes';
+  public reason: Reason = new Reason(ExcludeReasonType.FILE_MATCH);
 
   /**
    * Memoized list of files that match this config
@@ -96,7 +97,7 @@ export default class Config {
     return this.monorepo.name.toLocaleUpperCase().replace(/-/g, '_');
   }
 
-  public decide(included: boolean, reason: string): void {
+  public decide(included: boolean, reason: Reason): void {
     this.included = included;
     this.reason = reason;
   }

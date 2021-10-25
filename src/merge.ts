@@ -80,7 +80,7 @@ export default async function mergePipelines(configs: Config[]): Promise<Pipelin
     log(
       `${config.included ? '✅' : '🚫'}  ${chalk.blue(config.monorepo.name.padEnd(maxLen))} will be ${
         config.included ? chalk.green('included') : chalk.red('excluded')
-      } because it has ${config.reason}`
+      } because it has ${config.reason.toString()}`
     );
   });
 
