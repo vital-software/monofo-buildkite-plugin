@@ -1,0 +1,8 @@
+monorepo:
+  matches: '**'
+
+  # This excludes all branches explicitly because wildcard
+  branches: '!*'
+
+steps:
+  - command: echo "branch-excluded" > branch-excluded
