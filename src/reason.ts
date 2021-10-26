@@ -1,7 +1,7 @@
 // Reason types should fit into the sentence: "Foo has been included/excluded because it has {REASON}"
 export enum IncludeReasonType {
   ALL_FILE_MATCH = 'matching change(s): all files match',
-  DEPENDS_ON = 'been pulled in by a depends_on:',
+  DEPENDS_ON = 'been pulled in by a depends_on from',
   FILE_MATCH = 'matching change(s):',
   FORCED = 'been forced to by',
   NO_FILE_MATCH = 'no files match',
