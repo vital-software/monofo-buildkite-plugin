@@ -1,8 +1,11 @@
 import path from 'path';
+import { createTables, startDb, stopDb } from 'jest-dynalite';
+import { CacheMetadataRepository } from '../src/cache-metadata';
 import Config from '../src/config';
 import { updateDecisions } from '../src/decide';
 import { matchConfigs } from '../src/diff';
-import { fakeProcess } from './fixtures';
+import { service } from '../src/dynamodb';
+import { BUILD_ID_2, BUILD_ID_3, fakeProcess } from './fixtures';
 
 async function getInclusionReasons(
   changedFiles: string[] = [],
@@ -22,10 +25,6 @@ async function getInclusionReasons(
 }
 
 describe('config.reason', () => {
-  beforeAll(() => {
-    process.env = fakeProcess();
-  });
-
   const changedFiles = ['foo/abc.js', 'foo/README.md', 'bar/abc.ts', 'baz/abc.ts'];
 
   it('matches expected reasons', async () => {
@@ -106,7 +105,7 @@ describe('config.reason', () => {
     ]);
   });
 
-  it("doesn't match a previous build", async () => {
+  it("matches expected reasons when there isn't a previous build", async () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, './projects/kitchen-sink'));
     const configs = await Config.getAll(process.cwd());
@@ -139,5 +138,49 @@ describe('config.reason', () => {
       { name: 'some-long-name', included: true, reason: 'no previous successful build, fallback to being included' },
       { name: 'unreferenced', included: true, reason: 'no previous successful build, fallback to being included' },
     ]);
+  });
+
+  it('matches expected reasons when cache hits/misses', async () => {
+    await startDb();
+    await createTables();
+
+    process.env = fakeProcess({ BUILDKITE_PIPELINE_SLUG: 'pure-hit' });
+    process.chdir(path.resolve(__dirname, './projects/pure'));
+
+    const repo = new CacheMetadataRepository(service);
+
+    await Promise.all([
+      repo.put({
+        buildId: BUILD_ID_2,
+        component: `pure-hit/foo`,
+        contentHash: '0ffe034c45380e93a2f65d67d8c286a237b00285233c91b778ba70f860c7b54a',
+      }),
+      repo.put({
+        buildId: BUILD_ID_3,
+        component: `pure-hit/baz`,
+        contentHash: 'non-matching-content-hash',
+      }),
+    ]);
+
+    const configs = await Config.getAll(process.cwd());
+    matchConfigs('foo', configs, changedFiles);
+    await updateDecisions(configs);
+
+    const reasons = configs.map((c) => ({
+      name: c.monorepo.name,
+      included: c.included,
+      reason: c.reason.toString(),
+    }));
+
+    expect(reasons).toStrictEqual([
+      {
+        name: 'foo',
+        included: false,
+        reason: 'already been built previously, in build beefbeef-beef-beef-beef-beefbeefbeef (pure cache hit)',
+      },
+      { name: 'baz', included: true, reason: '1 matching change: baz/abc.ts (pure cache missed)' },
+    ]);
+
+    await stopDb();
   });
 });
