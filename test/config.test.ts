@@ -14,8 +14,9 @@ describe('getConfig()', () => {
     const configNames = (await Config.getAll(path.resolve(__dirname, 'projects/kitchen-sink'))).map(
       (c) => c.monorepo.name
     );
-    expect(configNames).toHaveLength(14);
+    expect(configNames).toHaveLength(15);
     expect(configNames).toStrictEqual([
+      'branch-excluded',
       'changed',
       'dependedon',
       'excluded',
