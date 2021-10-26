@@ -1,6 +1,7 @@
 import chalk from 'chalk';
 import debug from 'debug';
 import _ from 'lodash';
+import sendBuildkiteAnnotation from './annotate';
 import Config from './config';
 import { updateDecisions } from './decide';
 import { ARTIFACT_INJECTION_STEP_KEY, artifactInjectionSteps } from './steps/artifact-injection';
@@ -83,6 +84,8 @@ export default async function mergePipelines(configs: Config[]): Promise<Pipelin
       } because it has ${config.reason.toString()}`
     );
   });
+
+  await sendBuildkiteAnnotation(configs);
 
   const artifactSteps = artifactInjectionSteps(configs);
 
