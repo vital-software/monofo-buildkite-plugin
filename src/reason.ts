@@ -1,20 +1,20 @@
 // Reason types should fit into the sentence: "Foo has been included/excluded because it has {REASON}"
 export enum IncludeReasonType {
   ALL_FILE_MATCH = 'matching change(s): all files match',
-  NO_FILE_MATCH = 'no files match',
+  DEPENDS_ON = 'been pulled in by a depends_on:',
   FILE_MATCH = 'matching change(s):',
   FORCED = 'been forced to by',
+  NO_FILE_MATCH = 'no files match',
   NO_PREVIOUS_SUCCESSFUL = 'no previous successful build, fallback to being included',
-  DEPENDS_ON = 'been pulled in by a depends_on:',
 }
 
 export enum ExcludeReasonType {
-  FILE_MATCH = 'no matching changes',
   BRANCH = 'a branches configuration which excludes the current branch',
-  PIPELINE_RUN_OPT_OUT = 'been opted-out of PIPELINE_RUN_ALL via monorepo.matches === false',
+  BUILT_PREVIOUSLY = 'Built previously in',
+  FILE_MATCH = 'no matching changes',
   FORCED = 'been forced NOT to by',
   NO_PREVIOUS_SUCCESSFUL = 'no previous successful build, fallback to being excluded',
-  BUILT_PREVIOUSLY = 'Built previously in',
+  PIPELINE_RUN_OPT_OUT = 'been opted-out of PIPELINE_RUN_ALL via monorepo.matches === false',
 }
 
 export default class Reason {
