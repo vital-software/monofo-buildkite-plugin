@@ -25,6 +25,10 @@ async function getInclusionReasons(
 }
 
 describe('config.reason', () => {
+  beforeAll(startDb);
+  beforeAll(createTables);
+  afterAll(stopDb);
+
   const changedFiles = ['foo/abc.js', 'foo/README.md', 'bar/abc.ts', 'baz/abc.ts'];
 
   it('matches expected reasons', async () => {
@@ -141,9 +145,6 @@ describe('config.reason', () => {
   });
 
   it('matches expected reasons when cache hits/misses', async () => {
-    await startDb();
-    await createTables();
-
     process.env = fakeProcess({ BUILDKITE_PIPELINE_SLUG: 'pure-hit' });
     process.chdir(path.resolve(__dirname, './projects/pure'));
 
@@ -180,7 +181,5 @@ describe('config.reason', () => {
       },
       { name: 'baz', included: true, reason: '1 matching change: baz/abc.ts (pure cache missed)' },
     ]);
-
-    await stopDb();
   });
 });
