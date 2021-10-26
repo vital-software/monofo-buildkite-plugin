@@ -189,7 +189,7 @@ describe('config.reason', () => {
       {
         name: 'foo',
         included: false,
-        reason: 'Built previously in beefbeef-beef-beef-beef-beefbeefbeef (Pure cache hit)',
+        reason: 'been built previously in beefbeef-beef-beef-beef-beefbeefbeef (Pure cache hit)',
       },
       { name: 'baz', included: true, reason: '1 matching change(s): baz/abc.ts (Pure cache missed)' },
     ]);

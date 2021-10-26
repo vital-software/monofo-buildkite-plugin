@@ -10,7 +10,7 @@ export enum IncludeReasonType {
 
 export enum ExcludeReasonType {
   BRANCH = 'a branches configuration which excludes the current branch',
-  BUILT_PREVIOUSLY = 'Built previously in',
+  BUILT_PREVIOUSLY = 'been built previously in',
   FILE_MATCH = 'no matching changes',
   FORCED = 'been forced NOT to by',
   NO_PREVIOUS_SUCCESSFUL = 'no previous successful build, fallback to being excluded',
