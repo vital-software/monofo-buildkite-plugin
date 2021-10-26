@@ -154,7 +154,8 @@ async function updateDecisionsForPureCache(configs: Config[]): Promise<void> {
     // Apply the cache hit: skip this build, and update the base build ID
     config.buildId = buildId;
     config.included = false;
-    config.reason.previousBuild = buildId;
+
+    config.reason = new Reason(ExcludeReasonType.BUILT_PREVIOUSLY, [buildId]);
     config.reason.pureCacheHit = true;
   });
 }

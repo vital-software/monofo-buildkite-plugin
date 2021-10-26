@@ -41,19 +41,19 @@ describe('config.reason', () => {
         reason: 'a branches configuration which excludes the current branch',
       },
       { name: 'changed', included: false, reason: 'no matching changes' },
-      { name: 'dependedon', included: true, reason: 'been pulled in by a depends_on from foo' },
+      { name: 'dependedon', included: true, reason: 'been pulled in by a depends_on: foo' },
       { name: 'excluded', included: false, reason: 'been forced NOT to by PIPELINE_NO_RUN_EXCLUDED' },
-      { name: 'foo', included: true, reason: '1 matching change: foo/README.md' },
+      { name: 'foo', included: true, reason: '1 matching change(s): foo/README.md' },
       { name: 'bar', included: false, reason: 'no matching changes' },
       { name: 'included', included: true, reason: 'been forced to by PIPELINE_RUN_INCLUDED' },
-      { name: 'match-all', included: true, reason: '4 matching changes: all files match' },
+      { name: 'match-all', included: true, reason: '4 matching change(s): all files match' },
       { name: 'match-all-false', included: false, reason: 'no matching changes' },
-      { name: 'match-all-mixed', included: true, reason: '4 matching changes: all files match' },
-      { name: 'match-all-true', included: true, reason: '4 matching changes: all files match' },
+      { name: 'match-all-mixed', included: true, reason: '4 matching change(s): all files match' },
+      { name: 'match-all-true', included: true, reason: '4 matching change(s): all files match' },
       { name: 'qux', included: false, reason: 'no matching changes' },
-      { name: 'baz', included: true, reason: '1 matching change: baz/abc.ts' },
+      { name: 'baz', included: true, reason: '1 matching change(s): baz/abc.ts' },
       { name: 'some-long-name', included: false, reason: 'no matching changes' },
-      { name: 'unreferenced', included: true, reason: '4 matching changes: all files match' },
+      { name: 'unreferenced', included: true, reason: '4 matching change(s): all files match' },
     ]);
   });
 
@@ -74,7 +74,7 @@ describe('config.reason', () => {
       {
         name: 'match-all-false',
         included: false,
-        reason: 'opted-out of PIPELINE_RUN_ALL via monorepo.matches === false',
+        reason: 'been opted-out of PIPELINE_RUN_ALL via monorepo.matches === false',
       },
       { name: 'match-all-mixed', included: true, reason: 'been forced to by PIPELINE_RUN_ALL' },
       { name: 'match-all-true', included: true, reason: 'been forced to by PIPELINE_RUN_ALL' },
@@ -91,21 +91,21 @@ describe('config.reason', () => {
     });
 
     expect(reasons).toStrictEqual([
-      { name: 'branch-excluded', included: false, reason: 'PIPELINE_RUN_ONLY specified' },
-      { name: 'changed', included: false, reason: 'PIPELINE_RUN_ONLY specified' },
-      { name: 'dependedon', included: false, reason: 'PIPELINE_RUN_ONLY specified' },
+      { name: 'branch-excluded', included: false, reason: 'been forced NOT to by PIPELINE_RUN_ONLY' },
+      { name: 'changed', included: false, reason: 'been forced NOT to by PIPELINE_RUN_ONLY' },
+      { name: 'dependedon', included: false, reason: 'been forced NOT to by PIPELINE_RUN_ONLY' },
       { name: 'excluded', included: false, reason: 'been forced NOT to by PIPELINE_NO_RUN_EXCLUDED' },
-      { name: 'foo', included: true, reason: 'PIPELINE_RUN_ONLY specified' },
-      { name: 'bar', included: false, reason: 'PIPELINE_RUN_ONLY specified' },
+      { name: 'foo', included: true, reason: 'been forced to by PIPELINE_RUN_ONLY' },
+      { name: 'bar', included: false, reason: 'been forced NOT to by PIPELINE_RUN_ONLY' },
       { name: 'included', included: true, reason: 'been forced to by PIPELINE_RUN_INCLUDED' },
-      { name: 'match-all', included: false, reason: 'PIPELINE_RUN_ONLY specified' },
-      { name: 'match-all-false', included: false, reason: 'PIPELINE_RUN_ONLY specified' },
-      { name: 'match-all-mixed', included: false, reason: 'PIPELINE_RUN_ONLY specified' },
-      { name: 'match-all-true', included: false, reason: 'PIPELINE_RUN_ONLY specified' },
-      { name: 'qux', included: false, reason: 'PIPELINE_RUN_ONLY specified' },
-      { name: 'baz', included: false, reason: 'PIPELINE_RUN_ONLY specified' },
-      { name: 'some-long-name', included: false, reason: 'PIPELINE_RUN_ONLY specified' },
-      { name: 'unreferenced', included: false, reason: 'PIPELINE_RUN_ONLY specified' },
+      { name: 'match-all', included: false, reason: 'been forced NOT to by PIPELINE_RUN_ONLY' },
+      { name: 'match-all-false', included: false, reason: 'been forced NOT to by PIPELINE_RUN_ONLY' },
+      { name: 'match-all-mixed', included: false, reason: 'been forced NOT to by PIPELINE_RUN_ONLY' },
+      { name: 'match-all-true', included: false, reason: 'been forced NOT to by PIPELINE_RUN_ONLY' },
+      { name: 'qux', included: false, reason: 'been forced NOT to by PIPELINE_RUN_ONLY' },
+      { name: 'baz', included: false, reason: 'been forced NOT to by PIPELINE_RUN_ONLY' },
+      { name: 'some-long-name', included: false, reason: 'been forced NOT to by PIPELINE_RUN_ONLY' },
+      { name: 'unreferenced', included: false, reason: 'been forced NOT to by PIPELINE_RUN_ONLY' },
     ]);
   });
 
@@ -133,7 +133,7 @@ describe('config.reason', () => {
       {
         name: 'match-all-false',
         included: false,
-        reason: 'no previous successful build, task fallback to being excluded',
+        reason: 'no previous successful build, fallback to being excluded',
       },
       { name: 'match-all-mixed', included: true, reason: 'no previous successful build, fallback to being included' },
       { name: 'match-all-true', included: true, reason: 'no previous successful build, fallback to being included' },
@@ -189,9 +189,9 @@ describe('config.reason', () => {
       {
         name: 'foo',
         included: false,
-        reason: 'already been built previously, in build beefbeef-beef-beef-beef-beefbeefbeef (pure cache hit)',
+        reason: 'Built previously in beefbeef-beef-beef-beef-beefbeefbeef (Pure cache hit)',
       },
-      { name: 'baz', included: true, reason: '1 matching change: baz/abc.ts (pure cache missed)' },
+      { name: 'baz', included: true, reason: '1 matching change(s): baz/abc.ts (Pure cache missed)' },
     ]);
   });
 });
