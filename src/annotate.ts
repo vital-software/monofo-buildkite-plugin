@@ -2,6 +2,7 @@ import debug from 'debug';
 import execa from 'execa';
 import _ from 'lodash';
 import Config from './config';
+import { plurals } from './util';
 
 const log = debug('monofo:annotate');
 
@@ -21,20 +22,21 @@ function generateDetails(configs: Config[]): string {
 
   const includedString = sortedConfigs[0].included ? 'included' : 'excluded';
 
-  return `
-<details><summary>${configs.length} pipelines ${includedString}</summary>
+  return `<h5>${configs.length} pipelines ${includedString}</h5>
 <table><thead><tr><th>Pipeline</th><th>File</th><th>Because it has&hellip;</th></tr></thead>
-<tbody>${details}</tbody></table></details>`;
+<tbody>${details}</tbody></table>`;
 }
 
 function generateAnnotationContent(configs: Config[]): string {
   const [includedConfigs, excludedConfigs] = _.partition(configs, (item) => item.included);
 
-  const title = `<h4>Monofo pipeline inclusions (${includedConfigs.length} incl/${configs.length} total)</h4>`;
   const includedDetails = generateDetails(includedConfigs);
   const excludedDetails = generateDetails(excludedConfigs);
 
-  return `${title}${includedDetails}${excludedDetails}`;
+  return `<details>
+<summary>Build includes ${includedConfigs.length} matched pipeline${plurals(includedConfigs.length)}</summary>
+${includedDetails}${excludedDetails}
+</details>`;
 }
 
 async function sendAnnotation(body: string) {
