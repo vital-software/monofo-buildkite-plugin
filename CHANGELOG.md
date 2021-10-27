@@ -1,3 +1,10 @@
+## [1.19.1](https://github.com/vital-software/monofo/compare/v1.19.0...v1.19.1) (2021-10-27)
+
+
+### Bug Fixes
+
+* **core:** fix annotation sort by name ([300a264](https://github.com/vital-software/monofo/commit/300a264204d2edd6a0641b09a5b5d2ba1548c721))
+
 # [1.19.0](https://github.com/vital-software/monofo/compare/v1.18.0...v1.19.0) (2021-10-27)
 
 
