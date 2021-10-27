@@ -22,7 +22,7 @@ function generateDetails(configs: Config[]): string {
 
   return `
 <details><summary>${configs.length} pipelines ${includedString}</summary>
-<table><thead><tr><th>Pipeline</th><th>File</th><th>Reason</th></tr></thead>
+<table><thead><tr><th>Pipeline</th><th>File</th><th>Because it has&hellip;</th></tr></thead>
 <tbody>${details}</tbody></table></details>`;
 }
 
