@@ -11,7 +11,7 @@ function generateDetails(configs: Config[]): string {
     return '';
   }
 
-  const sortedConfigs = _.sortBy(configs, ['name', 'reason.reason']);
+  const sortedConfigs = _.sortBy(configs, ['name']);
 
   const details = sortedConfigs
     .map((config) => {
