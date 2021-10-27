@@ -38,7 +38,7 @@ function generateAnnotationContent(configs: Config[]): string {
 
 async function sendAnnotation(body: string) {
   try {
-    const response = await execa.command('buildkite-agent annotate --context=monofo --style=info', {
+    const response = await execa.command('buildkite-agent annotate --context=monofo', {
       input: body,
     });
 
