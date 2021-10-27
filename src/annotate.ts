@@ -11,7 +11,7 @@ function generateDetails(configs: Config[]): string {
     return '';
   }
 
-  const sortedConfigs = _.sortBy(configs, ['name']);
+  const sortedConfigs = _.sortBy(configs, ['monorepo.name']);
 
   const details = sortedConfigs
     .map((config) => {
