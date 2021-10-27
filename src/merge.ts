@@ -50,7 +50,10 @@ function replaceExcludedKeys(configs: Config[], hasArtifactStep: boolean): Confi
  * we get fancier, we should emit one for each component. `MONOFO_${config.envVarName()}_BASE_BUILD_ID`
  */
 function baseBuildEnvVars(config: Config): Record<string, string | undefined> {
-  return { MONOFO_BASE_BUILD_ID: config.buildId || 'unknown' };
+  return {
+    MONOFO_BASE_BUILD_ID: config.baseBuild?.id || 'unknown',
+    MONOFO_BASE_BUILD_COMMIT: config.baseBuild?.commit || 'unknown',
+  };
 }
 
 function toMerge(config: Config): Pipeline {

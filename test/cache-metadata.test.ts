@@ -1,7 +1,7 @@
 import { startDb, stopDb, createTables } from 'jest-dynalite';
 import { CacheMetadataRepository } from '../src/cache-metadata';
 import { service } from '../src/dynamodb';
-import { BUILD_ID, fakeProcess, PIPELINE } from './fixtures';
+import { BUILD_ID, COMMIT, fakeProcess, PIPELINE } from './fixtures';
 
 describe('CacheMetadataRepository', () => {
   beforeAll(startDb);
@@ -17,6 +17,7 @@ describe('CacheMetadataRepository', () => {
 
     await repository.put({
       buildId: BUILD_ID,
+      commit: COMMIT,
       contentHash,
       component,
     });

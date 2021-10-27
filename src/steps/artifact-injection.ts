@@ -35,12 +35,12 @@ export function artifactInjectionSteps(configs: Config[]): Step[] {
 
   command = command.concat(
     skipped
-      .groupBy((c) => c.buildId)
+      .groupBy((c) => c.baseBuild?.id)
       .flatMap((configsForBuild) => {
-        const { buildId } = configsForBuild[0];
+        const { baseBuild } = configsForBuild[0];
 
-        if (!buildId) {
-          log('Not adding inject artifacts step: no build ID found');
+        if (!baseBuild) {
+          log('Not adding inject artifacts step: no base build found');
           return [];
         }
 
@@ -48,7 +48,7 @@ export function artifactInjectionSteps(configs: Config[]): Step[] {
           .flatMap((e) => e.monorepo.produces)
           .filter((artifact) => !artifact.startsWith('.phony/'));
 
-        return produces.map((artifact) => copyArtifactCommand(artifact, buildId));
+        return produces.map((artifact) => copyArtifactCommand(artifact, baseBuild.id));
       })
       .value()
   );

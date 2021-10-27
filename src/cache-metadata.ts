@@ -13,6 +13,7 @@ export interface CacheMetadataKey {
 
 export interface CacheMetadata extends CacheMetadataKey {
   buildId: string;
+  commit: string;
 }
 
 export const CACHE_METADATA_TABLE_NAME = 'monofo_cache_metadata';

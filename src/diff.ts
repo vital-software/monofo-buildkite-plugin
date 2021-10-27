@@ -159,11 +159,11 @@ export async function getBaseBuild(info: BuildkiteEnvironment): Promise<Buildkit
   return getBaseBuildForFeatureBranch(info);
 }
 
-export function matchConfigs(buildId: string, configs: Config[], changedFiles: string[]): void {
+export function matchConfigs(build: BuildkiteBuild, configs: Config[], changedFiles: string[]): void {
   log(`Found ${count(changedFiles, 'changed file')}: ${changedFiles.join(', ')}`);
 
   configs.forEach((config) => {
-    config.setBuildId(buildId);
+    config.setBaseBuild(build);
     config.updateMatchingChanges(changedFiles);
 
     if (config.changes.length > 1) {

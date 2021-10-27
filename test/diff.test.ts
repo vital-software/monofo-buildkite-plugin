@@ -4,7 +4,7 @@ import { getBuildkiteInfo } from '../src/buildkite/config';
 import Config from '../src/config';
 import { getBaseBuild, matchConfigs } from '../src/diff';
 import { mergeBase, revList, revParse } from '../src/git';
-import { COMMIT, fakeProcess } from './fixtures';
+import { BASE_BUILD, COMMIT, fakeProcess } from './fixtures';
 
 jest.mock('../src/git');
 jest.mock('../src/buildkite/client');
@@ -79,7 +79,7 @@ describe('matchConfigs', () => {
       process.env = fakeProcess();
       process.chdir(path.resolve(__dirname, './projects/kitchen-sink'));
       const configs = await Config.getAll(process.cwd());
-      matchConfigs('foo', configs, changedFiles);
+      matchConfigs(BASE_BUILD, configs, changedFiles);
       const changes = configs.map((r) => r.changes);
 
       expect(changes).toHaveLength(15);
@@ -110,7 +110,7 @@ describe('matchConfigs', () => {
       process.env = fakeProcess();
       process.chdir(path.resolve(__dirname, './projects/kitchen-sink'));
       const configs = await Config.getAll(process.cwd());
-      matchConfigs('foo', configs, changedFiles);
+      matchConfigs(BASE_BUILD, configs, changedFiles);
       const changes = configs.map((r) => r.changes);
 
       expect(changes).toHaveLength(15);

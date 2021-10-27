@@ -81,8 +81,9 @@ describe('monofo pipeline', () => {
           'echo "baz1"',
           'echo "unreferenced" > unref',
         ]);
-        expect(Object.entries(p.env)).toHaveLength(5);
+        expect(Object.entries(p.env)).toHaveLength(6);
         expect(p.env.MONOFO_BASE_BUILD_ID).toBe(BUILD_ID);
+        expect(p.env.MONOFO_BASE_BUILD_COMMIT).toBe(COMMIT);
         expect(p.env.BAR_WAS_EXCLUDED).toBe('true');
       });
   });
@@ -230,11 +231,13 @@ describe('monofo pipeline', () => {
     await Promise.all([
       repo.put({
         buildId: BUILD_ID_2,
+        commit: COMMIT,
         component: `pure-hit/foo`,
         contentHash: '0ffe034c45380e93a2f65d67d8c286a237b00285233c91b778ba70f860c7b54a',
       }),
       repo.put({
         buildId: BUILD_ID_3,
+        commit: COMMIT,
         component: `pure-hit/baz`,
         contentHash: '766bad0b5b5b268746b73b23fb208c0aab1942f03ee55799e02f781af511010f',
       }),
@@ -277,11 +280,13 @@ describe('monofo pipeline', () => {
     await Promise.all([
       repo.put({
         buildId: BUILD_ID_2,
+        commit: COMMIT,
         component: `pure-hit/foo`,
         contentHash: '0ffe034c45380e93a2f65d67d8c286a237b00285233c91b778ba70f860c7b54a',
       }),
       repo.put({
         buildId: BUILD_ID_3,
+        commit: COMMIT,
         component: `pure-hit/baz`,
         contentHash: '766bad0b5b5b268746b73b23fb208c0aab1942f03ee55799e02f781af511010f',
       }),

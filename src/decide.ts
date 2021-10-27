@@ -84,7 +84,7 @@ function updateDecisionsForEnvVars(configs: Config[]): void {
  */
 function updateDecisionsFoFallback(configs: Config[]): void {
   configs.forEach((config) => {
-    if (!config.buildId) {
+    if (!config.baseBuild) {
       if (config.monorepo.matches === false) {
         config.decide(false, new Reason(ExcludeReasonType.NO_PREVIOUS_SUCCESSFUL));
       } else {
@@ -140,22 +140,25 @@ async function updateDecisionsForPureCache(configs: Config[]): Promise<void> {
   );
 
   const foundMetdataByComponent = Object.fromEntries(
-    (await repository.getAll(keys)).map((metadata) => [metadata.component, metadata.buildId])
+    (await repository.getAll(keys)).map((metadata) => [
+      metadata.component,
+      { buildId: metadata.buildId, commit: metadata.commit },
+    ])
   );
 
   cacheConfigs.forEach((config) => {
-    const buildId = foundMetdataByComponent[config.getComponent()];
+    const metadata = foundMetdataByComponent[config.getComponent()];
 
-    if (!buildId) {
+    if (!metadata?.buildId) {
       config.reason.pureCacheHit = false;
       return;
     }
 
     // Apply the cache hit: skip this build, and update the base build ID
-    config.buildId = buildId;
+    config.baseBuild = { id: metadata.buildId, commit: metadata.commit };
     config.included = false;
 
-    config.reason = new Reason(ExcludeReasonType.BUILT_PREVIOUSLY, [buildId]);
+    config.reason = new Reason(ExcludeReasonType.BUILT_PREVIOUSLY, [metadata.buildId]);
     config.reason.pureCacheHit = true;
   });
 }

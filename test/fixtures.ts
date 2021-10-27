@@ -8,6 +8,13 @@ export const BUILD_ID = 'f62a1b4d-10f9-4790-bc1c-e2c3a0c80983';
 export const BUILD_ID_2 = 'beefbeef-beef-beef-beef-beefbeefbeef';
 export const BUILD_ID_3 = 'cafecafe-cafe-cafe-cafe-cafecafecafe';
 
+export const BASE_BUILD: BuildkiteBuild = {
+  blocked: false,
+  commit: COMMIT,
+  id: BUILD_ID,
+  web_url: 'https://example.com',
+};
+
 export function fakeProcess(merge: Record<string, string> = {}): NodeJS.ProcessEnv {
   return {
     MOCK_DYNAMODB_ENDPOINT: process.env?.MOCK_DYNAMODB_ENDPOINT,

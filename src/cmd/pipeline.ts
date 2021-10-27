@@ -26,7 +26,7 @@ const cmd: Command = {
       .then((configs) => {
         return getBaseBuild(getBuildkiteInfo(process.env))
           .then((baseBuild) =>
-            diff(baseBuild.commit).then((changedFiles) => matchConfigs(baseBuild.id, configs, changedFiles))
+            diff(baseBuild.commit).then((changedFiles) => matchConfigs(baseBuild, configs, changedFiles))
           )
           .catch((e) => {
             log('Failed to find base commit or diff changes, falling back to do a full build');
