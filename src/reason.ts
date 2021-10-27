@@ -29,7 +29,7 @@ export default class Reason {
 
     // Pluralizing output
     if (reasonString.match(/\(s\)/)) {
-      reasonString.replace(/\(s\)/, this.items.length > 1 ? 's' : '');
+      reasonString = reasonString.replace(/\(s\)/, this.items.length > 1 ? 's' : '');
     }
 
     let itemPart = '';

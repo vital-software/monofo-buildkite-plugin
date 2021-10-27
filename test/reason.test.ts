@@ -43,17 +43,17 @@ describe('config.reason', () => {
       { name: 'changed', included: false, reason: 'no matching changes' },
       { name: 'dependedon', included: true, reason: 'been pulled in by a depends_on from foo' },
       { name: 'excluded', included: false, reason: 'been forced NOT to by PIPELINE_NO_RUN_EXCLUDED' },
-      { name: 'foo', included: true, reason: '1 matching change(s): foo/README.md' },
+      { name: 'foo', included: true, reason: '1 matching change: foo/README.md' },
       { name: 'bar', included: false, reason: 'no matching changes' },
       { name: 'included', included: true, reason: 'been forced to by PIPELINE_RUN_INCLUDED' },
-      { name: 'match-all', included: true, reason: '4 matching change(s): all files match' },
+      { name: 'match-all', included: true, reason: '4 matching changes: all files match' },
       { name: 'match-all-false', included: false, reason: 'no matching changes' },
-      { name: 'match-all-mixed', included: true, reason: '4 matching change(s): all files match' },
-      { name: 'match-all-true', included: true, reason: '4 matching change(s): all files match' },
+      { name: 'match-all-mixed', included: true, reason: '4 matching changes: all files match' },
+      { name: 'match-all-true', included: true, reason: '4 matching changes: all files match' },
       { name: 'qux', included: false, reason: 'no matching changes' },
-      { name: 'baz', included: true, reason: '1 matching change(s): baz/abc.ts' },
+      { name: 'baz', included: true, reason: '1 matching change: baz/abc.ts' },
       { name: 'some-long-name', included: false, reason: 'no matching changes' },
-      { name: 'unreferenced', included: true, reason: '4 matching change(s): all files match' },
+      { name: 'unreferenced', included: true, reason: '4 matching changes: all files match' },
     ]);
   });
 
@@ -191,7 +191,7 @@ describe('config.reason', () => {
         included: false,
         reason: 'been built previously in beefbeef-beef-beef-beef-beefbeefbeef (Pure cache hit)',
       },
-      { name: 'baz', included: true, reason: '1 matching change(s): baz/abc.ts (Pure cache missed)' },
+      { name: 'baz', included: true, reason: '1 matching change: baz/abc.ts (Pure cache missed)' },
     ]);
   });
 });
