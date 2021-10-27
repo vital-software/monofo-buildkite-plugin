@@ -6,6 +6,10 @@ import Config from './config';
 const log = debug('monofo:annotate');
 
 function generateDetails(configs: Config[]): string {
+  if (!configs.length) {
+    return '';
+  }
+
   const sortedConfigs = _.sortBy(configs, ['name', 'reason.reason']);
 
   const details = sortedConfigs
@@ -45,6 +49,10 @@ async function sendAnnotation(body: string) {
 }
 
 export default async function sendBuildkiteAnnotation(configs: Config[]) {
+  if (!configs.length) {
+    return;
+  }
+
   const content = generateAnnotationContent(configs);
 
   await sendAnnotation(content);
