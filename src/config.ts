@@ -69,7 +69,7 @@ export default class Config {
    * Base build we're comparing against, if one can be found. If one can't, we'll enter fallback mode and run
    * everything.
    */
-  public buildId?: string;
+  public baseBuild?: BuildkiteBuild;
 
   /**
    * Set of files, with changes that match the configuration
@@ -108,11 +108,11 @@ export default class Config {
 
   public useFallback(): void {
     this.changes = FALLBACK_CHANGES;
-    this.buildId = undefined;
+    this.baseBuild = undefined;
   }
 
-  public setBuildId(buildId: string): void {
-    this.buildId = buildId;
+  public setBaseBuild(build: BuildkiteBuild): void {
+    this.baseBuild = build;
   }
 
   public includedInBranchList(branch: string): boolean {

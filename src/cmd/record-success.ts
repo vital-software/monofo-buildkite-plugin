@@ -30,7 +30,7 @@ const cmd: Command<RecordSuccessArgs> = {
 
     // Required<T>, because .positional() enforces for us (not reflected in type)
     const { componentName, contentHash } = args as Required<RecordSuccessArgs>;
-    const { buildId, pipeline } = getBuildkiteInfo();
+    const { buildId, pipeline, commit } = getBuildkiteInfo();
 
     const ddb = new AWS.DynamoDB();
     const metadata = new CacheMetadataRepository(ddb);
@@ -39,6 +39,7 @@ const cmd: Command<RecordSuccessArgs> = {
     await metadata.put({
       contentHash,
       buildId,
+      commit,
       component: `${pipeline}/${componentName}`, // See also Config.getComponent()
     });
     process.stdout.write(`Done!\n`);

@@ -5,7 +5,7 @@ import Config from '../src/config';
 import { updateDecisions } from '../src/decide';
 import { matchConfigs } from '../src/diff';
 import { service } from '../src/dynamodb';
-import { BUILD_ID_2, BUILD_ID_3, fakeProcess } from './fixtures';
+import { BASE_BUILD, BUILD_ID_2, BUILD_ID_3, COMMIT, fakeProcess } from './fixtures';
 
 async function getInclusionReasons(
   changedFiles: string[] = [],
@@ -14,7 +14,7 @@ async function getInclusionReasons(
   process.env = fakeProcess(env);
   process.chdir(path.resolve(__dirname, './projects/kitchen-sink'));
   const configs = await Config.getAll(process.cwd());
-  matchConfigs('foo', configs, changedFiles);
+  matchConfigs(BASE_BUILD, configs, changedFiles);
   await updateDecisions(configs);
 
   return configs.map((c) => ({
@@ -165,18 +165,20 @@ describe('config.reason', () => {
     await Promise.all([
       repo.put({
         buildId: BUILD_ID_2,
+        commit: COMMIT,
         component: `pure-hit/foo`,
         contentHash: '0ffe034c45380e93a2f65d67d8c286a237b00285233c91b778ba70f860c7b54a',
       }),
       repo.put({
         buildId: BUILD_ID_3,
+        commit: COMMIT,
         component: `pure-hit/baz`,
         contentHash: 'non-matching-content-hash',
       }),
     ]);
 
     const configs = await Config.getAll(process.cwd());
-    matchConfigs('foo', configs, changedFiles);
+    matchConfigs(BASE_BUILD, configs, changedFiles);
     await updateDecisions(configs);
 
     const reasons = configs.map((c) => ({
