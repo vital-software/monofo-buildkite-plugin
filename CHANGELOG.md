@@ -1,3 +1,16 @@
+# [1.19.0](https://github.com/vital-software/monofo/compare/v1.18.0...v1.19.0) (2021-10-27)
+
+
+### Bug Fixes
+
+* **deps:** update dependency aws-sdk to v2.1015.0 ([142942a](https://github.com/vital-software/monofo/commit/142942a402447111440c01bccc2974bf3fb907bf))
+
+
+### Features
+
+* **core:** Add Buildkite annotation saying what is included/excluded ([c4b9b2f](https://github.com/vital-software/monofo/commit/c4b9b2f7af6b6cb9fc3b5a320e33a9caa5b28722))
+* **core:** include MONOFO_BASE_BUILD_COMMIT in merged env vars ([5661925](https://github.com/vital-software/monofo/commit/5661925be46ed95d02cacb4eae09e108361ca55d))
+
 # [1.18.0](https://github.com/vital-software/monofo/compare/v1.17.4...v1.18.0) (2021-10-19)
 
 
