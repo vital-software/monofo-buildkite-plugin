@@ -27,6 +27,11 @@ export default class Reason {
   toString(): string {
     let reasonString = `${this.reason}`;
 
+    // Pluralizing output
+    if (reasonString.match(/\(s\)/)) {
+      reasonString.replace(/\(s\)/, this.items.length > 1 ? 's' : '');
+    }
+
     let itemPart = '';
     let countPart = '';
 
