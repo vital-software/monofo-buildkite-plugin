@@ -14,7 +14,8 @@ function generateDetails(configs: Config[]): string {
 
   const details = sortedConfigs
     .map((config) => {
-      return `<tr><td>${config.monorepo.name}</td><td>${config.file.path}</td><td>${config.reason.toString()}</tr>`;
+      return `<tr><td>${config.monorepo.name}</td>
+<td>${config.file.path}</td><td>${config.reason.toString()}</td></tr>`;
     })
     .join('');
 
