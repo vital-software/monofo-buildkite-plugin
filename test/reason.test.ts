@@ -95,7 +95,11 @@ describe('config.reason', () => {
     });
 
     expect(reasons).toStrictEqual([
-      { name: 'branch-excluded', included: true, reason: 'a branches configuration which excludes the current branch' },
+      {
+        name: 'branch-excluded',
+        included: false,
+        reason: 'a branches configuration which excludes the current branch',
+      },
       { name: 'changed', included: false, reason: 'been forced NOT to by PIPELINE_RUN_ONLY' },
       { name: 'dependedon', included: false, reason: 'been forced NOT to by PIPELINE_RUN_ONLY' },
       { name: 'excluded', included: false, reason: 'been forced NOT to by PIPELINE_NO_RUN_EXCLUDED' },
