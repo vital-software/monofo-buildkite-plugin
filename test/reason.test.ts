@@ -63,7 +63,11 @@ describe('config.reason', () => {
     });
 
     expect(reasons).toStrictEqual([
-      { name: 'branch-excluded', included: true, reason: 'been forced to by PIPELINE_RUN_ALL' },
+      {
+        name: 'branch-excluded',
+        included: false,
+        reason: 'a branches configuration which excludes the current branch',
+      },
       { name: 'changed', included: true, reason: 'been forced to by PIPELINE_RUN_ALL' },
       { name: 'dependedon', included: true, reason: 'been forced to by PIPELINE_RUN_ALL' },
       { name: 'excluded', included: false, reason: 'been forced NOT to by PIPELINE_NO_RUN_EXCLUDED' },
@@ -91,7 +95,7 @@ describe('config.reason', () => {
     });
 
     expect(reasons).toStrictEqual([
-      { name: 'branch-excluded', included: false, reason: 'been forced NOT to by PIPELINE_RUN_ONLY' },
+      { name: 'branch-excluded', included: true, reason: 'a branches configuration which excludes the current branch' },
       { name: 'changed', included: false, reason: 'been forced NOT to by PIPELINE_RUN_ONLY' },
       { name: 'dependedon', included: false, reason: 'been forced NOT to by PIPELINE_RUN_ONLY' },
       { name: 'excluded', included: false, reason: 'been forced NOT to by PIPELINE_NO_RUN_EXCLUDED' },
@@ -122,7 +126,11 @@ describe('config.reason', () => {
     }));
 
     expect(reasons).toStrictEqual([
-      { name: 'branch-excluded', included: true, reason: 'no previous successful build, fallback to being included' },
+      {
+        name: 'branch-excluded',
+        included: false,
+        reason: 'a branches configuration which excludes the current branch',
+      },
       { name: 'changed', included: true, reason: 'no previous successful build, fallback to being included' },
       { name: 'dependedon', included: true, reason: 'no previous successful build, fallback to being included' },
       { name: 'excluded', included: true, reason: 'no previous successful build, fallback to being included' },
