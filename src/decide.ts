@@ -167,7 +167,7 @@ export async function updateDecisions(configs: Config[]): Promise<void> {
   updateDecisionsForChanges(configs);
   updateDecisionsForDependsOn(configs);
   await updateDecisionsForPureCache(configs);
-  updateDecisionsForBranchList(configs);
   updateDecisionsForEnvVars(configs);
   updateDecisionsFoFallback(configs);
+  updateDecisionsForBranchList(configs);
 }
