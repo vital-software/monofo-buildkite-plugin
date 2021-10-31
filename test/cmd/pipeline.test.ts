@@ -145,8 +145,7 @@ describe('monofo pipeline', () => {
       .then((p) => {
         expect(p).toBeDefined();
         expect(commandSummary(p.steps)).toStrictEqual([
-          "echo 'inject for: excluded, foo, bar, match-all-false'",
-          'echo "branch-excluded" > branch-excluded',
+          "echo 'inject for: branch-excluded, excluded, foo, bar, match-all-false'",
           'echo "changed" > changed',
           'echo "dependedon" > dependedon',
           "echo 'bar was replaced'",
