@@ -1,3 +1,15 @@
+# [2.0.0](https://github.com/vital-software/monofo/compare/v1.19.1...v2.0.0) (2021-10-31)
+
+
+### Bug Fixes
+
+* **decide:** branch list exclusion wins over fallback ([7f6baf7](https://github.com/vital-software/monofo/commit/7f6baf7d7b35a129b10ac5039b8f0cf6d58d4fa5))
+
+
+### BREAKING CHANGES
+
+* **decide:** Order of decision is changed
+
 ## [1.19.1](https://github.com/vital-software/monofo/compare/v1.19.0...v1.19.1) (2021-10-27)
 
 
