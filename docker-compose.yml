@@ -7,3 +7,9 @@ services:
         target: /monofo
         type: bind
     image: ${NODE_IMAGE_TAG:-239595706494.dkr.ecr.us-west-2.amazonaws.com/build-cache:monofo-node-main}
+
+  lint:
+    image: buildkite/plugin-linter
+    command: ['--id', 'vital-software/monofo']
+    volumes:
+      - ".:/plugin:ro"

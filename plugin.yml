@@ -1,0 +1,12 @@
+name: Monofo
+description: Dynamically generates monorepo pipelines from multiple subprojects
+author: https://github.com/vital-software
+requirements:
+  - git
+  - aws
+  - npx
+configuration:
+  properties:
+    generate:
+      type: string
+  additionalProperties: false
