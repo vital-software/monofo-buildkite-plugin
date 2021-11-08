@@ -4,7 +4,7 @@ When calculating what needs to be done in a build, Monofo first selects a "base"
 files that have changed. There are some requirements of the base build:
 
 1. There is an associated Buildkite build that is successful, fully applied, and not blocked, for the base build's commit
-2. The base build's commit is an ancestor of the commit being tested (i.e. the hase commit was at or before the currently building commit on the branch)
+2. The base build's commit is an ancestor of the commit being tested (i.e. the base commit was at or before the currently building commit on the branch)
 
 There are three different algorithms used for selecting the base build:
 
