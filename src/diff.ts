@@ -104,6 +104,7 @@ async function getMostRecentBranchBuild(
  * the default branch in git, and pick the most topologically recent.
  */
 async function getBaseBuildForDefaultBranch(info: BuildkiteEnvironment): Promise<BuildkiteBuild> {
+  log(`Getting base build for default branch`);
   return getSuitableBranchBuildAtOrBeforeCommit(info, info.commit, info.defaultBranch).catch((e) => {
     log(`Failed to find successful build for default branch (${info.branch}) via Buildkite API`, e);
     throw e;
@@ -124,6 +125,7 @@ async function getBaseBuildForIntegrationBranch(
   info: BuildkiteEnvironment,
   integrationBranch: string
 ): Promise<BuildkiteBuild> {
+  log(`Getting base build for integration branch`);
   return getMostRecentBranchBuild(info, integrationBranch)
     .then((result) => result || getBaseBuildForDefaultBranch(info))
     .catch((e) => {
@@ -139,6 +141,7 @@ async function getBaseBuildForIntegrationBranch(
  * the default branch in git, and pick the most topologically recent.
  */
 async function getBaseBuildForFeatureBranch(info: BuildkiteEnvironment): Promise<BuildkiteBuild> {
+  log(`Getting base build for feature branch`);
   return mergeBase(`origin/${info.defaultBranch}`, info.commit, info.defaultBranch).then((commit) => {
     log(`Found merge base of ${commit} for current feature branch`);
     return getSuitableBranchBuildAtOrBeforeCommit(info, commit, info.defaultBranch).catch((e) => {
