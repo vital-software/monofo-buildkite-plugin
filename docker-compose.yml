@@ -14,3 +14,9 @@ services:
       args:
         - NODE_TAG=14
     image: 239595706494.dkr.ecr.us-west-2.amazonaws.com/build-cache:monofo-node-14-latest
+
+  lint:
+    image: buildkite/plugin-linter
+    command: ['--id', 'vital-software/monofo']
+    volumes:
+      - ".:/plugin:ro"
