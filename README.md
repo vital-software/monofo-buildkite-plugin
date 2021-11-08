@@ -26,7 +26,7 @@ steps:
           env:
             BUILDKITE_API_ACCESS_TOKEN: "global/buildkite-api-access-token"
       - vital-software/monofo#v2.0.1:
-          command: generate
+          generate: pipeline
 ```
 
 Note that Monofo requires an environment variable to be configured, allowing it

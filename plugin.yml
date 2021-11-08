@@ -7,6 +7,6 @@ requirements:
   - npx
 configuration:
   properties:
-    command:
+    generate:
       type: string
   additionalProperties: false
