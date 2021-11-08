@@ -5,8 +5,11 @@ requirements:
   - git
   - aws
   - npx
+  - mktemp
 configuration:
   properties:
     generate:
       type: string
+      enum:
+        - pipeline
   additionalProperties: false

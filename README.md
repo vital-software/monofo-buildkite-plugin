@@ -21,6 +21,7 @@ an example to generate your pipeline might be:
 ```yaml
 steps:
   - name: ":pipeline: Generate pipeline"
+    command: echo "Monorepo pipeline uploaded"
     plugins:
       - seek-oss/aws-sm#v2.2.1: # for example, but your secret management might be e.g. via S3 bucket or "env" file instead
           env:
