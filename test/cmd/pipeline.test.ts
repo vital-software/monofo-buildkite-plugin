@@ -208,8 +208,8 @@ describe('monofo pipeline', () => {
         expect(p).toBeDefined();
         expect(p.steps).toHaveLength(4);
         expect(p.steps.map((s) => s.key)).toStrictEqual([
-          'anon-step-cb64da0ef06c',
-          'anon-step-bf2e8e001a41',
+          'anon-step-0f9d3e84a439', // These will change if the hashing algorithm does
+          'anon-step-6da74a8bdeec',
           'record-success-foo',
           'record-success-baz',
         ]);
@@ -305,8 +305,8 @@ describe('monofo pipeline', () => {
       .then((p) => {
         expect(p).toBeDefined();
         expect(p.steps.map((s) => s.key)).toStrictEqual([
-          'anon-step-cb64da0ef06c',
-          'anon-step-bf2e8e001a41',
+          'anon-step-0f9d3e84a439', // These will change if the hashing algorithm does
+          'anon-step-6da74a8bdeec',
           'record-success-foo',
           'record-success-baz',
         ]);

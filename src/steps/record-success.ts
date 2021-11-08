@@ -12,7 +12,7 @@ function anonymousKey(step: CommandStep | Step): string {
   hash.update(`${step.label || ''}:`);
   hash.update(JSON.stringify(step.depends_on) || ':');
   hash.update(JSON.stringify(step.plugins) || ':');
-  hash.update(`${(step as CommandStep)?.command || ''}:`);
+  hash.update(`${JSON.stringify(step?.command || step?.commands || '')}:`);
   return `anon-step-${hash.digest('hex').slice(0, 12)}`;
 }
 
