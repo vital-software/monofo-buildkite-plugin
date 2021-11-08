@@ -13,21 +13,25 @@ time by only building what you need.
 
 Instead of calling `buildkite-agent pipeline upload` in the first step of a
 pipeline, execute `monofo pipeline` which will output the dynamic pipeline on
-stdout. A good example for what to paste into the Step Editor UI in Buildkite
-might be:
+stdout: `npx monofo pipeline | buildkite-agent pipeline upload`
+
+To make this easier, Monofo supports configuration as a Buildkite plugin, so
+an example to generate your pipeline might be:
 
 ```yaml
 steps:
   - name: ":pipeline: Generate pipeline"
-    command: npx monofo pipeline | buildkite-agent pipeline upload
     plugins:
       - seek-oss/aws-sm#v2.2.1: # for example, but your secret management might be e.g. via S3 bucket or "env" file instead
           env:
             BUILDKITE_API_ACCESS_TOKEN: "global/buildkite-api-access-token"
+      - vital-software/monofo#v2.0.1
+          command: generate
 ```
 
-The only required configuration is the `BUILDKITE_API_ACCESS_TOKEN` environment
-variable. See [Configuration](#configuration) for details.
+Note that Monofo requires an environment variable to be configured, allowing it
+to access the Buildkite API. This is the `BUILDKITE_API_ACCESS_TOKEN`
+environment variable. See [Configuration](#configuration) for details.
 
 ### Splitting pipelines using multiple `pipeline.yml` files
 
