@@ -1,3 +1,11 @@
+## [2.0.2](https://github.com/vital-software/monofo/compare/v2.0.1...v2.0.2) (2021-11-10)
+
+
+### Bug Fixes
+
+* **diff:** look through more commits to find a base build, including second parents ([6b48883](https://github.com/vital-software/monofo/commit/6b488839770f451fc0ed72c70ae7d20e2719da7d))
+* **diff:** reverse order of logic to allow integration builds ([1e4ccd5](https://github.com/vital-software/monofo/commit/1e4ccd5a7155a17ff2675bd3437456b1c331ebd8)), closes [#262](https://github.com/vital-software/monofo/issues/262)
+
 ## [2.0.1](https://github.com/vital-software/monofo/compare/v2.0.0...v2.0.1) (2021-11-02)
 
 
