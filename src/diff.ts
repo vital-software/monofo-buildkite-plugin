@@ -30,29 +30,40 @@ async function getSuitableBranchBuildAtOrBeforeCommit(
     per_page: 50,
   });
 
-  const gitCommits: Promise<string[]> = revList('--first-parent', '-n', '100', commit);
+  const gitFirstParentCommits: Promise<string[]> = revList('--first-parent', '-n', '100', commit);
+  const gitAnyParentCommits: Promise<string[]> = revList('-n', `500`, commit);
   const buildkiteCommits: Promise<string[]> = builds.then((all) =>
     all.filter((build) => !build.blocked).map((build) => build.commit)
   );
 
-  return Promise.all([gitCommits, buildkiteCommits]).then((commitLists: string[][]) => {
-    const intersection = _.intersection<string>(...commitLists);
+  return Promise.all([gitFirstParentCommits, gitAnyParentCommits, buildkiteCommits]).then(
+    ([firstParentCommitList, anyParentCommitList, buildkiteCommitList]) => {
+      // Ordering really matters here:
+      //  - First all the commits in order
+      //  - Then just the first-parent ones in case that list reveals commits on the other side of a large merge
+      //  - And the union of the two is then used for ordering, not the order builds happened on Buildkite, so we're
+      //    following the git topology more closely
+      const intersection = _.intersection<string>(
+        _.union(anyParentCommitList, firstParentCommitList),
+        buildkiteCommitList
+      );
 
-    if (intersection.length < 1) {
-      throw new Error('Could not find any matching successful builds');
-    }
-
-    log(`Found ${intersection[0]} as latest successful build of default branch from ${commit} or earlier`);
-    return builds.then((b: BuildkiteBuild[]) => {
-      const build = _.find(b, (v: BuildkiteBuild) => v.commit === intersection[0]);
-
-      if (!build) {
-        return Promise.reject(new Error(`Cannot find build ${intersection[0]}`));
+      if (intersection.length < 1) {
+        throw new Error('Could not find any matching successful builds');
       }
 
-      return Promise.resolve(build);
-    });
-  });
+      log(`Found ${intersection[0]} as latest successful build of default branch from ${commit} or earlier`);
+      return builds.then((b: BuildkiteBuild[]) => {
+        const build = _.find(b, (v: BuildkiteBuild) => v.commit === intersection[0]);
+
+        if (!build) {
+          return Promise.reject(new Error(`Cannot find build ${intersection[0]}`));
+        }
+
+        return Promise.resolve(build);
+      });
+    }
+  );
 }
 
 /**
