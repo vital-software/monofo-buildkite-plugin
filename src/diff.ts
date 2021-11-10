@@ -159,12 +159,12 @@ async function getBaseBuildForFeatureBranch(info: BuildkiteEnvironment): Promise
  * can snarf artifacts)
  */
 export async function getBaseBuild(info: BuildkiteEnvironment): Promise<BuildkiteBuild> {
-  if (info.branch === info.defaultBranch) {
-    return getBaseBuildForDefaultBranch(info);
-  }
-
   if (info.branch === info.integrationBranch) {
     return getBaseBuildForIntegrationBranch(info, info.integrationBranch);
+  }
+
+  if (info.branch === info.defaultBranch) {
+    return getBaseBuildForDefaultBranch(info);
   }
 
   return getBaseBuildForFeatureBranch(info);
