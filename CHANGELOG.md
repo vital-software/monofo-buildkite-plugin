@@ -1,3 +1,11 @@
+## [2.0.3](https://github.com/vital-software/monofo/compare/v2.0.2...v2.0.3) (2021-11-23)
+
+
+### Bug Fixes
+
+* **deps:** update dependency got to v11.8.3 ([51cd1f8](https://github.com/vital-software/monofo/commit/51cd1f8aaf840d30afb1db37ecd5257af3475365))
+* **diff:** fix integration strategy to check for existing commits with cat-file ([b6b1c15](https://github.com/vital-software/monofo/commit/b6b1c151bb1dad279f4a53bbe980ddd24e096a5f))
+
 ## [2.0.2](https://github.com/vital-software/monofo/compare/v2.0.1...v2.0.2) (2021-11-10)
 
 
