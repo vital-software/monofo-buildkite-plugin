@@ -2,7 +2,7 @@ import debug from 'debug';
 import _ from 'lodash';
 import BuildkiteClient from './buildkite/client';
 import Config from './config';
-import { mergeBase, revList, revParse } from './git';
+import { commitExists, mergeBase, revList } from './git';
 import { count, filterAsync } from './util';
 
 const log = debug('monofo:diff');
@@ -72,8 +72,8 @@ async function getSuitableBranchBuildAtOrBeforeCommit(
  *   1. There is an associated Buildkite build that is successful, fully applied, and not blocked, for the base build's
  *       commit
  *
- * That's the only guarantee. The commit of that build might be quite topolgoically distant. It will exist though (we
- * check with rev-parse)
+ * That's the only guarantee. The commit of that build might be quite topologically distant. It will exist though (we
+ * check with git cat-file -e COMMIT^{commit})
  */
 async function getMostRecentBranchBuild(
   info: BuildkiteEnvironment,
@@ -84,16 +84,12 @@ async function getMostRecentBranchBuild(
   const builds: BuildkiteBuild[] = await client.getBuilds({
     'branch[]': [branch],
     state: 'passed',
-    per_page: 10,
+    per_page: 20,
   });
 
   const successful = builds.filter((build) => !build.blocked);
 
-  const withExistingCommits = await filterAsync(successful, async (build) => {
-    return revParse(build.commit)
-      .then(() => true)
-      .catch(() => false);
-  });
+  const withExistingCommits = await filterAsync(successful, async (build) => commitExists(build.commit));
 
   return withExistingCommits.pop();
 }

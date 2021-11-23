@@ -31,6 +31,8 @@ export function revList(...args: string[]): Promise<string[]> {
   return git('rev-list', ...args).then((v) => v.trim().split('\n'));
 }
 
-export function revParse(...args: string[]): Promise<string> {
-  return git('rev-parse', ...args).then((v) => v.trim());
+export function commitExists(commit: string): Promise<boolean> {
+  return git('cat-file', '-e', `${commit}^{commit}`)
+    .then(() => true)
+    .catch(() => false);
 }
