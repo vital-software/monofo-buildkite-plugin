@@ -45,8 +45,13 @@ declare global {
       BUILDKITE_PIPELINE_SLUG: string;
       BUILDKITE_SOURCE: string;
       BUILDKITE_API_ACCESS_TOKEN: string;
+
       PIPELINE_RUN_ALL?: string;
       PIPELINE_RUN_ONLY?: string;
+
+      PIPELINE_FILE_GLOB?: string;
+      PIPELINE_FILE_IGNORE_GLOB?: string;
+
       MONOFO_DEFAULT_BRANCH?: string;
       MONOFO_INTEGRATION_BRANCH?: string;
     }
