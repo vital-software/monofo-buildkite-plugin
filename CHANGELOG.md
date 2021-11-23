@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/vital-software/monofo/compare/v2.0.3...v2.1.0) (2021-11-23)
+
+
+### Features
+
+* **config-file:** Allow customizing PIPELINE_FILE_GLOB ([c095f39](https://github.com/vital-software/monofo/commit/c095f39563e3db38e8edb6b656c611f58228e9ac))
+
 ## [2.0.3](https://github.com/vital-software/monofo/compare/v2.0.2...v2.0.3) (2021-11-23)
 
 
