@@ -3,20 +3,24 @@ import debug from 'debug';
 
 const log = debug('monofo:git');
 
-function git(...args: string[]): Promise<string> {
-  const command = ['git'].concat(args).join(' ');
-
+function execWithLog({ command, logError = true }: { command: string; logError?: boolean }): Promise<string> {
   return new Promise((resolve, reject) => {
     log(`Running command: ${command}`);
     exec(command, (err, stdout, stderr) => {
       if (err) {
-        log(`Failed to execute ${command} (stderr follows):\n${stderr}`);
+        if (logError) {
+          log(`Failed to execute ${command} (stderr follows):\n${stderr}`);
+        }
         reject(err);
       } else {
         resolve(stdout);
       }
     });
   });
+}
+
+function git(...args: string[]): Promise<string> {
+  return execWithLog({ command: ['git'].concat(args).join(' ') });
 }
 
 export function mergeBase(...args: string[]): Promise<string> {
@@ -32,7 +36,7 @@ export function revList(...args: string[]): Promise<string[]> {
 }
 
 export function commitExists(commit: string): Promise<boolean> {
-  return git('cat-file', '-e', `${commit}^{commit}`)
+  return execWithLog({ command: `git cat-file -t ${commit}`, logError: false })
     .then(() => true)
     .catch(() => false);
 }

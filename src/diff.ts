@@ -79,6 +79,7 @@ async function getMostRecentBranchBuild(
   info: BuildkiteEnvironment,
   branch: string
 ): Promise<BuildkiteBuild | undefined> {
+  log(`Finding most recent build of ${branch} where the commit still exists`);
   const client = new BuildkiteClient(info);
 
   const builds: BuildkiteBuild[] = await client.getBuilds({
@@ -88,8 +89,10 @@ async function getMostRecentBranchBuild(
   });
 
   const successful = builds.filter((build) => !build.blocked);
+  log(`Found ${successful.length} successful branches`);
 
   const withExistingCommits = await filterAsync(successful, async (build) => commitExists(build.commit));
+  log(`Found ${withExistingCommits.length} branches with existing commits`);
 
   return withExistingCommits.pop();
 }
@@ -156,14 +159,20 @@ async function getBaseBuildForFeatureBranch(info: BuildkiteEnvironment): Promise
  */
 export async function getBaseBuild(info: BuildkiteEnvironment): Promise<BuildkiteBuild> {
   if (info.branch === info.integrationBranch) {
-    return getBaseBuildForIntegrationBranch(info, info.integrationBranch);
+    const build = await getBaseBuildForIntegrationBranch(info, info.integrationBranch);
+    log(`Found base build for integration branch: ${build.commit}`);
+    return build;
   }
 
   if (info.branch === info.defaultBranch) {
-    return getBaseBuildForDefaultBranch(info);
+    const build = await getBaseBuildForDefaultBranch(info);
+    log(`Found base build for default branch: ${build.commit}`);
+    return build;
   }
 
-  return getBaseBuildForFeatureBranch(info);
+  const build = await getBaseBuildForFeatureBranch(info);
+  log(`Found base build for feature branch: ${build.commit}`);
+  return build;
 }
 
 export function matchConfigs(build: BuildkiteBuild, configs: Config[], changedFiles: string[]): void {
