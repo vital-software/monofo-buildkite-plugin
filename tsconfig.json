@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "build",
+    "outDir": "dist",
     "rootDir": ".",
     "moduleResolution": "node",
     "declaration": true,
@@ -13,6 +13,6 @@
     "emitDecoratorMetadata": true,
     "resolveJsonModule": true
   },
-  "include": ["src/**/*.ts", "test/**/*.ts", "bin/*.js"],
+  "include": ["src/**/*.ts", "bin/*.js"],
   "extends": "@tsconfig/node12/tsconfig.json"
 }

@@ -1,0 +1,33 @@
+env:
+  NODE_ENV: development
+  BUILDKITE_PLUGIN_DOCKER_COMPOSE_CONFIG_0: "docker-compose.yml"
+  BUILDKITE_PLUGIN_DOCKER_COMPOSE_CONFIG_1: "docker-compose.buildkite.yml"
+
+monorepo:
+  pure: true
+  expects:
+    - node-modules.tar.lz4
+    - typescript.tar.lz4
+  matches:
+    - "**/*.ts"
+    - "test/**/*.yml"
+    - tsconfig.json
+    - package.json
+    - yarn.lock
+
+steps:
+  - label: ":jest: Test on Node LTS"
+    key: test
+    command: yarn test
+    depends_on:
+      - node-image
+      - node-modules
+      - typescript
+    plugins:
+      - improbable-eng/metahook#v0.4.1:
+          pre-command: >
+            buildkite-agent artifact download node-modules.tar.lz4 . && tar -x --use-compress-program=lz4 -f node-modules.tar.lz4 &
+            buildkite-agent artifact download typescript.tar.lz4 . && tar -x --use-compress-program=lz4 -f typescript.tar.lz4 &
+            wait
+      - docker-compose#v3.9.0:
+          run: node

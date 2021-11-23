@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-set -euo pipefail
-
-echo "Entrypoint: checking yarn install" >&2
-(yarn check --integrity && yarn check --verify-tree) || yarn install --frozen-lockfile >&2
-
-echo "Entrypoint: install complete, continuing" >&2
-exec "${@}"
