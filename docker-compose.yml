@@ -2,15 +2,8 @@ version: "2.3"
 
 services:
   node:
-    build:
-      context: .
-      args:
-        - NODE_TAG=lts
-    image: 239595706494.dkr.ecr.us-west-2.amazonaws.com/build-cache:monofo-node-latest
-
-  node-14:
-    build:
-      context: .
-      args:
-        - NODE_TAG=14
-    image: 239595706494.dkr.ecr.us-west-2.amazonaws.com/build-cache:monofo-node-14-latest
+    volumes:
+      - source: .
+        target: /monofo
+        type: bind
+    image: ${NODE_IMAGE_TAG:-239595706494.dkr.ecr.us-west-2.amazonaws.com/build-cache:monofo-node-main}

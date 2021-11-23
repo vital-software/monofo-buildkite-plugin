@@ -1,0 +1,24 @@
+env:
+  # This is the dynamic image tag, used when changes have been made to the Dockerfile; it gives those changes a unique build artifact
+  NODE_IMAGE_TAG: "239595706494.dkr.ecr.us-west-2.amazonaws.com/build-cache:monofo-node-${BUILDKITE_COMMIT}-${BUILDKITE_BUILD_NUMBER}"
+
+monorepo:
+  matches: Dockerfile
+  excluded_env:
+     # This is the stable image tag used when the image hasn't been changed (no changes to Dockerfile since base build)
+    NODE_IMAGE_TAG: "239595706494.dkr.ecr.us-west-2.amazonaws.com/build-cache:monofo-node-main"
+
+steps:
+  - name: ":docker::nodejs: Container"
+    key: node-image
+    commands:
+      - docker build -f Dockerfile -t "${NODE_IMAGE_TAG}" .
+      - docker push "${NODE_IMAGE_TAG}"
+      - >
+        if [[ "${BUILDKITE_BRANCH}" == "main" ]]; then
+          docker tag "${NODE_IMAGE_TAG}" 239595706494.dkr.ecr.us-west-2.amazonaws.com/build-cache:monofo-node-main;
+          docker push 239595706494.dkr.ecr.us-west-2.amazonaws.com/build-cache:monofo-node-main;
+        fi
+    timeout_in_minutes: 20
+    agents:
+      queue: docker

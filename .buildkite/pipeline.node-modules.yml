@@ -1,0 +1,26 @@
+env:
+  BUILDKITE_PLUGIN_DOCKER_COMPOSE_CONFIG_0: "docker-compose.yml"
+  BUILDKITE_PLUGIN_DOCKER_COMPOSE_CONFIG_1: "docker-compose.buildkite.yml"
+
+monorepo:
+  pure: true
+  matches:
+    - package.json
+    - yarn.lock
+  produces: node-modules.tar.lz4
+
+steps:
+  - name: ":yarn: Install"
+    key: node-modules
+    depends_on:
+      - node-image
+    commands:
+      - yarn install --frozen-lockfile
+      - tar -c --use-compress-program="lz4 -2" -f node-modules.tar.lz4 node_modules
+    timeout_in_minutes: 20
+    plugins:
+      - docker-compose#v3.7.0:
+          run: node
+      - artifacts#v1.4.0:
+          upload: node-modules.tar.lz4
+

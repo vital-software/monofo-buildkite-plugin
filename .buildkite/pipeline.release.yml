@@ -1,0 +1,24 @@
+env:
+  NODE_ENV: development
+  BUILDKITE_PLUGIN_DOCKER_COMPOSE_CONFIG_0: "docker-compose.yml"
+  BUILDKITE_PLUGIN_DOCKER_COMPOSE_CONFIG_1: "docker-compose.buildkite.yml"
+
+monorepo:
+  matches: true # because whether we should run determined only by branch
+  pure: false
+
+steps:
+  - label: ":shipit: Release"
+    depends_on:
+      - node-image
+      - node-modules
+      - typescript
+      - test
+    command: yarn run release
+    branches: main next next-major beta alpha *.x
+    plugins:
+      - docker-compose#v3.9.0:
+          run: node
+      - seek-oss/aws-sm#v2.3.1:
+          env:
+            NPM_TOKEN: "global/npm-token"
