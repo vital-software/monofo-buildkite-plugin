@@ -15,7 +15,7 @@ steps:
       - typescript
       - test
     command: yarn run release
-    branches: main next next-major beta alpha *.x
+    branches: main next next-major beta alpha
     plugins:
       - improbable-eng/metahook#v0.4.1:
           pre-command: >
