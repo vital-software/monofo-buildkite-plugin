@@ -28,7 +28,7 @@
     "test:watch": "run-s \"test --watch\""
   },
   "engines": {
-    "node": ">=12.10"
+    "node": ">=14.16"
   },
   "dependencies": {
     "aws-sdk": "2.1019.0",
@@ -51,7 +51,7 @@
     "@google/semantic-release-replace-plugin": "1.1.0",
     "@semantic-release/changelog": "6.0.1",
     "@semantic-release/git": "10.0.1",
-    "@tsconfig/node12": "1.0.9",
+    "@tsconfig/node14": "1.0.1",
     "@types/bluebird": "3.5.36",
     "@types/debug": "4.1.7",
     "@types/glob": "7.2.0",

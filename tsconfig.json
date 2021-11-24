@@ -14,5 +14,5 @@
     "resolveJsonModule": true
   },
   "include": ["src/**/*.ts", "bin/*.js"],
-  "extends": "@tsconfig/node12/tsconfig.json"
+  "extends": "@tsconfig/node14/tsconfig.json"
 }
