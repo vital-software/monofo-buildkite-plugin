@@ -1,11 +1,11 @@
 import Config from '../config';
-import { BaseArgs, setUpHander, Command } from '../handler';
+import { BaseArgs, MonofoCommand, setUpHander, toCommand } from '../handler';
 
 interface ListArgs extends BaseArgs {
   componentName?: string;
 }
 
-const cmd: Command<ListArgs> = {
+const cmd: MonofoCommand<ListArgs> = {
   command: 'list <componentName>',
   describe: 'List matching files for different parts of the pipeline',
   aliases: ['ls'],
@@ -16,7 +16,7 @@ const cmd: Command<ListArgs> = {
       required: true,
     }),
 
-  async innerHandler(args): Promise<string> {
+  async handler(args): Promise<string> {
     setUpHander(args);
 
     const { componentName } = args as Required<ListArgs>;
@@ -34,10 +34,6 @@ const cmd: Command<ListArgs> = {
     process.stdout.write(`${output}\n`);
     return output;
   },
-
-  async handler(args) {
-    await cmd.innerHandler(args);
-  },
 };
 
-export = cmd;
+export = toCommand(cmd);

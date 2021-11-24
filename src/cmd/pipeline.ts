@@ -4,20 +4,17 @@ import { getBuildkiteInfo } from '../buildkite/config';
 import Config from '../config';
 import { getBaseBuild, matchConfigs } from '../diff';
 import { diff } from '../git';
-import { setUpHander, Command } from '../handler';
+import { MonofoCommand, setUpHander, toCommand } from '../handler';
 import mergePipelines from '../merge';
 
 const log = debug('monofo:cmd:pipeline');
 
-const cmd: Command = {
+const cmd: MonofoCommand = {
   command: 'pipeline',
   describe: 'Output a merged pipeline.yml',
   aliases: '$0',
   builder: {},
-  async handler(args): Promise<void> {
-    await cmd.innerHandler(args);
-  },
-  innerHandler(args): Promise<string> {
+  handler(args): Promise<string> {
     setUpHander(args);
 
     return Config.getAll(process.cwd())
@@ -44,4 +41,4 @@ const cmd: Command = {
   },
 };
 
-export = cmd;
+export = toCommand(cmd);

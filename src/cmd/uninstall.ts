@@ -2,7 +2,7 @@ import { AWSError } from 'aws-sdk';
 import debug from 'debug';
 import { CACHE_METADATA_TABLE_NAME } from '../cache-metadata';
 import { service } from '../dynamodb';
-import { setUpHander, Command } from '../handler';
+import { BaseArgs, MonofoCommand, setUpHander, toCommand } from '../handler';
 
 const log = debug('monofo:cmd:uninstall');
 
@@ -19,18 +19,15 @@ async function deleteTable(): Promise<void> {
   }
 }
 
-const cmd: Command = {
+const cmd: MonofoCommand<BaseArgs> = {
   command: 'uninstall',
   describe: 'Uninstalls the DynamoDB table',
   builder: {},
-  async innerHandler(args): Promise<string> {
+  async handler(args): Promise<string> {
     setUpHander(args);
     await deleteTable();
     return '';
   },
-  async handler(args) {
-    await cmd.innerHandler(args);
-  },
 };
 
-export = cmd;
+export = toCommand(cmd);

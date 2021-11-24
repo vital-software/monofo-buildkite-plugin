@@ -15,6 +15,15 @@ export function setUpHander<T extends BaseArgs>(args: Arguments<T>): void {
   }
 }
 
-export type Command<T extends BaseArgs = BaseArgs> = CommandModule<T, T> & {
-  innerHandler: (args: Arguments<T>) => Promise<string>;
+export type MonofoCommand<T extends BaseArgs = BaseArgs> = Omit<CommandModule<T, T>, 'handler'> & {
+  handler: (args: Arguments<T>) => Promise<string>;
 };
+
+export function toCommand<T extends BaseArgs>(cmd: MonofoCommand<T>): CommandModule<T, T> {
+  return {
+    ...cmd,
+    async handler(args) {
+      await cmd.handler(args);
+    },
+  };
+}

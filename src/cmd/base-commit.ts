@@ -1,15 +1,12 @@
 import { getBuildkiteInfo } from '../buildkite/config';
 import { getBaseBuild } from '../diff';
-import { setUpHander, Command } from '../handler';
+import { BaseArgs, MonofoCommand, setUpHander, toCommand } from '../handler';
 
-const cmd: Command = {
+const cmd: MonofoCommand<BaseArgs> = {
   command: 'base-commit',
   describe: 'Output a base commit hash, from which the current build should be compared',
   builder: {},
-  async handler(args) {
-    await cmd.innerHandler(args);
-  },
-  innerHandler(args): Promise<string> {
+  handler(args): Promise<string> {
     setUpHander(args);
 
     return getBaseBuild(getBuildkiteInfo(process.env))
@@ -24,4 +21,4 @@ const cmd: Command = {
   },
 };
 
-export = cmd;
+export = toCommand(cmd);

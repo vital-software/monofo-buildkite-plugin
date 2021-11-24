@@ -1,14 +1,14 @@
 import AWS from 'aws-sdk';
 import { getBuildkiteInfo } from '../buildkite/config';
 import { CacheMetadataRepository } from '../cache-metadata';
-import { setUpHander, BaseArgs, Command } from '../handler';
+import { setUpHander, BaseArgs, MonofoCommand } from '../handler';
 
 interface RecordSuccessArgs extends BaseArgs {
   componentName?: string;
   contentHash?: string;
 }
 
-const cmd: Command<RecordSuccessArgs> = {
+const cmd: MonofoCommand<RecordSuccessArgs> = {
   command: 'record-success <componentName> <contentHash>',
   describe: 'Record success of a component of the build, so that we can skip it next time if possible',
   builder: (yargs) =>
@@ -24,7 +24,7 @@ const cmd: Command<RecordSuccessArgs> = {
         required: true,
       }),
 
-  async innerHandler(args): Promise<string> {
+  async handler(args): Promise<string> {
     setUpHander(args);
 
     // Required<T>, because .positional() enforces for us (not reflected in type)
@@ -43,10 +43,6 @@ const cmd: Command<RecordSuccessArgs> = {
     });
     process.stdout.write(`Done!\n`);
     return `Recorded success of ${componentName}`;
-  },
-
-  async handler(args) {
-    await cmd.innerHandler(args);
   },
 };
 

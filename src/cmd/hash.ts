@@ -1,12 +1,12 @@
 import Config from '../config';
-import { BaseArgs, setUpHander, Command } from '../handler';
+import { BaseArgs, MonofoCommand, setUpHander, toCommand } from '../handler';
 import { FileHasher } from '../hash';
 
 interface HashArgs extends BaseArgs {
   componentName?: string;
 }
 
-const cmd: Command<HashArgs> = {
+const cmd: MonofoCommand<HashArgs> = {
   command: 'hash <componentName>',
   describe: 'Return the content hash for matching files of a part of the pipeline',
   builder: (yargs) =>
@@ -16,9 +16,6 @@ const cmd: Command<HashArgs> = {
       required: true,
     }),
   async handler(args) {
-    await cmd.innerHandler(args);
-  },
-  async innerHandler(args) {
     setUpHander(args);
 
     const { componentName } = args as Required<HashArgs>;
@@ -38,4 +35,4 @@ const cmd: Command<HashArgs> = {
   },
 };
 
-export = cmd;
+export = toCommand(cmd);
