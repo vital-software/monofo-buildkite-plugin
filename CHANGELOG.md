@@ -1,3 +1,16 @@
+# [3.0.0](https://github.com/vital-software/monofo/compare/v2.1.1...v3.0.0) (2021-11-24)
+
+
+### Features
+
+* add a plugin configuration for generating pipelines ([b51b173](https://github.com/vital-software/monofo/commit/b51b173eca7aadd16c837c4ff789175773054d23))
+* drop support for node 12 ([b99ceb4](https://github.com/vital-software/monofo/commit/b99ceb440769922113a71b0f132e7375129d3364))
+
+
+### BREAKING CHANGES
+
+* Node 12 is no longer supported
+
 ## [2.1.1](https://github.com/vital-software/monofo/compare/v2.1.0...v2.1.1) (2021-11-24)
 
 
