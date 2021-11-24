@@ -146,7 +146,7 @@
                 "hooks/pre-command"
               ],
               "from": "MONOFO_VERSION=[-0-9a-z.]*",
-              "to": "MONOFO_VERSION=${nextRelease.version}:",
+              "to": "MONOFO_VERSION=${nextRelease.version}",
               "results": [
                 {
                   "file": "hooks/pre-command",
