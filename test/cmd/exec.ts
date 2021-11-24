@@ -1,11 +1,12 @@
 import yargs, { Arguments, CommandModule } from 'yargs';
+import { BaseArgs } from '../../src/handler';
 
 /**
  * Note that even though this command returns a promise, it can't be used to run async command handlers until
  * yargsa or a similar library replaces it (yargs will call the parse callback long before an async command is
  * resolved: https://github.com/yargs/yargs/issues/1069)
  */
-export default async function execSync<T = CommonArguments, U = unknown>(
+export default async function execSync<T = BaseArgs, U = unknown>(
   command: CommandModule<T, U>,
   args: string
 ): Promise<string> {

@@ -1,8 +1,7 @@
-import { Arguments, CommandModule } from 'yargs';
 import Config from '../config';
 import { BaseArgs, setUpHander } from '../handler';
 import { FileHasher } from '../hash';
-import { Command } from '../util';
+import { Command } from '../types/cmd';
 
 interface HashArgs extends BaseArgs {
   componentName?: string;
@@ -17,8 +16,10 @@ const cmd: Command<HashArgs> = {
       type: 'string',
       required: true,
     }),
-
-  async handler(args): Promise<string> {
+  async handler(args) {
+    await cmd.innerHandler(args);
+  },
+  async innerHandler(args) {
     setUpHander(args);
 
     const { componentName } = args as Required<HashArgs>;

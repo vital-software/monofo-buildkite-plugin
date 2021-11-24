@@ -26,7 +26,8 @@ describe('monofo hash', () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, '../projects/pure'));
 
-    const output = await (hash.handler(EXAMPLE_ARGUMENTS) as unknown as Promise<string>);
-    expect(output).toContain('0ffe034c45380e93a2f65d67d8c286a237b00285233c91b778ba70f860c7b54a');
+    expect(await hash.innerHandler(EXAMPLE_ARGUMENTS)).toContain(
+      '0ffe034c45380e93a2f65d67d8c286a237b00285233c91b778ba70f860c7b54a'
+    );
   });
 });

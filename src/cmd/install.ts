@@ -4,7 +4,7 @@ import debug from 'debug';
 import { CACHE_METADATA_TABLE_DEFINITION, CACHE_METADATA_TABLE_NAME } from '../cache-metadata';
 import { service } from '../dynamodb';
 import { setUpHander } from '../handler';
-import { Command } from '../util';
+import { Command } from '../types/cmd';
 
 const log = debug('monofo:cmd:install');
 
@@ -84,16 +84,20 @@ const cmd: Command = {
   command: 'install',
   describe: 'Installs a DynamoDB table to store cache pointers for pure builds',
   builder: {},
-
-  async handler(args): Promise<void> {
+  async innerHandler(args): Promise<string> {
     setUpHander(args);
 
     if (!(await describeTable())) {
       await createTable();
       log('Table was installed');
+      return 'Table was installed';
     } else {
       log('Found existing table, already installed');
+      return 'Found existing table, already installed';
     }
+  },
+  async handler(args): Promise<void> {
+    await cmd.innerHandler(args);
   },
 };
 
