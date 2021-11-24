@@ -6,7 +6,7 @@ import { getBaseBuild, matchConfigs } from '../diff';
 import { diff } from '../git';
 import { setUpHander } from '../handler';
 import mergePipelines from '../merge';
-import { Command } from '../util';
+import { Command } from '../types/cmd';
 
 const log = debug('monofo:cmd:pipeline');
 
@@ -15,8 +15,10 @@ const cmd: Command = {
   describe: 'Output a merged pipeline.yml',
   aliases: '$0',
   builder: {},
-
-  handler(args): Promise<string> {
+  async handler(args): Promise<void> {
+    await cmd.innerHandler(args);
+  },
+  innerHandler(args): Promise<string> {
     setUpHander(args);
 
     return Config.getAll(process.cwd())

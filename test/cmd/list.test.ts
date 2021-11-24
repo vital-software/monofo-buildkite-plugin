@@ -26,7 +26,7 @@ describe('monofo list', () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, '../projects/pure'));
 
-    const output = await (list.handler(EXAMPLE_ARGUMENTS) as unknown as Promise<string>);
+    const output = await list.innerHandler(EXAMPLE_ARGUMENTS);
     expect(output).toContain('foo/README.md');
   });
 });

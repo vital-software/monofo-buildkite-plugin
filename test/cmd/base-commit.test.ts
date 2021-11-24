@@ -34,15 +34,13 @@ describe('cmd base-commit', () => {
     process.env.BUILDKITE_API_ACCESS_TOKEN = 'fake';
     process.chdir(__dirname);
 
-    const out: Promise<string> = baseCommit.handler(emptyArgs) as unknown as Promise<string>;
-
-    return expect(out).resolves.toBe(COMMIT);
+    return expect(baseCommit.innerHandler(emptyArgs)).resolves.toBe(COMMIT);
   });
 
   it('can be executed with simple configuration', async () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, '../projects/kitchen-sink'));
 
-    return expect(baseCommit.handler(emptyArgs)).resolves.toBe(COMMIT);
+    return expect(baseCommit.innerHandler(emptyArgs)).resolves.toBe(COMMIT);
   });
 });

@@ -2,7 +2,7 @@ import AWS from 'aws-sdk';
 import { getBuildkiteInfo } from '../buildkite/config';
 import { CacheMetadataRepository } from '../cache-metadata';
 import { setUpHander, BaseArgs } from '../handler';
-import { Command } from '../util';
+import { Command } from '../types/cmd';
 
 interface RecordSuccessArgs extends BaseArgs {
   componentName?: string;
@@ -25,7 +25,7 @@ const cmd: Command<RecordSuccessArgs> = {
         required: true,
       }),
 
-  async handler(args): Promise<void> {
+  async innerHandler(args): Promise<string> {
     setUpHander(args);
 
     // Required<T>, because .positional() enforces for us (not reflected in type)
@@ -43,6 +43,11 @@ const cmd: Command<RecordSuccessArgs> = {
       component: `${pipeline}/${componentName}`, // See also Config.getComponent()
     });
     process.stdout.write(`Done!\n`);
+    return `Recorded success of ${componentName}`;
+  },
+
+  async handler(args) {
+    await cmd.innerHandler(args);
   },
 };
 

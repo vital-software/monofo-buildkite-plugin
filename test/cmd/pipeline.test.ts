@@ -55,7 +55,7 @@ describe('monofo pipeline', () => {
     process.env = fakeProcess();
     process.chdir(__dirname);
 
-    const out: Promise<string> = pipeline.handler(EMPTY_ARGUMENTS) as unknown as Promise<string>;
+    const out: Promise<string> = pipeline.innerHandler(EMPTY_ARGUMENTS);
 
     return expect(out).rejects.toThrowError('No pipeline files');
   });
@@ -64,7 +64,8 @@ describe('monofo pipeline', () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, '../projects/kitchen-sink'));
 
-    await (pipeline.handler(EMPTY_ARGUMENTS) as unknown as Promise<string>)
+    await pipeline
+      .innerHandler(EMPTY_ARGUMENTS)
       .then((o) => loadYaml(o) as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
@@ -92,7 +93,8 @@ describe('monofo pipeline', () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, '../projects/skipped'));
 
-    await (pipeline.handler(EMPTY_ARGUMENTS) as unknown as Promise<string>)
+    await pipeline
+      .innerHandler(EMPTY_ARGUMENTS)
       .then((o) => loadYaml(o) as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
@@ -112,7 +114,8 @@ describe('monofo pipeline', () => {
     });
     process.chdir(path.resolve(__dirname, '../projects/kitchen-sink'));
 
-    await (pipeline.handler(EMPTY_ARGUMENTS) as unknown as Promise<string>)
+    await pipeline
+      .innerHandler(EMPTY_ARGUMENTS)
       .then((o) => loadYaml(o) as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
@@ -140,7 +143,8 @@ describe('monofo pipeline', () => {
     });
     process.chdir(path.resolve(__dirname, '../projects/kitchen-sink'));
 
-    await (pipeline.handler(EMPTY_ARGUMENTS) as unknown as Promise<string>)
+    await pipeline
+      .innerHandler(EMPTY_ARGUMENTS)
       .then((o) => loadYaml(o) as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
@@ -165,7 +169,8 @@ describe('monofo pipeline', () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, '../projects/crossdeps'));
 
-    await (pipeline.handler(EMPTY_ARGUMENTS) as unknown as Promise<string>)
+    await pipeline
+      .innerHandler(EMPTY_ARGUMENTS)
       .then((o) => loadYaml(o) as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
@@ -182,7 +187,8 @@ describe('monofo pipeline', () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, '../projects/flexible-structure'));
 
-    await (pipeline.handler(EMPTY_ARGUMENTS) as unknown as Promise<string>)
+    await pipeline
+      .innerHandler(EMPTY_ARGUMENTS)
       .then((o) => loadYaml(o) as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
@@ -195,7 +201,8 @@ describe('monofo pipeline', () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, '../projects/pure'));
 
-    await (pipeline.handler(EMPTY_ARGUMENTS) as unknown as Promise<string>)
+    await pipeline
+      .innerHandler(EMPTY_ARGUMENTS)
       .then((o) => loadYaml(o) as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
@@ -242,7 +249,8 @@ describe('monofo pipeline', () => {
       }),
     ]);
 
-    await (pipeline.handler(EMPTY_ARGUMENTS) as unknown as Promise<string>)
+    await pipeline
+      .innerHandler(EMPTY_ARGUMENTS)
       .then((o) => loadYaml(o) as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();
@@ -291,7 +299,8 @@ describe('monofo pipeline', () => {
       }),
     ]);
 
-    await (pipeline.handler(EMPTY_ARGUMENTS) as unknown as Promise<string>)
+    await pipeline
+      .innerHandler(EMPTY_ARGUMENTS)
       .then((o) => loadYaml(o) as Pipeline)
       .then((p) => {
         expect(p).toBeDefined();

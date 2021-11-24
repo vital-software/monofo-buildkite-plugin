@@ -1,14 +1,16 @@
 import { getBuildkiteInfo } from '../buildkite/config';
 import { getBaseBuild } from '../diff';
 import { setUpHander } from '../handler';
-import { Command } from '../util';
+import { Command } from '../types/cmd';
 
 const cmd: Command = {
   command: 'base-commit',
   describe: 'Output a base commit hash, from which the current build should be compared',
   builder: {},
-
-  handler(args): Promise<string> {
+  async handler(args) {
+    await cmd.innerHandler(args);
+  },
+  innerHandler(args): Promise<string> {
     setUpHander(args);
 
     return getBaseBuild(getBuildkiteInfo(process.env))

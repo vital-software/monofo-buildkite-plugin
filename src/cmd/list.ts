@@ -1,6 +1,6 @@
 import Config from '../config';
 import { BaseArgs, setUpHander } from '../handler';
-import { Command } from '../util';
+import { Command } from '../types/cmd';
 
 interface ListArgs extends BaseArgs {
   componentName?: string;
@@ -17,7 +17,7 @@ const cmd: Command<ListArgs> = {
       required: true,
     }),
 
-  async handler(args): Promise<string> {
+  async innerHandler(args): Promise<string> {
     setUpHander(args);
 
     const { componentName } = args as Required<ListArgs>;
@@ -34,6 +34,10 @@ const cmd: Command<ListArgs> = {
 
     process.stdout.write(`${output}\n`);
     return output;
+  },
+
+  async handler(args) {
+    await cmd.innerHandler(args);
   },
 };
 
