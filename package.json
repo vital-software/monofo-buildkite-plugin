@@ -17,6 +17,8 @@
     "build:watch": "run-s \"build -w\"",
     "clean": "rm -rf build",
     "commit": "git-cz",
+    "git:sync": "git push plugin +refs/remotes/origin/*:refs/heads/* +refs/tags/*:refs/tags/*",
+    "git:sync:setup": "git remote add plugin git@github.com:vital-software/monofo-buildkite-plugin.git",
     "lint": "eslint \"{src,test}/**/*.ts\"",
     "lint:fix": "run-s \"lint --fix\"",
     "monofo": "./bin/monofo.js",
