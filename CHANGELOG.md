@@ -1,3 +1,10 @@
+## [2.1.1](https://github.com/vital-software/monofo/compare/v2.1.0...v2.1.1) (2021-11-24)
+
+
+### Bug Fixes
+
+* **pure:** JSON stringify the commands so that if they're an array we still get them all ([0cc91ff](https://github.com/vital-software/monofo/commit/0cc91ff56fb4bf7654687c7982961d581a915a48))
+
 # [2.1.0](https://github.com/vital-software/monofo/compare/v2.0.3...v2.1.0) (2021-11-23)
 
 
