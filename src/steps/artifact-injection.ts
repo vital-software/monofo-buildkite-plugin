@@ -1,5 +1,6 @@
 import debug from 'debug';
 import _ from 'lodash';
+import { CommandStep, Step } from '../buildkite/types';
 import Config from '../config';
 
 const log = debug('monofo:steps:artifact-injection');

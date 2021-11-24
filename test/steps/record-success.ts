@@ -7,7 +7,6 @@ describe('recordSuccessSteps', () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, '../projects/pure'));
 
-    const r = await recordSuccessSteps([]);
-    expect(r).toHaveLength(0);
+    await expect(recordSuccessSteps([])).resolves.toHaveLength(0);
   });
 });

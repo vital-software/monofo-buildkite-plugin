@@ -1,4 +1,5 @@
 import { getBuildkiteInfo } from '../src/buildkite/config';
+import { BuildkiteBuild, BuildkiteEnvironment } from '../src/buildkite/types';
 
 export const ORG = 'dominics';
 export const PIPELINE = 'monofo';

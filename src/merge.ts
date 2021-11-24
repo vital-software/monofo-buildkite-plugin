@@ -2,6 +2,7 @@ import chalk from 'chalk';
 import debug from 'debug';
 import _ from 'lodash';
 import sendBuildkiteAnnotation from './annotate';
+import { Pipeline, Step } from './buildkite/types';
 import Config from './config';
 import { updateDecisions } from './decide';
 import { ARTIFACT_INJECTION_STEP_KEY, artifactInjectionSteps } from './steps/artifact-injection';

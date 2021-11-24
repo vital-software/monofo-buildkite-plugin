@@ -1,3 +1,4 @@
+import { CommandStep, Step } from '../buildkite/types';
 import Config from '../config';
 
 const NOTHING_TO_DO_STEP_LABEL = `:white_check_mark: :shrug: Nothing to do`;

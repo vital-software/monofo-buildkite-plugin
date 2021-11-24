@@ -1,6 +1,7 @@
 import { URL } from 'url';
 import debug from 'debug';
 import got from 'got';
+import { BuildkiteBuild, BuildkiteEnvironment } from './types';
 
 const log = debug('monofo:buildkite:client');
 

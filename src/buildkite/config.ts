@@ -1,3 +1,5 @@
+import { BuildkiteEnvironment } from './types';
+
 const BUILDKITE_REQUIRED_ENV = [
   'BUILDKITE_BUILD_ID',
   'BUILDKITE_BRANCH',
