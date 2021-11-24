@@ -136,6 +136,20 @@
                 }
               ],
               "countMatches": true
+            },
+            {
+              "files": ["hooks/pre-command"],
+              "from": "MONOFO_VERSION=[-0-9a-z.]*",
+              "to": "MONOFO_VERSION=${nextRelease.version}:",
+              "results": [
+                {
+                  "file": "hooks/pre-command",
+                  "hasChanged": true,
+                  "numMatches": 1,
+                  "numReplacements": 1
+                }
+              ],
+              "countMatches": true
             }
           ]
         }
@@ -146,7 +160,8 @@
           "assets": [
             "CHANGELOG.md",
             "package.json",
-            "README.md"
+            "README.md",
+            "hooks/pre-command"
           ]
         }
       ],
