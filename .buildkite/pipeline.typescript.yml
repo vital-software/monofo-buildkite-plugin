@@ -27,6 +27,6 @@ steps:
           pre-command: buildkite-agent artifact download node-modules.tar.lz4 . && tar -x --use-compress-program=lz4 -f node-modules.tar.lz4
       - docker-compose#v3.9.0:
           run: node
-      - artifacts#v1.4.0:
+      - artifacts#v1.5.0:
           upload:
             - typescript.tar.lz4
