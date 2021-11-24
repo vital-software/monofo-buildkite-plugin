@@ -12,6 +12,7 @@ module.exports = {
   },
   // See: https://www.robertcooper.me/using-eslint-and-prettier-in-a-typescript-project
   extends: [
+    'airbnb-base',
     'airbnb-typescript/base',
     'plugin:jest/recommended',
     'plugin:@typescript-eslint/eslint-recommended',
@@ -20,10 +21,8 @@ module.exports = {
     'plugin:prettier/recommended' // Enables eslint-plugin-prettier and eslint-config-prettier. This will display prettier errors as ESLint errors. Make sure this is always the last configuration in the extends array.
   ],
   parserOptions: {
-    project: __dirname + '/tsconfig.json',
+    project: 'tsconfig.json',
     tsconfigRootDir: __dirname, // https://github.com/typescript-eslint/typescript-eslint/issues/251#issuecomment-567365174
-    ecmaVersion: 2020, // Allows for the parsing of modern ECMAScript features
-    sourceType: 'module' // Allows for the use of imports
   },
   rules: {
     'import/order': [
