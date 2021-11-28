@@ -1,7 +1,6 @@
 import { getBuildkiteInfo } from '../buildkite/config';
 import { getBaseBuild } from '../diff';
-import { setUpHander } from '../handler';
-import { Command } from '../types/cmd';
+import { setUpHander, Command } from '../handler';
 
 const cmd: Command = {
   command: 'base-commit',

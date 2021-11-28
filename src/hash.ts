@@ -46,7 +46,7 @@ export class FileHasher {
     const readStream = fs.createReadStream(pathToFile, { encoding: 'utf8' });
 
     for await (const chunk of readStream) {
-      hash.update(chunk);
+      hash.update(chunk as string);
     }
 
     return hash.digest('hex');

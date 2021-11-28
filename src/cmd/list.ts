@@ -1,6 +1,5 @@
 import Config from '../config';
-import { BaseArgs, setUpHander } from '../handler';
-import { Command } from '../types/cmd';
+import { BaseArgs, setUpHander, Command } from '../handler';
 
 interface ListArgs extends BaseArgs {
   componentName?: string;

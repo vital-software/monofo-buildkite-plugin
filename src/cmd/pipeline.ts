@@ -4,9 +4,8 @@ import { getBuildkiteInfo } from '../buildkite/config';
 import Config from '../config';
 import { getBaseBuild, matchConfigs } from '../diff';
 import { diff } from '../git';
-import { setUpHander } from '../handler';
+import { setUpHander, Command } from '../handler';
 import mergePipelines from '../merge';
-import { Command } from '../types/cmd';
 
 const log = debug('monofo:cmd:pipeline');
 
@@ -30,9 +29,10 @@ const cmd: Command = {
           .then((baseBuild) =>
             diff(baseBuild.commit).then((changedFiles) => matchConfigs(baseBuild, configs, changedFiles))
           )
-          .catch((e) => {
-            log('Failed to find base commit or diff changes, falling back to do a full build');
-            return Promise.resolve(Config.configureFallback(e, configs));
+          .catch((e: unknown) => {
+            log('Failed to find base commit or diff changes, falling back to do a full build', e);
+            Config.configureFallback(configs);
+            return Promise.resolve();
           })
           .then(() => mergePipelines(configs));
       })

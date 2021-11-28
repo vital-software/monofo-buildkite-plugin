@@ -1,5 +1,5 @@
 import debug from 'debug';
-import { Arguments } from 'yargs';
+import { Arguments, CommandModule } from 'yargs';
 
 const log = debug('monofo:handler');
 
@@ -14,3 +14,7 @@ export function setUpHander<T extends BaseArgs>(args: Arguments<T>): void {
     process.chdir(args.chdir);
   }
 }
+
+export type Command<T extends BaseArgs = BaseArgs> = CommandModule<T, T> & {
+  innerHandler: (args: Arguments<T>) => Promise<string>;
+};
