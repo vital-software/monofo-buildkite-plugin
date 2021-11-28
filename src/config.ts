@@ -354,10 +354,9 @@ export default class Config {
 
   /**
    * Mutates the given configs to a fallback configuration
-   * @param _e An error that caused the fallback, if there is one? Unused
-   * @param configs
+   * @param configs Set of configs to configure fallback on
    */
-  public static configureFallback(_e: Error, configs: Config[]): void {
-    return configs.forEach((c) => c.useFallback());
+  public static configureFallback(configs: Config[]): void {
+    configs.forEach((c) => c.useFallback());
   }
 }

@@ -1,7 +1,6 @@
 import Config from '../config';
-import { BaseArgs, setUpHander } from '../handler';
+import { BaseArgs, setUpHander, Command } from '../handler';
 import { FileHasher } from '../hash';
-import { Command } from '../types/cmd';
 
 interface HashArgs extends BaseArgs {
   componentName?: string;

@@ -1,8 +1,7 @@
 import AWS from 'aws-sdk';
 import { getBuildkiteInfo } from '../buildkite/config';
 import { CacheMetadataRepository } from '../cache-metadata';
-import { setUpHander, BaseArgs } from '../handler';
-import { Command } from '../types/cmd';
+import { setUpHander, BaseArgs, Command } from '../handler';
 
 interface RecordSuccessArgs extends BaseArgs {
   componentName?: string;

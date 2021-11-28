@@ -2,8 +2,7 @@ import { AWSError } from 'aws-sdk';
 import debug from 'debug';
 import { CACHE_METADATA_TABLE_NAME } from '../cache-metadata';
 import { service } from '../dynamodb';
-import { setUpHander } from '../handler';
-import { Command } from '../types/cmd';
+import { setUpHander, Command } from '../handler';
 
 const log = debug('monofo:cmd:uninstall');
 

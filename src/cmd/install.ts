@@ -3,8 +3,7 @@ import { DescribeTableOutput } from 'aws-sdk/clients/dynamodb';
 import debug from 'debug';
 import { CACHE_METADATA_TABLE_DEFINITION, CACHE_METADATA_TABLE_NAME } from '../cache-metadata';
 import { service } from '../dynamodb';
-import { setUpHander } from '../handler';
-import { Command } from '../types/cmd';
+import { setUpHander, Command } from '../handler';
 
 const log = debug('monofo:cmd:install');
 
@@ -91,10 +90,9 @@ const cmd: Command = {
       await createTable();
       log('Table was installed');
       return 'Table was installed';
-    } else {
-      log('Found existing table, already installed');
-      return 'Found existing table, already installed';
     }
+    log('Found existing table, already installed');
+    return 'Found existing table, already installed';
   },
   async handler(args): Promise<void> {
     await cmd.innerHandler(args);

@@ -39,14 +39,14 @@ module.exports = {
     ],
 
     // Soften some errors
-    'import/prefer-default-export': 'warn',
     'no-restricted-syntax': ['warn', 'ForInStatement', 'LabeledStatement', 'WithStatement'], // Removes ForOfStatement from extended standards
     'no-return-assign': ['error', 'except-parens'],
-    'class-methods-use-this': 'warn',
 
     // And turn some completely off
+    'class-methods-use-this': 'off',
+    'import/prefer-default-export': 'off',
+    'max-classes-per-file': 'off',
     'no-underscore-dangle': 'off',
-    'max-classes-per-file': 'off'
   },
   overrides: [
     {
