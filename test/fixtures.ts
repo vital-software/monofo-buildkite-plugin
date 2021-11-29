@@ -38,6 +38,8 @@ export function fakeProcess(merge: Record<string, string> = {}): NodeJS.ProcessE
     AWS_ACCESS_KEY_ID: 'foo',
     AWS_SECRET_ACCESS_KEY: 'bar',
 
+    PATH: process.env?.PATH,
+
     ...merge,
   };
 }
