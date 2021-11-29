@@ -21,7 +21,9 @@ teardown() {
 
 @test "calls npx when generating a pipeline" {
   export BUILDKITE_PLUGIN_MONOFO_GENERATE="pipeline"
-  run $PWD/pre-command
+
+  # shellcheck source=./generate.bash
+  output="$(source $PWD/generate.bash)"
 
   [[ "$output" = *"npx output"* ]] || ( echo "Failed to match: $output" >&3 && exit 2 )
   [[ "$output" = *"git output"* ]] || ( echo "Failed to match: $output" >&3 && exit 2 )
