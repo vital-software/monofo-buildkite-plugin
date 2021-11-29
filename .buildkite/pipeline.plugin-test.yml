@@ -1,0 +1,12 @@
+monorepo:
+  pure: true
+  matches:
+    - hooks/*
+
+steps:
+  - name: ":bats: Run bats tests"
+    key: plugin-test
+    timeout_in_minutes: 20
+    plugins:
+      - docker-compose#v3.9.0:
+          run: plugin-test
