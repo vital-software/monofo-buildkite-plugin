@@ -1,5 +1,5 @@
-import yargs, { Argv } from 'yargs';
-import { BaseArgs, Command } from '../../src/handler';
+import yargs, { Argv, CommandModule } from 'yargs';
+import { BaseArgs } from '../../src/handler';
 
 /**
  * Note that even though this command returns a promise, it can't be used to run async command handlers until
@@ -7,7 +7,7 @@ import { BaseArgs, Command } from '../../src/handler';
  * resolved: https://github.com/yargs/yargs/issues/1069)
  */
 export default async function execSync<T extends BaseArgs = BaseArgs>(
-  command: Command<T>,
+  command: CommandModule<T, T>,
   args: string
 ): Promise<string> {
   let output = '';
