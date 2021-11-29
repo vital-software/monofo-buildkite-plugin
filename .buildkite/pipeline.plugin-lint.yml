@@ -1,0 +1,12 @@
+monorepo:
+  pure: true
+  matches:
+    - plugin.yml
+
+steps:
+  - name: ":buildkite: plugin lint"
+    key: plugin-lint
+    timeout_in_minutes: 20
+    plugins:
+      - docker-compose#v3.9.0:
+          run: plugin-lint
