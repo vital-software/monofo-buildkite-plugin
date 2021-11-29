@@ -20,36 +20,19 @@
 
 set -euo pipefail
 
-# This version marker is automatically updated to match the published release
-MONOFO_VERSION=3.1.4
-
 BUILDKITE_PLUGIN_MONOFO_GENERATE=${BUILDKITE_PLUGIN_MONOFO_GENERATE:-}
 BUILDKITE_AGENT_ACCESS_TOKEN=${BUILDKITE_AGENT_ACCESS_TOKEN:-}
 
-if [[ -z "${BUILDKITE_PLUGIN_MONOFO_GENERATE}" || "$BUILDKITE_PLUGIN_MONOFO_GENERATE" != "pipeline" ]]; then
-  # Nothing to do: we only generate a pipeline if `generate` is set to `pipeline`
-  exit 0
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+if [[ -n "${BUILDKITE_PLUGIN_MONOFO_GENERATE}" && "$BUILDKITE_PLUGIN_MONOFO_GENERATE" == "pipeline" ]]; then
+  # shellcheck source=./lib/generate.bash
+  source "${SCRIPT_DIR}/lib/generate.bash"
 fi
 
-PIPELINE_FILE="$(mktemp /tmp/generate-pipeline.XXXXXX)"
-
-# Should be able to figure out version to use from BUILDKITE_PLUGIN_CONFIGURATION
-echo "${BUILDKITE_PLUGIN_CONFIGURATION:-}"
-
-echo "--- Fetching other branches" >&2
-git fetch -v origin +refs/heads/*:refs/remotes/origin/*
-
-echo "+++ :pipeline: Generating..." >&2
-DEBUG="monofo:*" npx "monofo@$MONOFO_VERSION" > "$PIPELINE_FILE"
-
-echo "--- :pipeline: Result" >&2
-cat "$PIPELINE_FILE"
-
-if [[ -n "$BUILDKITE_AGENT_ACCESS_TOKEN" ]]; then
-  echo "--- :pipeline: Upload" >&2
-  buildkite-agent pipeline upload < "$PIPELINE_FILE"
-else
-  echo "Skipping pipeline upload, because no BUILDKITE_AGENT_ACCESS_TOKEN was set: probably not running in Buildkite"
+if [[ -n "${BUILDKITE_PLUGIN_MONOFO_UPLOAD}" ]]; then
+  # shellcheck source=./lib/upload.bash
+  source "${SCRIPT_DIR}/lib/upload.bash"
 fi
 
-rm -f "$PIPELINE_FILE"
+exit 0
