@@ -1,6 +1,6 @@
 import path from 'path';
 import { Arguments } from 'yargs';
-import * as list from '../../src/cmd/list';
+import list from '../../src/cmd/list';
 import { BaseArgs } from '../../src/handler';
 import { fakeProcess } from '../fixtures';
 import execSync from './exec';

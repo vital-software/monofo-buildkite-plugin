@@ -1,6 +1,6 @@
 import path from 'path';
 import { Arguments } from 'yargs';
-import * as hash from '../../src/cmd/hash';
+import hash from '../../src/cmd/hash';
 import { BaseArgs } from '../../src/handler';
 import { fakeProcess } from '../fixtures';
 import execSync from './exec';
