@@ -4,6 +4,7 @@ set -euo pipefail
 
 # shellcheck source=./run.bash
 source "$_lib_script_dir/run.bash"
+MONOFO=$(monofo "pipeline")
 
 # Usage: create a pipeline that looks like this:
 #
@@ -25,6 +26,7 @@ source "$_lib_script_dir/run.bash"
 # cached and fast
 
 PIPELINE_FILE="$(mktemp /tmp/generate-pipeline.XXXXXX)"
+BUILDKITE_AGENT_ACCESS_TOKEN=${BUILDKITE_AGENT_ACCESS_TOKEN:-}
 
 # Should be able to figure out version to use from BUILDKITE_PLUGIN_CONFIGURATION
 echo "${BUILDKITE_PLUGIN_CONFIGURATION:-}"
@@ -33,7 +35,6 @@ echo "--- Fetching other branches" >&2
 git fetch -v origin +refs/heads/*:refs/remotes/origin/*
 
 echo "+++ :pipeline: Generating..." >&2
-MONOFO=$(monofo "pipeline")
 $MONOFO > "$PIPELINE_FILE"
 
 echo "--- :pipeline: Result" >&2
