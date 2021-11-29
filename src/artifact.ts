@@ -1,12 +1,22 @@
 import * as fs from 'fs';
-import { parse } from 'path';
+import { parse, ParsedPath } from 'path';
 import stream from 'stream';
 import { promisify } from 'util';
-import execa from 'execa';
+import execa, { ExecaChildProcess } from 'execa';
 import got from 'got';
+import Request from 'got/dist/source/core';
+import { GotStream } from 'got/dist/source/types';
 import _ from 'lodash';
 
 const pipeline = promisify(stream.pipeline);
+
+const toStream = (process: ExecaChildProcess): stream.Writable => {
+  if (!process.stdin) {
+    throw new Error('Could not access stdin on child process');
+  }
+
+  return process.stdin;
+};
 
 export class Artifact {
   readonly name: string;
@@ -17,11 +27,14 @@ export class Artifact {
 
   readonly softFail: boolean;
 
-  constructor(readonly filename: string, config = process.env) {
-    const path = parse(filename);
-    const envName = _.upperCase(_.snakeCase(path.name));
+  readonly path: ParsedPath;
 
-    this.name = path.name;
+  constructor(readonly filename: string, config = process.env) {
+    this.path = parse(filename);
+    this.name = this.path.name;
+
+    const envName = _.upperCase(_.snakeCase(this.name));
+
     this.skip = Boolean(config?.[`MONOFO_ARTIFACT_${envName}_SKIP`]);
     this.buildId = config?.[`MONOFO_ARTIFACT_${envName}_BUILD_ID`];
     this.softFail = Boolean(config?.[`MONOFO_ARTIFACT_${envName}_SOFT_FAIL`]);
@@ -40,8 +53,33 @@ export class Artifact {
     ).stdout.split('\n')[0];
   }
 
-  public async download(): Promise<void> {
+  public async startDownload(): Promise<Request> {
     const url = await this.getDownloadUrl();
-    await pipeline(got.stream(url), fs.createWriteStream(this.filename));
+    return got.stream(url);
+  }
+
+  public async downloadAndExtract(): Promise<void> {
+    const artifact = await this.startDownload();
+    artifact.pipe(this.extractStream());
+  }
+
+  private extractStream(): NodeJS.WritableStream {
+    if (this.path.ext.endsWith('.tar.lz4')) {
+      return this.extractLz4();
+    }
+
+    if (this.path.ext.endsWith('.tar.cbidx')) {
+      return this.extractDesync();
+    }
+
+    return fs.createWriteStream(this.filename);
+  }
+
+  private extractLz4(): NodeJS.WritableStream {
+    return toStream(execa('tar', ['-xv', '--use-compress-program=lz4', '-f', '-'], { buffer: false }));
+  }
+
+  private extractDesync(): NodeJS.WritableStream {
+    return toStream(execa('desync', ['tar'], { buffer: false }));
   }
 }
