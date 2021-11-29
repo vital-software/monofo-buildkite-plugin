@@ -20,3 +20,31 @@ export async function filterAsync<T>(
 }
 
 export const glob = promisify(globAsync);
+
+export function hasBin(bin: string): Promise<boolean> {
+  return commandExists(bin)
+    .then(() => true)
+    .catch(() => false);
+}
+
+export function toStream(child: ExecaChildProcess): stream.Writable {
+  if (!child.stdin) {
+    throw new Error('Could not access stdin on child process');
+  }
+
+  return child.stdin;
+}
+
+export async function tar(): Promise<string> {
+  if (process.platform === 'darwin') {
+    if (await hasBin('gtar')) {
+      return 'gtar';
+    }
+
+    process.stderr.write(
+      'WARNING: may fail to extract correctly: if so, need a GNU compatible tar, named gtar, on PATH\n'
+    );
+  }
+
+  return 'tar';
+}

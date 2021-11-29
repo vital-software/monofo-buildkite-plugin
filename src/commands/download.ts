@@ -1,10 +1,10 @@
 import debug from 'debug';
 import _ from 'lodash';
 import { Arguments } from 'yargs';
-import { Artifact } from '../artifact';
+import { Artifact, ArtifactApi, ArtifactDownloader } from '../artifact';
 import { BaseArgs, MonofoCommand, toCommand } from '../handler';
 
-const log = debug('monofo:cmd:artifact');
+const log = debug('monofo:cmd:download');
 
 interface ArtifactArguments extends BaseArgs {
   artifacts: string[];
@@ -55,7 +55,10 @@ modifiers passed in env vars:
   async handler(args: Arguments<ArtifactArguments>): Promise<string> {
     const artifacts: Artifact[] = _.castArray(args.artifacts).map((filename) => new Artifact(filename));
     log(`Donwloading ${artifacts.length} artifacts: ${artifacts.map((a) => a.name).join(', ')}`);
-    return Promise.all(artifacts.map((artifact) => artifact.downloadAndExtract())).then(() => 'All done');
+
+    const downloader = new ArtifactDownloader(new ArtifactApi());
+
+    return Promise.all(artifacts.map((artifact) => downloader.downloadAndExtract(artifact))).then(() => 'All done');
   },
 };
 
