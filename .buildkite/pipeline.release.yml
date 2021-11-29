@@ -14,6 +14,7 @@ steps:
       - node-modules
       - typescript
       - test
+      - lint
     command: yarn run release
     branches: main next next-major beta alpha
     plugins:
