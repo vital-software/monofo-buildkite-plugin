@@ -1,3 +1,10 @@
+## [3.0.1](https://github.com/vital-software/monofo/compare/v3.0.0...v3.0.1) (2021-11-29)
+
+
+### Bug Fixes
+
+* **deps:** update dependency debug to v4.3.3 ([dccb9b8](https://github.com/vital-software/monofo/commit/dccb9b842ce7c4cd836c816bc946cdd4e24bbbaf))
+
 # [3.0.0](https://github.com/vital-software/monofo/compare/v2.1.1...v3.0.0) (2021-11-24)
 
 
