@@ -1,22 +1,8 @@
 #!/usr/bin/env bash
-# Usage: create a pipeline that looks like this:
+# Pre-command hook
 #
-# steps:
-#   - name: ":pipeline: Generate pipeline"
-#     plugins:
-#       - seek-oss/aws-sm#v2.2.1: # for example, but your secret management might be e.g. via S3 bucket or "env" file instead
-#           env:
-#             BUILDKITE_API_ACCESS_TOKEN: "global/buildkite-api-access-token"
-#       - vital-software/monofo#<latest>:
-#           generate: pipeline
-#
-# If you had a previous generator, you need to wait until all branches have the
-# script before calling it, or change the command to:
-#
-# git merge-base --is-ancestor <merge-commit-of-generate-pipeline> HEAD && .buildkite/generate-pipeline || ( <previous-command> )
-#
-# This script installs and calls monofo with a static version so the install is
-# cached and fast
+# This script just interprets a couple of key settings, and then calls into the
+# relevant sub-script in lib/
 
 set -euo pipefail
 
