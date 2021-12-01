@@ -1,5 +1,13 @@
+import stream from 'stream';
 import { promisify } from 'util';
-import globAsync from 'glob';
+import commandExists from 'command-exists';
+import debug from 'debug';
+import { ExecaChildProcess } from 'execa';
+import globAsync, { IOptions } from 'glob';
+
+const log = debug('monofo:util');
+
+const globPromise = promisify(globAsync);
 
 export const plurals = (n: number): string => (n === 1 ? '' : 's');
 export const count = (arr: Array<unknown>, name: string): string => `${arr.length} ${name}${plurals(arr.length)}`;
@@ -18,8 +26,6 @@ export async function filterAsync<T>(
   const filterMap = await mapAsync(array, callback);
   return array.filter((_, index) => filterMap[index]);
 }
-
-export const glob = promisify(globAsync);
 
 export function hasBin(bin: string): Promise<boolean> {
   return commandExists(bin)
@@ -47,4 +53,30 @@ export async function tar(): Promise<string> {
   }
 
   return 'tar';
+}
+
+// Glob caching
+const symlinks = {};
+const statCache = {};
+const realpathCache = {};
+const cache = {};
+
+export function glob(pattern: string, opts: IOptions = {}): Promise<string[]> {
+  return globPromise(pattern, {
+    matchBase: true,
+    dot: true,
+    cache,
+    symlinks,
+    statCache,
+    realpathCache,
+    ...opts,
+  });
+}
+
+export function globSet(patterns: string[], opts: IOptions = {}): Promise<string[]> {
+  return Promise.all(patterns.map(async (pattern) => glob(pattern, opts))).then((r) => {
+    const flat = [...new Set(r.flat())];
+    log(`Found ${count(flat, 'matching file')}`);
+    return flat;
+  });
 }

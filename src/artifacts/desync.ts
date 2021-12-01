@@ -2,7 +2,7 @@ import stream from 'stream';
 import execa, { ExecaReturnValue } from 'execa';
 import { hasBin, toStream } from '../util';
 
-// tar <our-existing-flags-but-without-compression> | desync tar --input-format tar --index $DESYNC_FLAGS --store s3+ssl://vital-buildkite-artifacts/katoa-store node-modules.caibx
+// tar <our-existing-flags-but-without-compression> | desync tar --input-format tar --index $DESYNC_FLAGS --store s3+ssl://vital-buildkite-artifacts/katoa-store node-modules.caidx
 // desync extract --cache /var/cache/desync --store s3+ssl://vital-buildkite-artifacts/katoa-store
 
 let hasDesync: Promise<boolean> | undefined;
@@ -48,7 +48,7 @@ export function inflate(outputPath = '.'): [stream.Writable, Promise<void>] {
  * - Expects the contents of a TAR archive to be piped into the returned writable stream
  * - Writes an index file to the given output path
  *
- * Send a .tar to the returned writable stream, and set `to` to a .caibx file
+ * Send a .tar to the returned writable stream, and set `to` to a .caidx file
  *
  * Deflates the tar into storage, and outputs an index file at to
  */
@@ -64,5 +64,5 @@ export function deflate(indexFileOutputPath: string): stream.Writable {
     )
   );
 
-  // TODO: after producing index: desync chop -s /some/local/store somefile.tar.caibx somefile.tar
+  // TODO: after producing index: desync chop -s /some/local/store somefile.tar.caidx somefile.tar
 }
