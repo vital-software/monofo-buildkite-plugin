@@ -2,12 +2,12 @@ import * as fs from 'fs';
 import { promisify } from 'util';
 import nock = require('nock');
 import rimrafSync = require('rimraf');
-import { Artifact, ArtifactApi, ArtifactDownloader } from '../src/artifact';
-import { fakeProcess } from './fixtures';
+import { Artifact, ArtifactApi, ArtifactDownloader } from '../../src/artifact/inflator';
+import { fakeProcess } from '../fixtures';
 
 const rimraf = promisify(rimrafSync);
 
-describe('ArtifactDownloader', () => {
+describe('ArtifactInflator', () => {
   let api: ArtifactApi;
   let sut: ArtifactDownloader;
 
@@ -34,11 +34,11 @@ describe('ArtifactDownloader', () => {
     await rimraf('foo/');
   });
 
-  it('can download and extract .tar.lz4 files correctly', async () => {
+  it('can download and inflate .tar.lz4 files correctly', async () => {
     process.env = fakeProcess();
 
     const artifact = new Artifact('foo.tar.lz4');
-    const res = await sut.downloadAndExtract(artifact);
+    const res = await sut.downloadAndInflate(artifact);
 
     expect(res).toBeUndefined();
     expect(fs.existsSync('foo/bar')).toBe(true);
