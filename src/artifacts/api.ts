@@ -5,6 +5,7 @@ import { Artifact } from './model';
 const log = debug('monofo:artifact:api');
 
 export class ArtifactApi {
+  // @todo move to buildkite-agent utils
   public async search(artifact: Artifact): Promise<string> {
     const args = [
       'artifact',

@@ -12,6 +12,21 @@ configuration:
       type: string
       enum:
         - pipeline
-    upload: {}
+    upload:
+      type: object
+      patternProperties:
+        '^[^/]*\.tar(\.lz4|\.caidx)?$':
+          oneOf:
+            - type: array
+              items:
+                type: string
+            - type: object
+              required:
+                - files-from
+              properties:
+                "files-from": { type: string }
+                null: { type: string }
+              additionalProperties: false
+      additionalProperties: false
     download: {}
   additionalProperties: false
