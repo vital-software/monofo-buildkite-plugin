@@ -53,8 +53,8 @@ monorepo:
 ```
 
 The `matches` configuration defines a set of (minimatch) glob-style paths to
-match. If there are any differences on your build that match (when compared to
-a carefully selected base commit), the component build is fully included in the
+match. If there are any differences on your build that match ([when compared to
+a carefully selected base commit](docs/diff.md)), the component build is fully included in the
 resulting output pipeline.
 
 However, if there are no matches for a component, its steps will be replaced by
@@ -93,37 +93,27 @@ As a special case, any artifact prefixed with `.phony/` is considered to not be
 a real file. These artifacts are still evaluated when _ordering_ pipeline steps,
 but they won't be actually downloaded.
 
-### Repeatable build skipping (`pure` flag)
+### Content-based build skipping (`pure`)
 
 You can mark a pipeline as pure by setting the `monorepo.pure` flag to `true` -
 this indicates that it doesn't have side-effects other than producing its
 artifacts, and the only inputs it relies on are listed in its `matches`.
-This means an extra layer of caching can be used, based on the
-contents of the files in the `matches` globs.  For example:
+
+Doing so enables an extra layer of caching, based on the contents of the input 
+files. For example:
 
 ```yaml
 monorepo:
   pure: true
-  matches: input-file.txt
-  produces: output-file.txt
-
-steps:
-  - command: do-something < input-file.txt > output-file.txt
-    plugins:
-      - artifacts#v1.3.0:
-          upload: output-file.txt
+  matches:  
+    - package.json
+    - yarn.lock
 ```
 
-When this build finishes, the contents of `input-file.txt` will be hashed.
-In any future build, if that file has the same contents, instead of running
-the `do-something` command step, `output-file.txt` will be directly downloaded
-from the last build that produced it successfully (and injected with the other
-artifacts at the start of the build)
+In any future build, if `package.json` and `yarn.lock` have the same content, 
+this pipeline will be skipped.
 
-Pure mode uses external metadata to be able to reuse artifacts from previous
-builds efficiently. Content hash to build ID mappings are stored in
-DynamoDB, so if you are using pure mode you will need to do some additional
-configuration. See [DynamoDB Setup](#dynamodb-setup)
+For more information, see [content-based build skipping](docs/pure.md)
 
 ### Branch inclusion/exclusion filters
 If you require more specificity for what branches do or do not run your pipelines,
@@ -177,36 +167,7 @@ _agent_ token.
 
 ### DynamoDB setup
 
-DynamoDB setup is only required if you're intending to use [pure mode](#repeatable-build-skipping-pure-flag)
-
-For starters, you'll need to run `monofo` as a user that can read and write to
-the `monofo_cache_metadata` DynamoDB table. How to do this depends on your
-own Buildkite stack, but you'd generally attach a policy that looks like this
-to the Buildkite role:
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "MonofoCacheMetadataAccess",
-      "Effect": "Allow",
-      "Action": [
-        "dynamodb:PutItem",
-        "dynamodb:DeleteTable",
-        "dynamodb:CreateTable",
-        "dynamodb:BatchGetItem"
-      ],
-      "Resource": "arn:aws:dynamodb:*:*:table/monofo_cache_metadata"
-    }
-  ]
-}
-```
-
-Then you should create the DynamoDB table so that it's ready for use. To do
-this, you can use `monofo install` to create the needed table (and
-`monofo uninstall` to remove it again should you need to). Finally, you can test
- writing to the DynamoDB table using the `monofo record-success` command.
+DynamoDB setup is only required if you're intending to use [pure mode](docs/pure.md#dynamodb-setup)
 
 
 ## CLI

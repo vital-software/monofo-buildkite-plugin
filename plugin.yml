@@ -12,4 +12,6 @@ configuration:
       type: string
       enum:
         - pipeline
+    upload: {}
+    download: {}
   additionalProperties: false
