@@ -1,7 +1,10 @@
 import debug from 'debug';
 import _ from 'lodash';
 import { Arguments } from 'yargs';
-import { Artifact, ArtifactApi, ArtifactDownloader } from '../artifact';
+import { ArtifactApi } from '../artifacts/api';
+import { ArtifactDownloader } from '../artifacts/download';
+import { ArtifactInflator } from '../artifacts/inflate';
+import { Artifact } from '../artifacts/model';
 import { BaseArgs, MonofoCommand, toCommand } from '../handler';
 
 const log = debug('monofo:cmd:download');
@@ -27,7 +30,7 @@ interface ArtifactArguments extends BaseArgs {
  */
 const cmd: MonofoCommand<ArtifactArguments> = {
   command: 'download',
-  describe: `Downloads the given list of artifacts, extracting them if they are suitable archives
+  describe: `Downloads the given list of artifacts, inflating them if they are suitable archives
 
 Receives a list of references to files
 
@@ -57,8 +60,13 @@ modifiers passed in env vars:
     log(`Donwloading ${artifacts.length} artifacts: ${artifacts.map((a) => a.name).join(', ')}`);
 
     const downloader = new ArtifactDownloader(new ArtifactApi());
+    const inflator = new ArtifactInflator();
 
-    return Promise.all(artifacts.map((artifact) => downloader.downloadAndExtract(artifact))).then(() => 'All done');
+    return Promise.all(
+      artifacts.map(async (artifact) => {
+        return inflator.inflate(await downloader.download(artifact), artifact);
+      })
+    ).then(() => 'All done');
   },
 };
 
