@@ -72,7 +72,7 @@ The supported compression types are:
 ### Desync
 
 Monofo uses [desync](https://github.com/folbricht/desync) to provide content-addressed 
-caching and storage, speeding up the upload and download of artifacts and cached files. 
+caching and storage, speeding up the upload and download of artifacts and cached files.
 
 ### Installing desync
 

@@ -1,8 +1,6 @@
 import { promises as fs } from 'fs';
 import { join } from 'path';
-import { promisify } from 'util';
 import debug from 'debug';
-import globAsync from 'glob';
 import { load as loadYaml } from 'js-yaml';
 import _ from 'lodash';
 import minimatch from 'minimatch';
@@ -13,16 +11,9 @@ import { BuildkiteBuild, Step } from './buildkite/types';
 import ConfigFile, { strings } from './config-file';
 import { FileHasher } from './hash';
 import Reason, { ExcludeReasonType } from './reason';
-import { count } from './util';
+import { count, glob, globSet } from './util';
 
 const log = debug('monofo:config');
-const glob = promisify(globAsync);
-
-// Glob caching
-const symlinks = {};
-const statCache = {};
-const realpathCache = {};
-const cache = {};
 
 interface MonorepoConfig {
   name: string;
@@ -173,25 +164,7 @@ export default class Config {
   public async getMatchingFiles(): Promise<string[]> {
     if (!this.matchingFiles) {
       log(`Getting matching files for ${this.monorepo.name}`);
-      const patterns = this.matchPatterns();
-
-      this.matchingFiles = await Promise.all(
-        patterns.map(async (pattern) =>
-          glob(pattern, {
-            matchBase: true,
-            dot: true,
-            nodir: true,
-            cache,
-            symlinks,
-            statCache,
-            realpathCache,
-          })
-        )
-      ).then((r) => {
-        const flat = [...new Set(r.flat())];
-        log(`Found ${count(flat, 'matching file')}`);
-        return flat;
-      });
+      this.matchingFiles = await globSet(this.matchPatterns(), { nodir: true });
     }
 
     return this.matchingFiles || [];

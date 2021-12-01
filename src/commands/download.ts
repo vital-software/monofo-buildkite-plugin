@@ -19,7 +19,7 @@ interface ArtifactArguments extends BaseArgs {
  * Receives a list of references to files
  *
  * We support two special cases:
- *  - if .tar.caibx, we inflate the artifact from desync, and extract in-place
+ *  - if .tar.caidx, we inflate the artifact from desync, and extract in-place
  *  - if .tar.lz4, we inflate the artifact using lz4, and extract in-place
  * In both cases, we don't support a "from/to" style configuration, only a list
  *
@@ -35,7 +35,7 @@ const cmd: MonofoCommand<ArtifactArguments> = {
 Receives a list of references to files
 
 We support two special cases:
-  - if .tar.caibx, we inflate the artifact from desync, and extract in-place
+  - if .tar.caidx, we inflate the artifact from desync, and extract in-place
   - if .tar.lz4, we inflate the artifact using lz4, and extract in-place
 
 In both cases, we don't support a "from/to" style configuration, only a list. For each artifact, we support three
