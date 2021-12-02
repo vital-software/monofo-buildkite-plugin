@@ -13,12 +13,12 @@ monorepo:
   matches:  
     - package.json
     - yarn.lock
-  produces: node-modules.tar
+  produces: node-modules.tar.lz4
 
 steps:
   - commands: 
       - yarn install
-      - tar -c -f node-modules.tar node_modules/
+      - find . -type d -name node_modules -prune -print0 > node-modules.list
     plugins:
       - vital-software/monofo#v3.0.3:
           upload:

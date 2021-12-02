@@ -10,9 +10,10 @@ services:
 
   plugin-lint:
     image: buildkite/plugin-linter
-    command: ['--id', 'vital-software/monofo']
+    command: /plugin/.buildkite/plugin-lint
+    entrypoint: []
     volumes:
-      - ".:/plugin:ro"
+      - ".:/plugin"
 
   plugin-test:
     image: buildkite/plugin-tester
