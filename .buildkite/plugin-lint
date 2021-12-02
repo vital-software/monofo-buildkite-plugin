@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+# Combines the documentation in the README file ahead of plugin lint
+#
+# This is because the plugin lint container can only examine a single Markdown
+# file to find code examples, but we want it to check all our documentation
+set -eu
+
+cat /plugin/README.md /plugin/docs/*.md > /plugin/.combined-docs.md
+exec lint --id vital-software/monofo --readme .combined-docs.md "${@}"

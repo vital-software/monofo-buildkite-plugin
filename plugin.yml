@@ -19,14 +19,22 @@ configuration:
           oneOf:
             - type: array
               items:
-                type: string
+                oneOf:
+                  - type: string
+                  - type: object
+                    properties:
+                      from: { type: string }
+                      to:   { type: string }
+                    additionalProperties: false
             - type: object
               required:
-                - files-from
+                - filesFrom
               properties:
-                "files-from": { type: string }
-                null: { type: string }
+                filesFrom: { type: string }
+                null:      { type: boolean }
               additionalProperties: false
-      additionalProperties: false
-    download: {}
+    download:
+      type: array
+      items:
+        type: string
   additionalProperties: false

@@ -2,11 +2,16 @@ monorepo:
   pure: true
   matches:
     - plugin.yml
+    - "**/*.md"
+    - .buildkite/before-plugin-lint
 
 steps:
   - name: ":buildkite: plugin lint"
     key: plugin-lint
+    command: '--readme README.combined.md'
     timeout_in_minutes: 20
     plugins:
+      - improbable-eng/metahook#v0.4.1:
+          pre-command: .buildkite/before-plugin-lint
       - docker-compose#v3.9.0:
           run: plugin-lint
