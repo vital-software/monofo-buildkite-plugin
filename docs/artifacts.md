@@ -52,7 +52,11 @@ steps:
   - commands:
       - yarn run some-command
     plugins:
+<<<<<<<
+      - vital-software/monofo#v3.0.2:
+=======
       - vital-software/monofo#v3.0.3:
+>>>>>>>
           download:
             - node-modules.tar.lz4
             - build.tar.cbidx
@@ -71,10 +75,10 @@ The supported compression types are:
 
 ### Desync
 
-Monofo uses [desync](https://github.com/folbricht/desync) to provide content-addressed 
+Monofo uses [desync](https://github.com/folbricht/desync) to provide content-addressed
 caching and storage, speeding up the upload and download of artifacts and cached files.
 
-### Installing desync
+#### Installing desync
 
 In order for Monofo to use desync, it must be available on the `PATH`. You can
 build a `desync` binary for your platform using `go install`:
@@ -83,7 +87,7 @@ build a `desync` binary for your platform using `go install`:
 GOOS=linux GOARCH=amd64 go install github.com/folbricht/desync/cmd/desync@latest
 ```
 
-### Configuring desync
+#### Configuring desync
 
 desync must also be configured using the `MONOFO_DESYNC_FLAGS` environment variable
 before it'll be available for use. This environment variable is substituted into

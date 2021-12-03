@@ -1,6 +1,12 @@
 #!/usr/bin/env bats
 
 setup() {
+  export MONOFO_HOOK_DEBUG=1
+
+  PROJECT_ROOT="$(dirname "$BATS_TEST_DIRNAME")"
+  PATH="$BATS_TMPDIR:$PATH"
+  SUT="$PROJECT_ROOT/hooks/pre-command"
+
   export PATH="$BATS_TMPDIR:$PATH"
 
   # Mock npx monofo
@@ -21,7 +27,7 @@ teardown() {
 
 @test "calls npx when generating a pipeline" {
   export BUILDKITE_PLUGIN_MONOFO_GENERATE="pipeline"
-  run $PWD/pre-command
+  run "$SUT"
 
   [[ "$output" = *"npx output"* ]] || ( echo "Failed to match: $output" >&3 && exit 2 )
   [[ "$output" = *"git output"* ]] || ( echo "Failed to match: $output" >&3 && exit 2 )
