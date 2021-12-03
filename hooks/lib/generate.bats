@@ -1,7 +1,11 @@
 #!/usr/bin/env bats
 
 setup() {
-  export PATH="$BATS_TMPDIR:$PATH"
+  export MONOFO_HOOK_DEBUG=1
+
+  PROJECT_ROOT="$(dirname "$(dirname "$BATS_TEST_DIRNAME")")"
+  PATH="$BATS_TMPDIR:$PATH"
+  SUT="$PROJECT_ROOT/hooks/lib/generate.bash"
 
   # Mock npx monofo
   echo "#!/usr/bin/env bash" > "$BATS_TMPDIR/npx"
@@ -23,7 +27,7 @@ teardown() {
   export BUILDKITE_PLUGIN_MONOFO_GENERATE="pipeline"
 
   # shellcheck source=./generate.bash
-  output="$(source $PWD/generate.bash)"
+  output="$(source "$SUT")"
 
   [[ "$output" = *"npx output"* ]] || ( echo "Failed to match: $output" >&3 && exit 2 )
   [[ "$output" = *"git output"* ]] || ( echo "Failed to match: $output" >&3 && exit 2 )

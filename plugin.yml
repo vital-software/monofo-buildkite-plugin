@@ -19,13 +19,7 @@ configuration:
           oneOf:
             - type: array
               items:
-                oneOf:
-                  - type: string
-                  - type: object
-                    properties:
-                      from: { type: string }
-                      to:   { type: string }
-                    additionalProperties: false
+                type: string
             - type: object
               required:
                 - filesFrom

@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Pre-command hook
+#
+# This script just interprets a couple of key settings, and then calls into the
+# relevant sub-script in lib/
+
+set -euo pipefail
+
+BUILDKITE_PLUGIN_MONOFO_GENERATE=${BUILDKITE_PLUGIN_MONOFO_GENERATE:-}
+BUILDKITE_AGENT_ACCESS_TOKEN=${BUILDKITE_AGENT_ACCESS_TOKEN:-}
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+if [[ -n "${BUILDKITE_PLUGIN_MONOFO_UPLOAD}" ]]; then
+  # shellcheck source=./lib/upload.bash
+  source "${SCRIPT_DIR}/lib/upload.bash"
+fi
+
+exit 0
+
+

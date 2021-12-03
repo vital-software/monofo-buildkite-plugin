@@ -2,6 +2,7 @@ import fs from 'fs';
 import stream, { pipeline as pipelineCb } from 'stream';
 import { promisify } from 'util';
 import debug from 'debug';
+import execa from 'execa';
 import _ from 'lodash';
 import split from 'split';
 import { Arguments } from 'yargs';
@@ -17,6 +18,7 @@ const pipeline = promisify(pipelineCb);
 const log = debug('monofo:cmd:upload');
 
 interface UploadArguments extends BaseArgs {
+  name: string;
   'glob-patterns': string[];
   'files-from'?: string;
   null: boolean;
@@ -46,10 +48,6 @@ async function filesToUpload(args: Arguments<UploadArguments>): Promise<string[]
   return matched;
 }
 
-async function upload(): Promise<void> {
-  return Promise.resolve();
-}
-
 /**
  * Upload task
  *
@@ -62,8 +60,17 @@ async function upload(): Promise<void> {
 const cmd: MonofoCommand<UploadArguments> = {
   command: 'upload',
 
+  describe:
+    'Produces a compressed tarball artifact from a given list of files or directories, and uploads it to Buildkite Artifacts',
+
   builder: (yargs) => {
     return yargs
+      .positional('name', {
+        array: false,
+        type: 'string',
+        describe: 'The artifact file name to produce from the given list of files',
+        demandOption: true,
+      })
       .positional('glob-patterns', {
         array: true,
         type: 'string',
@@ -92,8 +99,11 @@ const cmd: MonofoCommand<UploadArguments> = {
 
     log(`Uploading ${count(files, 'file')}`);
 
-    await Promise.all(files.map(upload));
+    await execa('tar', ['--files-from', '-'], { input: stream.Readable.from(files.join('\x00')) });
+
     return `Uploaded ${count(files, 'file')}`;
+
+    stream.Readable.from(files.join('\x00'));
 
     // const artifacts: Artifact[] = _.castArray(args.artifacts).map((filename) => new Artifact(filename));
     // log(`Donwloading ${artifacts.length} artifacts: ${artifacts.map((a) => a.name).join(', ')}`);

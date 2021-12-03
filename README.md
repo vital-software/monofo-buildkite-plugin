@@ -99,18 +99,18 @@ You can mark a pipeline as pure by setting the `monorepo.pure` flag to `true` -
 this indicates that it doesn't have side-effects other than producing its
 artifacts, and the only inputs it relies on are listed in its `matches`.
 
-Doing so enables an extra layer of caching, based on the contents of the input 
+Doing so enables an extra layer of caching, based on the contents of the input
 files. For example:
 
 ```yaml
 monorepo:
   pure: true
-  matches:  
+  matches:
     - package.json
     - yarn.lock
 ```
 
-In any future build, if `package.json` and `yarn.lock` have the same content, 
+In any future build, if `package.json` and `yarn.lock` have the same content,
 this pipeline will be skipped.
 
 For more information, see [content-based build skipping](docs/pure.md)
