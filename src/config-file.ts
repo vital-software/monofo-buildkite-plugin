@@ -5,19 +5,11 @@ import { glob } from './util';
 
 const log = debug('monofo:config-file');
 
-export /**
- * YAML helper for always returning an array of strings
+/**
+ * Represents an unparsed pipeline configuration file
+ *
+ * Encapsulates the filesystem aspects of searching for and loading pipeline files
  */
-function strings(v: undefined | string[] | string): string[] {
-  if (!v || v.length <= 0) {
-    return [];
-  }
-  if (_.isArray(v)) {
-    return v;
-  }
-  return [String(v)];
-}
-
 export default class ConfigFile {
   private static readonly PIPELINE_FILE_REGEX = /^pipeline\.(?<name>.*)\.yml$/;
 
