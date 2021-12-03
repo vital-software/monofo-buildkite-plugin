@@ -1,9 +1,9 @@
 #!/usr/bin/env bats
 
 setup() {
-  export PRE_COMMAND_DEBUG=1
+  export MONOFO_HOOK_DEBUG=1
 
-  PROJECT_ROOT="$(dirname "$BATS_TEST_DIRNAME")"
+  PROJECT_ROOT="$(dirname "$(dirname "$BATS_TEST_DIRNAME")")"
   PATH="$BATS_TMPDIR:$PATH"
   SUT="$PROJECT_ROOT/hooks/lib/download.bash"
 
@@ -21,38 +21,28 @@ teardown() {
 }
 
 @test "soft-fail allows curl failures" {
-  export TYPESCRIPT_SOFT_FAIL=1
+  export MONOFO_ARTIFACT_TYPESCRIPT_SOFT_FAIL=1
 
   # Mock failing curl
   echo "#!/usr/bin/env bash" > "$BATS_TMPDIR/curl"
   echo "echo 'Failed to download (fake)'; exit 2" >> "$BATS_TMPDIR/curl"
   chmod +x "$BATS_TMPDIR/curl"
 
-  run $SUT typescript
+  run $SUT typescript.tar.lz4
   [[ $? -eq 0 ]]
 }
 
-#@test "pre-command works with fake package" {
-#  mkdir -p "$BATS_TMPDIR/package/dist"
-#  touch "$BATS_TMPDIR/package/dist/foo.ts"
-#  tar -c --use-compress-program="lz4 -2" -f "$BATS_TMPDIR/typescript.tar.lz4" "$BATS_TMPDIR/package"
-#
-#  # Mock passing curl
-#  echo "#!/usr/bin/env bash" > "$BATS_TMPDIR/curl"
-#  echo "cat $BATS_TMPDIR/typescript.tar.lz4" >> "$BATS_TMPDIR/curl"
-#  chmod +x "$BATS_TMPDIR/curl"
-#
-#  run $SUT typescript
-#  [[ $? -eq 0 ]]
-#}
+@test "pre-command works with fake package" {
+  mkdir -p "$BATS_TMPDIR/package/dist"
+  touch "$BATS_TMPDIR/package/dist/foo.ts"
+  tar -c --use-compress-program="lz4 -2" -f "$BATS_TMPDIR/typescript.tar.lz4" "$BATS_TMPDIR/package"
 
-@test "calls monofo download when called with config" {
-  export BUILDKITE_PLUGIN_MONOFO_DOWNLOADE="foo"
+  # Mock passing curl
+  echo "#!/usr/bin/env bash" > "$BATS_TMPDIR/curl"
+  echo "cat $BATS_TMPDIR/typescript.tar.lz4" >> "$BATS_TMPDIR/curl"
+  chmod +x "$BATS_TMPDIR/curl"
 
-  # shellcheck source=./download.bash
-  output="$(source $PWD/download.bash)"
-
-  [[ 1 -eq 1 ]]
-#  [[ "$output" = *"npx output"* ]] || ( echo "Failed to match: $output" >&3 && exit 2 )
-#  [[ "$output" = *"git output"* ]] || ( echo "Failed to match: $output" >&3 && exit 2 )
+  run $SUT typescript.tar.lz4
+  [[ $? -eq 0 ]]
 }
+

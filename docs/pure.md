@@ -10,13 +10,13 @@ files.
 ```yaml
 monorepo:
   pure: true
-  matches:  
+  matches:
     - package.json
     - yarn.lock
   produces: node-modules.tar.lz4
 
 steps:
-  - commands: 
+  - commands:
       - yarn install
       - find . -type d -name node_modules -prune -print0 > node-modules.list
     plugins:

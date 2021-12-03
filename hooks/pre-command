@@ -7,6 +7,7 @@
 set -euo pipefail
 
 BUILDKITE_PLUGIN_MONOFO_GENERATE=${BUILDKITE_PLUGIN_MONOFO_GENERATE:-}
+BUILDKITE_PLUGIN_MONOFO_DOWNLOAD=${BUILDKITE_PLUGIN_MONOFO_DOWNLOAD:-}
 BUILDKITE_AGENT_ACCESS_TOKEN=${BUILDKITE_AGENT_ACCESS_TOKEN:-}
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
@@ -16,9 +17,11 @@ if [[ -n "${BUILDKITE_PLUGIN_MONOFO_GENERATE}" && "$BUILDKITE_PLUGIN_MONOFO_GENE
   source "${SCRIPT_DIR}/lib/generate.bash"
 fi
 
-if [[ -n "${BUILDKITE_PLUGIN_MONOFO_UPLOAD}" ]]; then
-  # shellcheck source=./lib/upload.bash
-  source "${SCRIPT_DIR}/lib/upload.bash"
+if [[ -n "${BUILDKITE_PLUGIN_MONOFO_DOWNLOAD}" ]]; then
+  # shellcheck source=./lib/download.bash
+  source "${SCRIPT_DIR}/lib/download.bash"
 fi
 
 exit 0
+
+
