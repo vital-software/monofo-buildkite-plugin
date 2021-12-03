@@ -4,6 +4,7 @@ import commandExists from 'command-exists';
 import debug from 'debug';
 import { ExecaChildProcess } from 'execa';
 import globAsync, { IOptions } from 'glob';
+import _ from 'lodash';
 
 const log = debug('monofo:util');
 
@@ -33,12 +34,20 @@ export function hasBin(bin: string): Promise<boolean> {
     .catch(() => false);
 }
 
-export function toStream(child: ExecaChildProcess): stream.Writable {
+export function stdinWritable(child: ExecaChildProcess): stream.Writable {
   if (!child.stdin) {
     throw new Error('Could not access stdin on child process');
   }
 
   return child.stdin;
+}
+
+export function stdoutReadable(child: ExecaChildProcess): stream.Readable {
+  if (!child.stdout) {
+    throw new Error('Could not access stdout on child process');
+  }
+
+  return child.stdout;
 }
 
 export async function tar(): Promise<string> {
@@ -53,6 +62,19 @@ export async function tar(): Promise<string> {
   }
 
   return 'tar';
+}
+
+/**
+ * YAML helper for always returning an array of strings
+ */
+export function strings(v: undefined | string[] | string): string[] {
+  if (!v || v.length <= 0) {
+    return [];
+  }
+  if (_.isArray(v)) {
+    return v;
+  }
+  return [String(v)];
 }
 
 // Glob caching

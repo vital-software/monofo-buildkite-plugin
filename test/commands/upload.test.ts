@@ -21,6 +21,10 @@ describe('cmd upload', () => {
   });
 
   it('can output help information', async () => {
-    return expect(execSync(upload, 'upload --help')).resolves.toContain('uploads the given list of artifacts');
+    return expect(execSync(upload, 'upload --help')).resolves.toContain(
+      'Produces a compressed tarball artifact from a given list of globs'
+    );
   });
+
+  it.todo('can upload lots of files');
 });

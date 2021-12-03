@@ -8,10 +8,10 @@ import toposort from 'toposort';
 import { parseBranchList } from './branch-list';
 import { getBuildkiteInfo } from './buildkite/config';
 import { BuildkiteBuild, Step } from './buildkite/types';
-import ConfigFile, { strings } from './config-file';
+import ConfigFile from './config-file';
 import { FileHasher } from './hash';
 import Reason, { ExcludeReasonType } from './reason';
-import { count, glob, globSet } from './util';
+import { count, glob, globSet, strings } from './util';
 
 const log = debug('monofo:config');
 

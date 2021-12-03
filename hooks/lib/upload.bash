@@ -48,26 +48,26 @@ files=$(echo "$BUILDKITE_PLUGIN_CONFIGURATION" | jq -r -c '.upload|to_entries|.[
 for file in $files; do
   (
     config_file="$(echo "$file" | jq -rc '.key')"
+
+    flags=(upload "$config_file")
+
     config_type="$(echo "$file" | jq -rc '.value | if type == "array" then "globs" else "file-list" end')"
-    config_value="$(echo "$file" | jq -rc '.value | if type != "array" then [.filesFrom, .null] else . end | .[]')"
 
     case "$config_type" in
       globs)
-        echo "Globs! $config_value" >&2
+        for config in $(echo "$file" | jq -rc '.value[]'); do
+          flags+=("$config")
+        done
         ;;
       file-list)
-        # We don't have to support - (stdin); there's no way to use it from a plugin; so we always have a file
-        filesFrom=$(echo "$config_value" | head -n 1)
-        useNull=$(echo "$config_value" | tail -n 1)
+        filesFrom="$(echo "$file" | jq -rc '.value.filesFrom')" # btw we don't have to support - (stdin) in the plugin context
+        useNull=$(echo "$file" | jq -rc '.value.null')
 
-        uploadFlags="--files-from $filesFrom"
+        flags+=(--files-from "$filesFrom")
 
         if [[ "$useNull" == "true" ]]; then
-          uploadFlags="$uploadFlags --null"
+          flags+=(--null)
         fi
-
-        echo "Going to run ${MONOFO} upload $config_file $uploadFlags" >&2
-        ${MONOFO} upload $config_file $uploadFlags
         ;;
       *)
         echo "Invalid config type $config_type" >&2
@@ -75,10 +75,8 @@ for file in $files; do
         ;;
     esac
 
-    echo "Got config value: $config_value" >&2
-
-    echo "Going to run ${MONOFO} upload $config_file ${UPLOAD_FLAGS:-}" >&2
-    echo ${MONOFO} upload "$config_file" ${UPLOAD_FLAGS:-}
+    echo "Going to run ${MONOFO} ${flags[*]}" >&2
+    ${MONOFO} "${flags[@]}"
   ) &
   pids+=($!)
 done

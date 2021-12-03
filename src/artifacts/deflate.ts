@@ -2,55 +2,38 @@ import fs from 'fs';
 import stream from 'stream';
 import { promisify } from 'util';
 import debug from 'debug';
-import execa from 'execa';
-import { tar, toStream } from '../util';
-import { inflate as inflateDesync, isDesyncEnabled } from './desync';
+import { deflateDesync } from './compression/desync';
+import { deflateLz4 } from './compression/lz4';
 import { Artifact } from './model';
 
 const log = debug('monofo:artifact:deflate');
 
 const pipeline = promisify(stream.pipeline);
-const finished = promisify(stream.finished);
 
 export class ArtifactDeflator {
+  /**
+   * @param input A readable stream of a tar archive
+   * @param artifact An output archive we're aiming to stream into
+   */
   public async deflate(input: stream.Readable, artifact: Artifact): Promise<void> {
-    try {
-      const [destination, finishedExec] = await this.destination(artifact);
-      await pipeline(input, destination);
+    switch (artifact.ext) {
+      case '.tar':
+        await pipeline(input, fs.createWriteStream(artifact.filename));
+        log(`Finished outputting tar file`, artifact.filename);
+        return;
 
-      await finishedExec;
-    } catch (error) {
-      log(`Failed to upload ${artifact.name}`, error);
+      case '.tar.lz4':
+        await pipeline(input, deflateLz4(), fs.createWriteStream(artifact.filename));
+        log(`Finished deflating LZ4 file`, artifact.filename);
+        return;
 
-      throw error;
+      case '.tar.caidx':
+        await pipeline(input, deflateDesync(artifact.filename), fs.createWriteStream(artifact.filename));
+        log(`Finished deflating caidx file`, artifact.filename);
+        return;
+
+      default:
+        throw new Error(`Unsupported artifact format: ${artifact.ext}`);
     }
-  }
-
-  private async destination(artifact: Artifact): Promise<[stream.Writable, Promise<void>]> {
-    if (artifact.ext.endsWith('tar.lz4')) {
-      log('Extracting from .tar.lz4');
-      return this.inflateLz4();
-    }
-
-    if (artifact.ext.endsWith('tar.cbidx') && (await isDesyncEnabled())) {
-      log('Extracting from .tar.cbidx');
-      return inflateDesync(artifact.filename.replace('/.cbidx$/', ''));
-    }
-
-    log('Extracting as-is');
-    const outputFile = fs.createWriteStream(artifact.filename);
-    return [outputFile, finished(outputFile).then(() => {})];
-  }
-
-  private async inflateLz4(): Promise<[stream.Writable, Promise<void>]> {
-    const subprocess = execa(await tar(), ['-xv', '--use-compress-program=lz4', '-f', '-'], {
-      buffer: true,
-      stdio: ['pipe', 'pipe', 'inherit'],
-    });
-
-    // eslint-disable-next-line no-void
-    void subprocess.then(() => log('Finished inflating LZ4 file'));
-
-    return [toStream(subprocess), subprocess.then(() => {})];
   }
 }

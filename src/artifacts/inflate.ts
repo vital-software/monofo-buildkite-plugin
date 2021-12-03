@@ -3,8 +3,8 @@ import stream from 'stream';
 import { promisify } from 'util';
 import debug from 'debug';
 import execa from 'execa';
-import { tar, toStream } from '../util';
-import { inflate as inflateDesync, isDesyncEnabled } from './desync';
+import { tar, stdinWritable } from '../util';
+import { inflateDesync, isDesyncEnabled } from './compression/desync';
 import { Artifact } from './model';
 
 const log = debug('monofo:artifact:inflate');
@@ -61,6 +61,6 @@ export class ArtifactInflator {
     // eslint-disable-next-line no-void
     void subprocess.then(() => log('Finished inflating LZ4 file'));
 
-    return [toStream(subprocess), subprocess.then(() => {})];
+    return [stdinWritable(subprocess), subprocess.then(() => {})];
   }
 }
