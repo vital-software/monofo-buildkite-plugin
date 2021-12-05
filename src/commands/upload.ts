@@ -5,10 +5,11 @@ import debug from 'debug';
 import execa from 'execa';
 import split from 'split';
 import { Arguments } from 'yargs';
+import { tar } from '../artifacts/compression/tar';
 import { ArtifactDeflator } from '../artifacts/deflate';
 import { Artifact } from '../artifacts/model';
 import { BaseArgs, MonofoCommand, toCommand } from '../handler';
-import { count, globSet, tar, stdinWritable, stdoutReadable } from '../util';
+import { count, globSet, stdinWritable, stdoutReadable } from '../util';
 
 const pipeline = promisify(pipelineCb);
 

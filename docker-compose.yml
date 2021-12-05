@@ -17,6 +17,6 @@ services:
 
   plugin-test:
     image: buildkite/plugin-tester
-    command: bats hooks/
+    command: bats -r hooks/
     volumes:
       - ".:/plugin:ro"

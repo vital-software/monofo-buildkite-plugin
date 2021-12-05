@@ -3,8 +3,9 @@ import stream from 'stream';
 import { promisify } from 'util';
 import debug from 'debug';
 import execa from 'execa';
-import { tar, stdinWritable } from '../util';
+import { stdinWritable } from '../util';
 import { inflateDesync, isDesyncEnabled } from './compression/desync';
+import { tar } from './compression/tar';
 import { Artifact } from './model';
 
 const log = debug('monofo:artifact:inflate');
