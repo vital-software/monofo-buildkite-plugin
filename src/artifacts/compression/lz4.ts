@@ -1,7 +1,8 @@
 import stream from 'stream';
 import debug from 'debug';
 import execa from 'execa';
-import { stdinWritable, tar } from '../../util';
+import { stdinWritable } from '../../util';
+import { tar } from './tar';
 
 const log = debug('monofo:artifact:lz4');
 

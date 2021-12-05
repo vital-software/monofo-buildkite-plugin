@@ -1,7 +1,7 @@
 monorepo:
   pure: true
   matches:
-    - hooks/*
+    - hooks/**
 
 steps:
   - name: ":bats: Run bats tests"

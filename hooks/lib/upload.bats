@@ -7,17 +7,14 @@ setup() {
   PATH="$BATS_TMPDIR:$PATH"
   SUT="$PROJECT_ROOT/hooks/lib/upload.bash"
 
-  # Mock buildkite-agent
-  echo "#!/usr/bin/env bash" > "$BATS_TMPDIR/buildkite-agent"
-  echo "if [[ \$1 = \"artifact\" && \$2 = \"search\" ]]; then echo \"https://example.com/some/artifact/path.tar.lz4\"; fi" >> "$BATS_TMPDIR/buildkite-agent"
-  chmod +x "$BATS_TMPDIR/buildkite-agent"
+  # Mock npx
+  echo "#!/usr/bin/env bash" > "$BATS_TMPDIR/npx"
+  echo "if [[ \$1 = \"monofo@\"* ]]; then echo \"npx output\"; else echo \"Unknown npx utility \$1\" >&2; exit 2; fi" >> "$BATS_TMPDIR/npx"
+  chmod +x "$BATS_TMPDIR/npx"
 }
 
 teardown() {
-  rm -rf "$BATS_TMPDIR/buildkite-agent"
-  rm -rf "$BATS_TMPDIR/curl"
-  rm -rf "$BATS_TMPDIR/typescript.tar.lz4"
-  rm -rf "$BATS_TMPDIR/package"
+  rm -rf "$BATS_TMPDIR/npx"
 }
 
 @test "calls monofo upload when called with config" {
@@ -26,10 +23,5 @@ teardown() {
   # shellcheck source=./upload.bash
   output="$(source $SUT)"
 
-  echo "$output"
-  echo "$output" >&3
-
-  [[ 1 -eq 1 ]]
-#  [[ "$output" = *"npx output"* ]] || ( echo "Failed to match: $output" >&3 && exit 2 )
-#  [[ "$output" = *"git output"* ]] || ( echo "Failed to match: $output" >&3 && exit 2 )
+  [[ "$output" = *"npx output"*"npx output"* ]] || ( echo "Failed to match: $output" >&3 && exit 2 )
 }

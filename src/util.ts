@@ -50,20 +50,6 @@ export function stdoutReadable(child: ExecaChildProcess): stream.Readable {
   return child.stdout;
 }
 
-export async function tar(): Promise<string> {
-  if (process.platform === 'darwin') {
-    if (await hasBin('gtar')) {
-      return 'gtar';
-    }
-
-    process.stderr.write(
-      'WARNING: may fail to extract correctly: if so, need a GNU compatible tar, named gtar, on PATH\n'
-    );
-  }
-
-  return 'tar';
-}
-
 /**
  * YAML helper for always returning an array of strings
  */
