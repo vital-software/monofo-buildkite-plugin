@@ -1,3 +1,13 @@
+## [3.0.2](https://github.com/vital-software/monofo/compare/v3.0.1...v3.0.2) (2021-12-06)
+
+
+### Bug Fixes
+
+* **deps:** update dependency yargs to v17.3.0 ([fe97188](https://github.com/vital-software/monofo/commit/fe97188e83d952a9c32df53aeff80bdc5d6b8345))
+* **hooks:** fix a stray colon in the replacement string ([1839944](https://github.com/vital-software/monofo/commit/1839944a844782823ac54d3381186490fcb293a6))
+* **import:** use esinterop syntax for loading command module ([ffec8d3](https://github.com/vital-software/monofo/commit/ffec8d3ddf40e06ce941eb3e1e62462c246ff188))
+* **types:** merge execSync from one branch with new command types from other ([4c66927](https://github.com/vital-software/monofo/commit/4c66927ecd5dc9c71bc5e1afa9ea71e2a4875b45))
+
 ## [3.0.1](https://github.com/vital-software/monofo/compare/v3.0.0...v3.0.1) (2021-11-29)
 
 
