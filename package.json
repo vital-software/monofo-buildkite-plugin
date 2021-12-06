@@ -31,7 +31,7 @@
     "node": ">=14.16"
   },
   "dependencies": {
-    "aws-sdk": "2.1019.0",
+    "aws-sdk": "2.1044.0",
     "bluebird": "3.7.2",
     "chalk": "4.1.2",
     "debug": "4.3.3",
