@@ -1,7 +1,6 @@
-import download from '../../src/cmd/download';
+import Download from '../../src/commands/download';
 import { mergeBase, diff, revList } from '../../src/git';
 import { fakeProcess, COMMIT } from '../fixtures';
-import execSync from './exec';
 
 jest.mock('../../src/git');
 jest.mock('../../src/buildkite/client');
@@ -21,6 +20,6 @@ describe('cmd download', () => {
   });
 
   it('can output help information', async () => {
-    return expect(execSync(download, 'download --help')).resolves.toContain('Downloads the given list of artifacts');
+    return expect(Download.run(['--help'])).resolves.toContain('Downloads the given list of artifacts');
   });
 });

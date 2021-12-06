@@ -1,10 +1,9 @@
 import * as fs from 'fs';
 import { promisify } from 'util';
 import { directory } from 'tempy';
-import upload from '../../src/cmd/upload';
+import Upload from '../../src/commands/upload';
 import { mergeBase, diff, revList } from '../../src/git';
 import { fakeProcess, COMMIT } from '../fixtures';
-import execSync from './exec';
 
 const writeFile = promisify(fs.writeFile);
 
@@ -26,13 +25,13 @@ describe('cmd upload', () => {
   });
 
   it('can output help information', async () => {
-    return expect(execSync(upload, 'upload --help')).resolves.toContain(
+    return expect(Upload.run(['--help'])).resolves.toContain(
       'Produces a compressed tarball artifact from a given list of globs'
     );
   });
 
   it('fails if not given an output file name to upload', async () => {
-    return expect(execSync(upload, 'upload --files-from -')).rejects.toThrowError('Must be given an output');
+    return expect(Upload.run(['--files-from', '-'])).rejects.toThrowError('Must be given an output');
   });
 
   it('can upload a list of files, null separated', async () => {
@@ -42,7 +41,7 @@ describe('cmd upload', () => {
       await writeFile(`${dir}/file-list.null.txt`, 'foo.txt\x00bar.txt');
 
       await expect(
-        execSync(upload, `upload --files-from "${dir}/file-list.null.txt" --null some-upload.tar.gz *.txt`)
+        Upload.run(['--files-from', '${dir}/file-list.null.txt', '--null', 'some-upload.tar.gz', '*.txt'])
       ).resolves.toContain('uploaded');
     });
   });
