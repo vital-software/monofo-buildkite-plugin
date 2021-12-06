@@ -1,22 +1,20 @@
 import debug from 'debug';
 import { dump as dumpYaml } from 'js-yaml';
 import { getBuildkiteInfo } from '../buildkite/config';
+import { BaseCommand } from '../command';
 import Config from '../config';
 import { getBaseBuild, matchConfigs } from '../diff';
 import { diff } from '../git';
-import { MonofoCommand, setUpHander, toCommand } from '../handler';
 import mergePipelines from '../merge';
 
 const log = debug('monofo:cmd:pipeline');
 
-const cmd: MonofoCommand = {
-  command: 'pipeline',
-  describe: 'Output a merged pipeline.yml',
-  aliases: '$0',
-  builder: {},
-  handler(args): Promise<string> {
-    setUpHander(args);
+export default class Pipeline extends BaseCommand {
+  static description = 'generate a dynamic pipeline.yml and output it';
 
+  static flags = { ...BaseCommand.flags };
+
+  run() {
     return Config.getAll(process.cwd())
       .then((c) =>
         c.length > 0 ? c : Promise.reject(new Error(`No pipeline files to process (cwd: ${process.cwd()})`))
@@ -38,7 +36,5 @@ const cmd: MonofoCommand = {
         process.stdout.write(`${v}\n`);
         return v;
       });
-  },
-};
-
-export = toCommand(cmd);
+  }
+}

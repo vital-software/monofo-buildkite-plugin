@@ -12,6 +12,6 @@
     "emitDecoratorMetadata": true,
     "resolveJsonModule": true
   },
-  "include": ["src/**/*.ts", "bin/*.js"],
+  "include": ["src/**/*.ts", "test/**/*.ts", "bin/*.js"],
   "extends": "@tsconfig/node14/tsconfig.json"
 }
