@@ -52,6 +52,7 @@ modifiers passed in env vars:
       type: 'string',
       describe: 'A list of artifact files to retrieve and extract',
       demandOption: true,
+      required: true,
     });
   },
 

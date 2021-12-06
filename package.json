@@ -114,6 +114,7 @@
     "prettier": "2.5.1",
     "semantic-release": "18.0.1",
     "stdout-stderr": "0.1.13",
+    "tempy": "1.0.1",
     "ts-jest": "27.1.0",
     "typescript": "4.5.2"
   },
@@ -192,13 +193,13 @@
             },
             {
               "files": [
-                "hooks/pre-command"
+                "hooks/lib/run.bash"
               ],
               "from": "MONOFO_VERSION=[-0-9a-z.]*",
               "to": "MONOFO_VERSION=${nextRelease.version}",
               "results": [
                 {
-                  "file": "hooks/pre-command",
+                  "file": "hooks/lib/run.bash",
                   "hasChanged": true,
                   "numMatches": 1,
                   "numReplacements": 1
@@ -217,7 +218,6 @@
             "docs/artifacts.md",
             "docs/pure.md",
             "hooks/lib/run.bash",
-            "hooks/pre-command",
             "package.json",
             "README.md"
           ]
