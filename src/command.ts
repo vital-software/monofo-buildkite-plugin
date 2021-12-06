@@ -1,5 +1,10 @@
 import { Command, flags as f } from '@oclif/command';
 
+export interface BaseFlags {
+  chdir?: string;
+  verbose: boolean;
+}
+
 export abstract class BaseCommand extends Command {
   static strict = false;
 

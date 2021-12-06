@@ -6,7 +6,7 @@ monorepo:
     - .buildkite/plugin-lint
 
 steps:
-  - name: ":buildkite: plugin lint"
+  - name: ":buildkite: Plugin Lint"
     key: plugin-lint
     timeout_in_minutes: 20
     plugins:
