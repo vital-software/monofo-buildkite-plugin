@@ -10,7 +10,8 @@
     "noFallthroughCasesInSwitch": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "esModuleInterop": true
   },
   "include": ["src/**/*.ts", "test/**/*.ts", "bin/*.js"],
   "extends": "@tsconfig/node14/tsconfig.json"
