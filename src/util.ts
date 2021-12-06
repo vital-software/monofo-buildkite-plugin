@@ -1,3 +1,6 @@
+import { promisify } from 'util';
+import globAsync from 'glob';
+
 export const plurals = (n: number): string => (n === 1 ? '' : 's');
 export const count = (arr: Array<unknown>, name: string): string => `${arr.length} ${name}${plurals(arr.length)}`;
 
@@ -15,3 +18,5 @@ export async function filterAsync<T>(
   const filterMap = await mapAsync(array, callback);
   return array.filter((_, index) => filterMap[index]);
 }
+
+export const glob = promisify(globAsync);

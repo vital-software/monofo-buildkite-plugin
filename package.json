@@ -6,6 +6,7 @@
   "bin": {
     "monofo": "./bin/monofo.js"
   },
+  "main": "dist/src/index.js",
   "repository": "https://github.com/vital-software/monofo",
   "license": "GPL-3.0-or-later",
   "keywords": [
@@ -13,24 +14,49 @@
     "monorepo"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "build:watch": "run-s \"build -w\"",
-    "clean": "rm -rf build",
+    "build": "run-s build:ts build:after:*",
+    "build:ts": "tsc -b",
+    "build:after:manifest": "OCLIF_TS_NODE=0 oclif-dev manifest",
+    "build:after:readme": "oclif-dev readme",
+    "build:watch": "run-s \"build:ts -w\"",
+    "clean": "rm -rf dist/ output/",
     "commit": "git-cz",
     "git:sync": "git push plugin +refs/remotes/origin/*:refs/heads/* +refs/tags/*:refs/tags/*",
     "git:sync:setup": "git remote add plugin git@github.com:vital-software/monofo-buildkite-plugin.git",
     "lint": "eslint \"{src,test}/**/*.ts\"",
     "lint:fix": "run-s \"lint --fix\"",
-    "monofo": "./bin/monofo.js",
+    "monofo": "./bin/run",
     "monofo:with-aws": "aws-vault exec vital-ci -- yarn monofo",
     "release": "semantic-release",
     "test": "jest",
-    "test:watch": "run-s \"test --watch\""
+    "test:watch": "run-s \"test --watch\"",
+    "prepack": "run-s build"
   },
   "engines": {
     "node": ">=14.16"
   },
+  "oclif": {
+    "commands": "./dist/src/commands",
+    "bin": "monofo",
+    "plugins": [
+      "@oclif/plugin-autocomplete",
+      "@oclif/plugin-not-found",
+      "@oclif/plugin-which"
+    ]
+  },
+  "files": [
+    "/bin",
+    "/dist",
+    "/yarn.lock",
+    "/oclif.manifest.json"
+  ],
   "dependencies": {
+    "@oclif/command": "1.8.0",
+    "@oclif/config": "1.17.0",
+    "@oclif/plugin-autocomplete": "0.3.0",
+    "@oclif/plugin-help": "3.2.3",
+    "@oclif/plugin-not-found": "1.2.4",
+    "@oclif/plugin-which": "1.0.3",
     "aws-sdk": "2.1044.0",
     "bluebird": "3.7.2",
     "chalk": "4.1.2",
@@ -42,13 +68,13 @@
     "lodash": "4.17.21",
     "minimatch": "3.0.4",
     "tiny-async-pool": "1.2.0",
-    "toposort": "2.0.2",
-    "yargs": "17.3.0"
+    "toposort": "2.0.2"
   },
   "devDependencies": {
     "@commitlint/cli": "15.0.0",
     "@commitlint/config-conventional": "15.0.0",
     "@google/semantic-release-replace-plugin": "1.1.0",
+    "@oclif/dev-cli": "1.26.6",
     "@semantic-release/changelog": "6.0.1",
     "@semantic-release/git": "10.0.1",
     "@tsconfig/node14": "1.0.1",
@@ -61,12 +87,13 @@
     "@types/minimatch": "3.0.5",
     "@types/tiny-async-pool": "1.0.0",
     "@types/toposort": "2.0.3",
-    "@types/yargs": "17.0.7",
     "@typescript-eslint/eslint-plugin": "5.6.0",
     "@typescript-eslint/parser": "5.6.0",
     "cz-conventional-changelog": "3.3.0",
     "eslint": "8.4.0",
     "eslint-config-airbnb-typescript": "16.1.0",
+    "eslint-config-oclif": "4.0.0",
+    "eslint-config-oclif-typescript": "1.0.2",
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-import": "2.25.3",
     "eslint-plugin-jest": "25.3.0",
@@ -77,8 +104,10 @@
     "jest-fetch-mock": "3.0.3",
     "nock": "13.2.1",
     "npm-run-all": "4.1.5",
+    "pkg": "5.5.1",
     "prettier": "2.5.1",
     "semantic-release": "18.0.1",
+    "stdout-stderr": "0.1.13",
     "ts-jest": "27.1.0",
     "typescript": "4.5.2"
   },
@@ -172,6 +201,11 @@
         }
       ],
       "@semantic-release/github"
+    ]
+  },
+  "pkg": {
+    "scripts": [
+      "dist/**/*.js"
     ]
   }
 }

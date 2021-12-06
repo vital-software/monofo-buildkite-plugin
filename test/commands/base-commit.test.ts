@@ -1,10 +1,7 @@
 import path from 'path';
-import { Arguments } from 'yargs';
-import baseCommit from '../../src/cmd/base-commit';
+import BaseCommit from '../../src/commands/base-commit';
 import { mergeBase, diff, revList } from '../../src/git';
-import { BaseArgs } from '../../src/handler';
 import { fakeProcess, COMMIT } from '../fixtures';
-import execSync from './exec';
 
 jest.mock('../../src/git');
 jest.mock('../../src/buildkite/client');
@@ -18,15 +15,13 @@ mockRevList.mockImplementation(() => Promise.resolve([COMMIT]));
 const mockDiff = diff as jest.Mock<Promise<string[]>>;
 mockDiff.mockImplementation(() => Promise.resolve(['foo/README.md', 'baz/abc.ts']));
 
-const emptyArgs: Arguments<BaseArgs> = { $0: '', _: [], chdir: undefined, verbose: false };
-
 describe('cmd base-commit', () => {
   beforeEach(() => {
     process.env = fakeProcess();
   });
 
   it('can output help information', async () => {
-    return expect(execSync(baseCommit, 'base-commit --help')).resolves.toContain('Output a base commit hash');
+    await expect(BaseCommit.run(['--help'])).resolves.toBeUndefined();
   });
 
   it('will error if Buildkite API does', async () => {
@@ -34,13 +29,13 @@ describe('cmd base-commit', () => {
     process.env.BUILDKITE_API_ACCESS_TOKEN = 'fake';
     process.chdir(__dirname);
 
-    return expect(baseCommit.innerHandler(emptyArgs)).resolves.toBe(COMMIT);
+    return expect(BaseCommit.run([])).resolves.toBe(COMMIT);
   });
 
   it('can be executed with simple configuration', async () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, '../projects/kitchen-sink'));
 
-    return expect(baseCommit.innerHandler(emptyArgs)).resolves.toBe(COMMIT);
+    return expect(BaseCommit.run([])).resolves.toBe(COMMIT);
   });
 });

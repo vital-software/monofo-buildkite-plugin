@@ -1,10 +1,8 @@
 import { basename } from 'path';
-import { promisify } from 'util';
 import debug from 'debug';
-import globAsync from 'glob';
 import _ from 'lodash';
+import { glob } from './util';
 
-const glob = promisify(globAsync);
 const log = debug('monofo:config-file');
 
 export /**

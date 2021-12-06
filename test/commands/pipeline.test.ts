@@ -2,16 +2,14 @@ import path from 'path';
 import { createTables, startDb, stopDb } from 'jest-dynalite';
 import { load as loadYaml } from 'js-yaml';
 import _ from 'lodash';
+import { stdout } from 'stdout-stderr';
 import { mocked } from 'ts-jest/utils';
-import { Arguments } from 'yargs';
-import { CommandStep, Pipeline, Step } from '../../src/buildkite/types';
+import { CommandStep, Pipeline as BuildkitePipeline, Step } from '../../src/buildkite/types';
 import { CacheMetadataRepository } from '../../src/cache-metadata';
-import pipeline from '../../src/cmd/pipeline';
+import Pipeline from '../../src/commands/pipeline';
 import { service } from '../../src/dynamodb';
 import { mergeBase, diff, revList } from '../../src/git';
-import { BaseArgs } from '../../src/handler';
 import { BUILD_ID, BUILD_ID_2, BUILD_ID_3, COMMIT, fakeProcess } from '../fixtures';
-import execSync from './exec';
 
 jest.mock('../../src/git');
 jest.mock('../../src/buildkite/client');
@@ -40,34 +38,35 @@ function commandSummary(steps: Step[]): string[] {
   });
 }
 
-const EMPTY_ARGUMENTS: Arguments<BaseArgs> = { $0: '', _: [], chdir: undefined, verbose: false };
-
 describe('monofo pipeline', () => {
   beforeAll(startDb);
   beforeAll(createTables);
   afterAll(stopDb);
 
   it('returns help output', async () => {
-    const output = await execSync(pipeline, 'pipeline --help');
-    expect(output).toContain('Output a merged pipeline.yml');
+    stdout.start();
+    await Pipeline.run(['--help']);
+    stdout.stop();
+    expect(stdout.output).toContain('Output a merged pipeline.yml');
   });
 
   it('can be executed with no configuration', async () => {
     process.env = fakeProcess();
     process.chdir(__dirname);
 
-    const out: Promise<string> = pipeline.innerHandler(EMPTY_ARGUMENTS);
+    stdout.start();
+    await Pipeline.run([]);
+    stdout.stop();
 
-    return expect(out).rejects.toThrowError('No pipeline files');
+    return expect(stdout.output).rejects.toThrowError('No pipeline files');
   });
 
   it('can be executed with configuration on the default branch', async () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, '../projects/kitchen-sink'));
 
-    await pipeline
-      .innerHandler(EMPTY_ARGUMENTS)
-      .then((o) => loadYaml(o) as Pipeline)
+    await Pipeline.run([])
+      .then((o) => loadYaml(o) as BuildkitePipeline)
       .then((p) => {
         expect(p).toBeDefined();
         expect(commandSummary(p.steps)).toStrictEqual([
@@ -94,9 +93,8 @@ describe('monofo pipeline', () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, '../projects/skipped'));
 
-    await pipeline
-      .innerHandler(EMPTY_ARGUMENTS)
-      .then((o) => loadYaml(o) as Pipeline)
+    await Pipeline.run([])
+      .then((o) => loadYaml(o) as BuildkitePipeline)
       .then((p) => {
         expect(p).toBeDefined();
         expect(commandSummary(p.steps)).toStrictEqual([
@@ -115,9 +113,8 @@ describe('monofo pipeline', () => {
     });
     process.chdir(path.resolve(__dirname, '../projects/kitchen-sink'));
 
-    await pipeline
-      .innerHandler(EMPTY_ARGUMENTS)
-      .then((o) => loadYaml(o) as Pipeline)
+    await Pipeline.run([])
+      .then((o) => loadYaml(o) as BuildkitePipeline)
       .then((p) => {
         expect(p).toBeDefined();
         expect(commandSummary(p.steps)).toStrictEqual([
@@ -144,9 +141,8 @@ describe('monofo pipeline', () => {
     });
     process.chdir(path.resolve(__dirname, '../projects/kitchen-sink'));
 
-    await pipeline
-      .innerHandler(EMPTY_ARGUMENTS)
-      .then((o) => loadYaml(o) as Pipeline)
+    await Pipeline.run([])
+      .then((o) => loadYaml(o) as BuildkitePipeline)
       .then((p) => {
         expect(p).toBeDefined();
         expect(commandSummary(p.steps)).toStrictEqual([
@@ -170,9 +166,8 @@ describe('monofo pipeline', () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, '../projects/crossdeps'));
 
-    await pipeline
-      .innerHandler(EMPTY_ARGUMENTS)
-      .then((o) => loadYaml(o) as Pipeline)
+    await Pipeline.run([])
+      .then((o) => loadYaml(o) as BuildkitePipeline)
       .then((p) => {
         expect(p).toBeDefined();
         expect(p.steps).toHaveLength(1); // No artifacts step, because only phony artifacts involved
@@ -188,9 +183,8 @@ describe('monofo pipeline', () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, '../projects/flexible-structure'));
 
-    await pipeline
-      .innerHandler(EMPTY_ARGUMENTS)
-      .then((o) => loadYaml(o) as Pipeline)
+    await Pipeline.run([])
+      .then((o) => loadYaml(o) as BuildkitePipeline)
       .then((p) => {
         expect(p).toBeDefined();
         expect(p.steps).toHaveLength(3);
@@ -202,9 +196,8 @@ describe('monofo pipeline', () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, '../projects/pure'));
 
-    await pipeline
-      .innerHandler(EMPTY_ARGUMENTS)
-      .then((o) => loadYaml(o) as Pipeline)
+    await Pipeline.run([])
+      .then((o) => loadYaml(o) as BuildkitePipeline)
       .then((p) => {
         expect(p).toBeDefined();
         expect(p.steps).toHaveLength(4);
@@ -250,9 +243,8 @@ describe('monofo pipeline', () => {
       }),
     ]);
 
-    await pipeline
-      .innerHandler(EMPTY_ARGUMENTS)
-      .then((o) => loadYaml(o) as Pipeline)
+    await Pipeline.run([])
+      .then((o) => loadYaml(o) as BuildkitePipeline)
       .then((p) => {
         expect(p).toBeDefined();
         expect(commandSummary(p.steps)).toStrictEqual([
@@ -300,9 +292,8 @@ describe('monofo pipeline', () => {
       }),
     ]);
 
-    await pipeline
-      .innerHandler(EMPTY_ARGUMENTS)
-      .then((o) => loadYaml(o) as Pipeline)
+    await Pipeline.run([])
+      .then((o) => loadYaml(o) as BuildkitePipeline)
       .then((p) => {
         expect(p).toBeDefined();
         expect(p.steps.map((s) => s.key)).toStrictEqual([

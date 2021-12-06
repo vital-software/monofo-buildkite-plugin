@@ -1,0 +1,14 @@
+#!/usr/bin/env node
+
+process.env.OCLIF_TS_NODE = '0';
+
+const fs = require('fs')
+const path = require('path')
+
+if (!fs.existsSync(path.join(__dirname, '../dist'))) {
+  throw new Error("Monofo expects to run with Typescript compiled; try running yarn build")
+}
+
+require('@oclif/command').run()
+.then(require('@oclif/command/flush'))
+.catch(require('@oclif/errors/handle'))
