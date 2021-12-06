@@ -143,13 +143,13 @@
             },
             {
               "files": [
-                "hooks/lib/run.bash"
+                "hooks/pre-command"
               ],
               "from": "MONOFO_VERSION=[-0-9a-z.]*",
               "to": "MONOFO_VERSION=${nextRelease.version}",
               "results": [
                 {
-                  "file": "hooks/lib/run.bash",
+                  "file": "hooks/pre-command",
                   "hasChanged": true,
                   "numMatches": 1,
                   "numReplacements": 1
