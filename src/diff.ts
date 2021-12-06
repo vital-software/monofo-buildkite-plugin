@@ -4,7 +4,8 @@ import BuildkiteClient from './buildkite/client';
 import { BuildkiteBuild, BuildkiteEnvironment } from './buildkite/types';
 import Config from './config';
 import { commitExists, mergeBase, revList } from './git';
-import { count, filterAsync } from './util';
+import { filterAsync } from './util/async';
+import { count } from './util/helper';
 
 const log = debug('monofo:diff');
 

@@ -11,7 +11,8 @@ import { BuildkiteBuild, Step } from './buildkite/types';
 import ConfigFile from './config-file';
 import { FileHasher } from './hash';
 import Reason, { ExcludeReasonType } from './reason';
-import { count, glob, globSet, strings } from './util';
+import { globSet } from './util/glob';
+import { strings } from './util/helper';
 
 const log = debug('monofo:config');
 

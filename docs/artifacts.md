@@ -11,9 +11,18 @@ you might find it easier to use the standard
 
 ## Uploads
 
-The `upload` subcommand accepts a list of files to upload under each artifact as
-either positional arguments, or from a file, or a stream (by passing
-`--files-from -` to read stdin)
+The `upload` subcommand takes a target artifact output file name, like 
+`node-modules.tar.lz4`. The artifact filename will determine what sort of 
+compressed archive is produced.
+
+The `upload` subcommand also needs a list of files to include in the archive.
+This list can be passed using:
+ - a list of glob expressions, or
+ - a file containing a list of paths to include
+
+Passing `-` as the file to read from will cause `upload` to read the list of
+files from `stdin` - this allows e.g. using `find -print0` to produce a list
+of matching files to upload.
 
 ```yaml
 steps:
@@ -21,7 +30,7 @@ steps:
       - yarn install
       - yarn build
     plugins:
-      - vital-software/monofo#v3.0.3:
+      - vital-software/monofo#v3.1.1:
           upload:
             node-modules.tar.lz4:
               filesFrom: node-modules.list
@@ -31,13 +40,11 @@ steps:
               - "another/dist/**"
 ```
 
-The artifact filename will determine the treatment given to each uploaded file;
-this is so that the artifact name is deterministic.
 
-The first style (`filesFrom`) is more performant than the second (a list of
-globs), because it e.g. allows the use of `-prune` (to early-exit from a `find`
-traversal, skipping a lot of file I/O; this is particularly useful for finding
-large numbers of small files by pointing at their parent directory)
+Passing a "filesFrom" list can be much faster than using globs, because it 
+allows the use of `-prune` (to early-exit from a `find` traversal, skipping a 
+lot of file I/O). This is particularly useful for finding large numbers of small
+files by pointing at their parent directories e.g. `node_modules/`)
 
 ## Downloads
 
@@ -52,11 +59,7 @@ steps:
   - commands:
       - yarn run some-command
     plugins:
-<<<<<<<
-      - vital-software/monofo#v3.0.2:
-=======
-      - vital-software/monofo#v3.0.3:
->>>>>>>
+      - vital-software/monofo#v3.1.1:
           download:
             - node-modules.tar.lz4
             - build.tar.cbidx

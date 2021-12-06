@@ -4,7 +4,7 @@ monorepo:
     - hooks/**
 
 steps:
-  - name: ":bats: Run bats tests"
+  - name: ":bash: Bash Tests"
     key: plugin-test
     timeout_in_minutes: 20
     plugins:

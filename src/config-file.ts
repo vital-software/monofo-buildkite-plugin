@@ -1,7 +1,6 @@
 import { basename } from 'path';
 import debug from 'debug';
-import _ from 'lodash';
-import { glob } from './util';
+import { glob } from './util/glob';
 
 const log = debug('monofo:config-file');
 

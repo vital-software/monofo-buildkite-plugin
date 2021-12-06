@@ -1,7 +1,4 @@
-import debug from 'debug';
 import _ from 'lodash';
-
-const log = debug('monofo:artifact');
 
 export class Artifact {
   readonly name: string;

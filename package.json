@@ -69,7 +69,7 @@
     "lodash": "4.17.21",
     "minimatch": "3.0.4",
     "rimraf": "3.0.2",
-    "split": "1.0.1",
+    "split2": "4.1.0",
     "tiny-async-pool": "1.2.0",
     "toposort": "2.0.2"
   },
@@ -90,7 +90,7 @@
     "@types/lodash": "4.14.178",
     "@types/minimatch": "3.0.5",
     "@types/rimraf": "3.0.2",
-    "@types/split": "1.0.0",
+    "@types/split2": "3.2.1",
     "@types/tiny-async-pool": "1.0.0",
     "@types/toposort": "2.0.3",
     "@typescript-eslint/eslint-plugin": "5.7.0",

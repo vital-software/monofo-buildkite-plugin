@@ -4,28 +4,28 @@ import execa from 'execa';
 import { stdinWritable } from '../../util/exec';
 import { tar } from './tar';
 
-const log = debug('monofo:artifact:lz4');
+const log = debug('monofo:artifact:gzip');
 
-export async function inflateLz4(): Promise<[stream.Writable, Promise<void>]> {
-  const subprocess = execa(await tar(), ['-xv', '--use-compress-program=lz4', '-f', '-'], {
+export async function inflateGzip(): Promise<[stream.Writable, Promise<void>]> {
+  const subprocess = execa(await tar(), ['-xzf', '-'], {
     buffer: true,
     stdio: ['pipe', 'pipe', 'inherit'],
   });
 
   // eslint-disable-next-line no-void
-  void subprocess.then(() => log('Finished inflating LZ4 file'));
+  void subprocess.then(() => log('Finished inflating .tar.gz file'));
 
   return [stdinWritable(subprocess), subprocess.then(() => {})];
 }
 
-export function deflateLz4(): stream.Writable {
-  const subprocess = execa('lz4', ['-2'], {
+export function deflateGzip(): stream.Writable {
+  const subprocess = execa('gzip', [], {
     buffer: true,
     stdio: ['pipe', 'pipe', 'inherit'],
   });
 
   // eslint-disable-next-line no-void
-  void subprocess.then(() => log('Finished deflating LZ4 file'));
+  void subprocess.then(() => log('Finished deflating .gz file'));
 
   return stdinWritable(subprocess);
 }
