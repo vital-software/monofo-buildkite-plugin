@@ -162,13 +162,27 @@
           "replacements": [
             {
               "files": [
-                "README.md"
+                "README.md",
+                "docs/artifacts.md",
+                "docs/pure.md"
               ],
               "from": "vital-software/monofo#v[-0-9a-z.]*:",
               "to": "vital-software/monofo#v${nextRelease.version}:",
               "results": [
                 {
                   "file": "README.md",
+                  "hasChanged": true,
+                  "numMatches": 1,
+                  "numReplacements": 1
+                },
+                {
+                  "file": "docs/artifacts.md",
+                  "hasChanged": true,
+                  "numMatches": 2,
+                  "numReplacements": 2
+                },
+                {
+                  "file": "docs/pure.md",
                   "hasChanged": true,
                   "numMatches": 1,
                   "numReplacements": 1
@@ -200,9 +214,12 @@
         {
           "assets": [
             "CHANGELOG.md",
+            "docs/artifacts.md",
+            "docs/pure.md",
+            "hooks/lib/run.bash",
+            "hooks/pre-command",
             "package.json",
-            "README.md",
-            "hooks/pre-command"
+            "README.md"
           ]
         }
       ],
