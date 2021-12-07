@@ -9,7 +9,7 @@ const log = debug('monofo:artifact:compression:lz4');
 let enabled: boolean | undefined;
 
 export const lz4: Compression = {
-  extensions: ['lz4'],
+  extension: 'lz4',
 
   deflate(input) {
     const subprocess = execa('lz4', ['-2'], {

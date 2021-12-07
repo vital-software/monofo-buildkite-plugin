@@ -20,7 +20,7 @@ function getFlags({ cache = true, store = true } = {}): string[] {
 }
 
 export const desync: Compression = {
-  extensions: ['caidx'],
+  extension: 'caidx',
 
   async enabled() {
     if (enabled === undefined) {
@@ -37,8 +37,8 @@ export const desync: Compression = {
    */
   deflate(input: stream.Readable): ExecaChildProcess<string> {
     return execa('desync', ['tar', '--input-format', 'tar', '--index', ...getFlags({ cache: false }), '-', '-'], {
-      buffer: true,
-      stdio: [input, 'pipe', 'inherit'],
+      buffer: false,
+      input,
     });
     // TODO: after producing index: desync chop -s /some/local/store somefile.tar.caidx somefile.tar
   },
@@ -54,7 +54,7 @@ export const desync: Compression = {
    */
   async inflate(input: stream.Readable, outputPath = '.'): Promise<ExecaReturnValue> {
     const result = await execa('desync', ['untar', '--index', ...getFlags(), '-', outputPath], {
-      stdio: [input, 'inherit', 'inherit'],
+      input,
     });
 
     log('Finished desync untar operation');

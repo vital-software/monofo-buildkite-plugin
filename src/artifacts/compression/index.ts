@@ -1,24 +1,25 @@
-import fs from 'fs';
 import stream from 'stream';
-import { promisify } from 'util';
 import debug from 'debug';
 import execa, { ExecaChildProcess } from 'execa';
 import { Artifact } from '../model';
+import { Compression } from './compression';
 import { desync } from './desync';
 import { gzip } from './gzip';
 import { lz4 } from './lz4';
 
-const pipeline = promisify(stream.pipeline);
-
 const log = debug('monofo:artifact:compression');
 
 // TODO: use file extension information automatically
-export const compressors = {
+export const compressors: Record<string, Compression> = {
   desync,
   gzip,
   lz4,
 };
 
+/**
+ * @param input A .tar file contents being streamed at the deflator
+ * @param artifact The eventual artifact we're hoping to produce
+ */
 export function deflator(input: stream.Readable, artifact: Artifact): ExecaChildProcess {
   switch (artifact.ext) {
     case 'tar':
@@ -71,3 +72,5 @@ export async function inflator(
     throw error;
   }
 }
+
+export * from './compression';

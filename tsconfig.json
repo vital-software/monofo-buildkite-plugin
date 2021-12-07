@@ -17,6 +17,6 @@
     "resolveJsonModule": true,
     "sourceRoot": "",
   },
-  "include": ["src", "bin/*.js"],
+  "include": ["src", "test", "bin/*.js"],
   "extends": "@tsconfig/node14/tsconfig.json"
 }
