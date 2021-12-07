@@ -1,5 +1,5 @@
 import execa from 'execa';
-import { hasBin } from '../../util/exec';
+import { hasBin } from './exec';
 
 async function tarBin(): Promise<string> {
   if (process.platform === 'darwin') {

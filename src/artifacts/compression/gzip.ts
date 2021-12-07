@@ -1,31 +1,38 @@
-import stream from 'stream';
 import debug from 'debug';
-import execa from 'execa';
-import { stdinWritable } from '../../util/exec';
-import { tar } from './tar';
+import execa, { ExecaChildProcess } from 'execa';
+import { hasBin } from '../../util/exec';
+import { tar } from '../../util/tar';
+import { Compression } from './compression';
 
-const log = debug('monofo:artifact:gzip');
+const log = debug('monofo:artifact:compression:gzip');
 
-export async function inflateGzip(): Promise<[stream.Writable, Promise<void>]> {
-  const subprocess = execa(await tar(), ['-xzf', '-'], {
-    buffer: true,
-    stdio: ['pipe', 'pipe', 'inherit'],
-  });
+export const gzip: Compression = {
+  extensions: ['gz'],
 
-  // eslint-disable-next-line no-void
-  void subprocess.then(() => log('Finished inflating .tar.gz file'));
+  deflate(input) {
+    const subprocess = execa('gzip', [], {
+      buffer: false,
+      stdio: [input, 'pipe', 'inherit'],
+    });
 
-  return [stdinWritable(subprocess), subprocess.then(() => {})];
-}
+    // eslint-disable-next-line no-void
+    void subprocess.then(() => log('Finished deflating .gz file'));
 
-export function deflateGzip(): stream.Writable {
-  const subprocess = execa('gzip', [], {
-    buffer: true,
-    stdio: ['pipe', 'pipe', 'inherit'],
-  });
+    return subprocess;
+  },
 
-  // eslint-disable-next-line no-void
-  void subprocess.then(() => log('Finished deflating .gz file'));
+  enabled(): Promise<boolean> {
+    return hasBin('gzip');
+  },
 
-  return stdinWritable(subprocess);
-}
+  async inflate(input, outputPath = '.'): Promise<ExecaChildProcess> {
+    const result = execa(await tar(), ['-C', outputPath, '-xzf', '-'], {
+      stdio: [input, 'inherit', 'inherit'],
+    });
+
+    // eslint-disable-next-line no-void
+    void result.then(() => log('Finished inflating GZIP archive'));
+
+    return result;
+  },
+};

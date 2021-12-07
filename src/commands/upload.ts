@@ -1,16 +1,20 @@
+import fs from 'fs';
 import stream from 'stream';
+import { promisify } from 'util';
 import { flags as f } from '@oclif/command';
 import debug from 'debug';
-import execa from 'execa';
-import { tar } from '../artifacts/compression/tar';
-import { ArtifactDeflator } from '../artifacts/deflate';
+import execa, { ExecaChildProcess } from 'execa';
+import { deflator } from '../artifacts/compression';
 import { filesToUpload } from '../artifacts/matcher';
 import { Artifact } from '../artifacts/model';
 import { BaseCommand, BaseFlags } from '../command';
 import { stdoutReadable } from '../util/exec';
 import { count } from '../util/helper';
+import { tar } from '../util/tar';
 
 const log = debug('monofo:cmd:upload');
+
+const pipeline = promisify(stream.pipeline);
 
 interface UploadFlags extends BaseFlags {
   'files-from'?: string;
@@ -25,15 +29,7 @@ interface UploadArgs {
 /**
  * Upload command
  *
- * This command has similar input modes to GNU tar. Meaning, it can take:
- * - a list of glob patterns, matching files and directories will be included in the artifact, and/or
- * - a path to a file containing a list of files to include in the artifact
- *   - which can be '-' for stdin
- *   - and can be null-separated (like the output mode of `find`'s `-print0` option)
- *
- * Then this command is designed to stream things to the eventual destination,
- * process any necessary deflation of the resulting tar archive, and ensure it's
- * locally cached
+
  */
 export default class Upload extends BaseCommand {
   /**
@@ -41,8 +37,21 @@ export default class Upload extends BaseCommand {
    */
   static strict = false;
 
-  static description =
-    'Produces a compressed tarball artifact from a given list of globs, and uploads it to Buildkite Artifacts';
+  static description = `Produces a compressed tarball artifact from a given list of globs, and uploads it to Buildkite Artifacts
+
+This command has similar input modes to GNU tar. Meaning, it can take:
+- a list of glob patterns, matching files and directories will be included in
+   the artifact, and/or
+- a path to a file containing a list of files to include in the artifact
+  - which can be '-' for stdin
+  - or can be null-separated (like the output mode of \`find\`'s \`-print0\` option)
+
+Then this command is designed to stream things to the eventual destination,
+process any necessary deflation of the resulting tar archive, and ensure it's
+locally cached
+`;
+
+  static examples = [`$ find . -name node_modules -type d -prune -print0 | monofo upload --files-from - --null`];
 
   static usage = 'monofo upload <output> [globs...]';
 
@@ -95,20 +104,18 @@ export default class Upload extends BaseCommand {
     }
 
     log(`Uploading ${count(files, 'path')} as ${args.output}`);
+    const output = fs.createWriteStream(artifact.filename);
 
-    const subprocess = execa(await tar(), ['-c', '--files-from', '-', '--null'], {
+    const subprocess: ExecaChildProcess = execa(await tar(), ['-c', '--files-from', '-', '--null'], {
       input: stream.Readable.from(files.join('\x00')),
+      buffer: false,
     });
 
-    const deflator = new ArtifactDeflator();
-
     log('Waiting for deflate');
-    await deflator.deflate(stdoutReadable(subprocess), artifact);
+    const subprocess2: ExecaChildProcess = deflator(stdoutReadable(subprocess), artifact);
 
     log('Waiting for subprocess');
-    await subprocess;
-
-    log('Waiting for upload');
+    await pipeline(stdoutReadable(subprocess2), output);
 
     log(`Successfully uploaded ${artifact.name}`);
     return `Uploaded ${artifact.name}`;

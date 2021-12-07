@@ -1,31 +1,38 @@
-import stream from 'stream';
 import debug from 'debug';
 import execa from 'execa';
-import { stdinWritable } from '../../util/exec';
-import { tar } from './tar';
+import { hasBin } from '../../util/exec';
+import { tar } from '../../util/tar';
+import { Compression } from './compression';
 
-const log = debug('monofo:artifact:lz4');
+const log = debug('monofo:artifact:compression:lz4');
 
-export async function inflateLz4(): Promise<[stream.Writable, Promise<void>]> {
-  const subprocess = execa(await tar(), ['-xv', '--use-compress-program=lz4', '-f', '-'], {
-    buffer: true,
-    stdio: ['pipe', 'pipe', 'inherit'],
-  });
+export const lz4: Compression = {
+  extensions: ['lz4'],
 
-  // eslint-disable-next-line no-void
-  void subprocess.then(() => log('Finished inflating LZ4 file'));
+  deflate(input) {
+    const subprocess = execa('lz4', ['-2'], {
+      buffer: true,
+      stdio: [input, 'pipe', 'inherit'],
+    });
 
-  return [stdinWritable(subprocess), subprocess.then(() => {})];
-}
+    void subprocess.then(() => log('Finished deflating LZ4 file'));
 
-export function deflateLz4(): stream.Writable {
-  const subprocess = execa('lz4', ['-2'], {
-    buffer: true,
-    stdio: ['pipe', 'pipe', 'inherit'],
-  });
+    return subprocess;
+  },
 
-  // eslint-disable-next-line no-void
-  void subprocess.then(() => log('Finished deflating LZ4 file'));
+  enabled() {
+    return hasBin('lz4');
+  },
 
-  return stdinWritable(subprocess);
-}
+  async inflate(input, outputPath = '.'): Promise<execa.ExecaChildProcess> {
+    const subprocess = execa(await tar(), ['-C', outputPath, '-xv', '--use-compress-program=lz4', '-f', '-'], {
+      buffer: true,
+      stdio: [input, 'pipe', 'inherit'],
+    });
+
+    // eslint-disable-next-line no-void
+    void subprocess.then(() => log('Finished inflating LZ4 file'));
+
+    return subprocess;
+  },
+};
