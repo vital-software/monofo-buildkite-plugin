@@ -169,29 +169,25 @@ _agent_ token.
 
 DynamoDB setup is only required if you're intending to use [pure mode](docs/pure.md#dynamodb-setup)
 
-
-## CLI
-
-```
-$ monofo --help
-Monofo provides utilities for dynamically generating monorepo pipelines
-
-Commands:
-  monofo base-commit  Output a base commit hash, from which the current build
-                      should be compared
-  monofo pipeline     Output a merged pipeline.yml                     [default]
-
-Options:
-      --version  Show version number                                   [boolean]
-  -v, --verbose  Run with verbose logging             [boolean] [default: false]
-      --help     Show help                                             [boolean]
-
-Visit https://github.com/vital-software/monofo for documentation about this command.
-```
-
-
 ## Development
 
 - `yarn commit` - Start a commit with formatting
 - `yarn test` - Runs the tests
 - `yarn build` - Compiles Typescript
+
+<!-- commands -->
+# Command Topics
+
+* [`monofo autocomplete`](docs/commands/autocomplete.md) - display autocomplete installation instructions
+* [`monofo base-commit`](docs/commands/base-commit.md) - output a base commit hash, against which the current build would be compared
+* [`monofo download`](docs/commands/download.md) - Downloads the given list of artifacts, inflating them if they are suitable archives
+* [`monofo hash`](docs/commands/hash.md) - hash the specified component and output the value
+* [`monofo install`](docs/commands/install.md) - install a DynamoDB table to store cache pointers for pure builds
+* [`monofo list`](docs/commands/list.md) - list matching files for different parts of the pipeline
+* [`monofo pipeline`](docs/commands/pipeline.md) - generate a dynamic pipeline.yml and output it
+* [`monofo record-success`](docs/commands/record-success.md) - Record success of a component of the build, so that we can skip it next time if possible
+* [`monofo uninstall`](docs/commands/uninstall.md) - Uninstalls the Monofo DynamoDB tables
+* [`monofo upload`](docs/commands/upload.md) - Produces a compressed tarball artifact from a given list of globs, and uploads it to Buildkite Artifacts
+* [`monofo which`](docs/commands/which.md) - show which plugin a command is in
+
+<!-- commandsstop -->
