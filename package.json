@@ -17,7 +17,7 @@
     "build": "run-s build:ts build:after:*",
     "build:ts": "tsc -b",
     "build:after:manifest": "OCLIF_TS_NODE=0 oclif-dev manifest",
-    "build:after:readme": "oclif-dev readme",
+    "build:after:readme": "oclif-dev readme --multi --dir=docs/commands",
     "build:watch": "run-s \"build:ts -w\"",
     "clean": "rm -rf dist/ output/",
     "commit": "git-cz",
