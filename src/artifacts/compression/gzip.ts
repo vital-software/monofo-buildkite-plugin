@@ -9,7 +9,7 @@ const log = debug('monofo:artifact:compression:gzip');
 let enabled: boolean | undefined;
 
 export const gzip: Compression = {
-  extensions: ['gz'],
+  extension: 'gz',
 
   deflate(input) {
     const subprocess = execa('gzip', [], {
