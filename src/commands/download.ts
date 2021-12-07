@@ -14,7 +14,7 @@ interface ArtifactArguments {
 }
 
 export default class Download extends BaseCommand {
-  static description = `Downloads the given list of artifacts, inflating them if they are suitable archives
+  static override description = `Downloads the given list of artifacts, inflating them if they are suitable archives
 
 Receives a list of references to files
 
@@ -33,11 +33,11 @@ modifiers passed in env vars:
   /**
    * Because artifacts is variadic
    */
-  static strict = false;
+  static override strict = false;
 
-  static usage = 'monofo download <artifacts...>';
+  static override usage = 'monofo download <artifacts...>';
 
-  static args = [
+  static override args = [
     {
       name: 'artifacts',
       description: 'A list of artifact files to retrieve and extract',

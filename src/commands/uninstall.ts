@@ -7,9 +7,9 @@ import { service } from '../dynamodb';
 const log = debug('monofo:cmd:uninstall');
 
 export default class Uninstall extends BaseCommand {
-  static description = 'Uninstalls the Monofo DynamoDB tables';
+  static override description = 'Uninstalls the Monofo DynamoDB tables';
 
-  static flags = { ...BaseCommand.flags };
+  static override flags = { ...BaseCommand.flags };
 
   async run() {
     try {

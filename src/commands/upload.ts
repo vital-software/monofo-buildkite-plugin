@@ -35,9 +35,9 @@ export default class Upload extends BaseCommand {
   /**
    * Because the globs argument is variadic
    */
-  static strict = false;
+  static override strict = false;
 
-  static description = `Produces a compressed tarball artifact from a given list of globs, and uploads it to Buildkite Artifacts
+  static override description = `Produces a compressed tarball artifact from a given list of globs, and uploads it to Buildkite Artifacts
 
 This command has similar input modes to GNU tar. Meaning, it can take:
 - a list of glob patterns, matching files and directories will be included in
@@ -51,11 +51,13 @@ process any necessary deflation of the resulting tar archive, and ensure it's
 locally cached
 `;
 
-  static examples = [`$ find . -name node_modules -type d -prune -print0 | monofo upload --files-from - --null`];
+  static override examples = [
+    `$ find . -name node_modules -type d -prune -print0 | monofo upload --files-from - --null`,
+  ];
 
-  static usage = 'monofo upload <output> [globs...]';
+  static override usage = 'monofo upload <output> [globs...]';
 
-  static flags = {
+  static override flags = {
     ...BaseCommand.flags,
     'files-from': f.string({
       char: 'F',
@@ -68,7 +70,7 @@ locally cached
     }),
   };
 
-  static args = [
+  static override args = [
     {
       name: 'output',
       required: true,

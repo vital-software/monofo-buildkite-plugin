@@ -9,11 +9,12 @@ interface RecordSuccessArgs {
 }
 
 export default class RecordSuccess extends BaseCommand {
-  static description = 'Record success of a component of the build, so that we can skip it next time if possible';
+  static override description =
+    'Record success of a component of the build, so that we can skip it next time if possible';
 
-  static flags = { ...BaseCommand.flags };
+  static override flags = { ...BaseCommand.flags };
 
-  static args = [
+  static override args = [
     { name: 'componentName', description: 'Name of the component that was successful', required: true },
     {
       name: 'contentHash',

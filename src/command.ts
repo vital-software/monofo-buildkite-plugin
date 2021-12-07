@@ -6,9 +6,9 @@ export interface BaseFlags {
 }
 
 export abstract class BaseCommand extends Command {
-  static strict = false;
+  static override strict = false;
 
-  static flags = {
+  static override flags = {
     chdir: f.string({
       char: 'C',
       description: 'Directory to change to before executing command',
@@ -22,7 +22,7 @@ export abstract class BaseCommand extends Command {
     help: f.version({ char: 'h', description: 'Show this help message' }),
   };
 
-  protected init(): Promise<void> {
+  protected override init(): Promise<void> {
     const { flags } = this.parse(BaseCommand);
 
     if (flags?.chdir) {

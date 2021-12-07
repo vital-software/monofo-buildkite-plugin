@@ -46,8 +46,7 @@
   },
   "files": [
     "/bin",
-    "/dist",
-    "/yarn.lock",
+    "/dist/src",
     "/oclif.manifest.json"
   ],
   "dependencies": {

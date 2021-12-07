@@ -10,14 +10,14 @@ import mergePipelines from '../merge';
 const log = debug('monofo:cmd:pipeline');
 
 export default class Pipeline extends BaseCommand {
-  static description = 'generate a dynamic pipeline.yml and output it';
+  static override description = 'generate a dynamic pipeline.yml and output it';
 
-  static flags = { ...BaseCommand.flags };
+  static override flags = { ...BaseCommand.flags };
 
   /**
    * This command is the default one to run if no subcommand is given
    */
-  static aliases = [''];
+  static override aliases = [''];
 
   run() {
     return Config.getAll(process.cwd())
