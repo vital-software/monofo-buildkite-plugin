@@ -7,8 +7,10 @@ import { tar } from '../artifacts/compression/tar';
 import { ArtifactDeflator } from '../artifacts/deflate';
 import { Artifact } from '../artifacts/model';
 import { BaseCommand } from '../command';
-import { count, globSet, stdoutReadable } from '../util';
 import { splitAsyncIterator } from '../util/async';
+import { stdoutReadable } from '../util/exec';
+import { globSet } from '../util/glob';
+import { count } from '../util/helper';
 
 const log = debug('monofo:cmd:upload');
 

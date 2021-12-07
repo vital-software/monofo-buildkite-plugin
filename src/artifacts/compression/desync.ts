@@ -1,13 +1,6 @@
-import fs from 'fs';
 import stream from 'stream';
-import { promisify } from 'util';
 import execa from 'execa';
-import { hasBin, stdinWritable, stdoutReadable } from '../../util';
-
-const pipeline = promisify(stream.pipeline);
-
-// tar <our-existing-flags-but-without-compression> | desync tar --input-format tar --index $DESYNC_FLAGS --store s3+ssl://vital-buildkite-artifacts/katoa-store node-modules.caidx
-// desync extract --cache /var/cache/desync --store s3+ssl://vital-buildkite-artifacts/katoa-store
+import { hasBin, stdinWritable } from '../../util/exec';
 
 let hasDesync: Promise<boolean> | undefined;
 

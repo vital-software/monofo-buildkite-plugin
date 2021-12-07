@@ -2,7 +2,7 @@ import * as crypto from 'crypto';
 import * as fs from 'fs';
 import debug from 'debug';
 import asyncPool from 'tiny-async-pool';
-import { count } from './util';
+import { count } from './util/helper';
 
 const log = debug('monofo:hash');
 

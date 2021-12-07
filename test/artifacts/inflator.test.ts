@@ -3,7 +3,6 @@ import { promisify } from 'util';
 import nock = require('nock');
 import rimrafSync = require('rimraf');
 import { ArtifactApi } from '../../src/artifacts/api';
-import { ArtifactDownloader } from '../../src/artifacts/download';
 import { ArtifactInflator } from '../../src/artifacts/inflate';
 import { Artifact } from '../../src/artifacts/model';
 import { fakeProcess } from '../fixtures';
@@ -17,14 +16,14 @@ describe('ArtifactInflator', () => {
   beforeAll(() => {
     nock('https://example.com')
       .get('/some-object/foo.tar.lz4?bar=baz')
-      .replyWithFile(200, `${__dirname}/artifacts/foo.tar.lz4`, {
+      .replyWithFile(200, `${__dirname}/fixtures/foo.tar.lz4`, {
         'Content-Type': 'application/json',
       });
   });
 
   beforeEach(() => {
     const search = jest.fn();
-    api = { search };
+    api = { search } as unknown as ArtifactApi;
 
     search.mockImplementation(() => {
       return Promise.resolve('https://example.com/some-object/foo.tar.lz4?bar=baz');
@@ -41,7 +40,7 @@ describe('ArtifactInflator', () => {
     process.env = fakeProcess();
 
     const artifact = new Artifact('foo.tar.lz4');
-    const res = await sut.inflate(artifact);
+    const res = await sut.inflate(fs.createReadStream(`${__dirname}/fixtures/foo.tar.lz4`), artifact);
 
     expect(res).toBeUndefined();
     expect(fs.existsSync('foo/bar')).toBe(true);
