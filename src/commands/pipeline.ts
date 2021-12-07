@@ -14,6 +14,11 @@ export default class Pipeline extends BaseCommand {
 
   static flags = { ...BaseCommand.flags };
 
+  /**
+   * This command is the default one to run if no subcommand is given
+   */
+  static aliases = [''];
+
   run() {
     return Config.getAll(process.cwd())
       .then((c) =>
