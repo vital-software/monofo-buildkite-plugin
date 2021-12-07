@@ -1,10 +1,12 @@
 import debug from 'debug';
-import execa, { ExecaChildProcess, ExecaReturnValue } from 'execa';
+import execa, { ExecaReturnValue } from 'execa';
 import { hasBin } from '../../util/exec';
 import { tar } from '../../util/tar';
 import { Compression } from './compression';
 
 const log = debug('monofo:artifact:compression:gzip');
+
+let enabled: boolean | undefined;
 
 export const gzip: Compression = {
   extensions: ['gz'],
@@ -12,7 +14,7 @@ export const gzip: Compression = {
   deflate(input) {
     const subprocess = execa('gzip', [], {
       buffer: false,
-      stdio: [input, 'pipe', 'inherit'],
+      input,
     });
 
     // eslint-disable-next-line no-void
@@ -21,16 +23,21 @@ export const gzip: Compression = {
     return subprocess;
   },
 
-  enabled(): Promise<boolean> {
-    return hasBin('gzip');
+  async enabled() {
+    if (enabled === undefined) {
+      enabled = await hasBin('gzip');
+    }
+    return enabled;
   },
 
   async inflate(input, outputPath = '.'): Promise<ExecaReturnValue> {
+    log('Inflating .tar.gz archive');
+
     const result = await execa(await tar(), ['-C', outputPath, '-xzf', '-'], {
-      stdio: [input, 'pipe', 'inherit'],
+      input,
     });
 
-    log('Finished inflating GZIP archive');
+    log('Finished inflating .tar.gz archive');
 
     return result;
   },

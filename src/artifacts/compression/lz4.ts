@@ -30,13 +30,13 @@ export const lz4: Compression = {
   },
 
   async inflate(input, outputPath = '.'): Promise<ExecaReturnValue> {
-    log('Inflating .tar.lz4');
+    log('Inflating .tar.lz4 archive');
 
     const result = await execa(await tar(), ['-C', outputPath, '-x', '--use-compress-program=lz4', '-f', '-'], {
       input,
     });
 
-    log('Finished inflating .tar.lz4 file');
+    log('Finished inflating .tar.lz4 archive');
 
     return result;
   },
