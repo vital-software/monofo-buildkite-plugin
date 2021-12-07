@@ -26,3 +26,5 @@ docker-compose.*.yml
 docker-compose.yml
 .log*
 .eslintignore
+dist/test/*
+yarn.lock

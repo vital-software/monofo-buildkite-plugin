@@ -3,16 +3,20 @@
     "outDir": "dist",
     "rootDir": ".",
     "moduleResolution": "node",
+
     "declaration": true,
-    "inlineSourceMap": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "experimentalDecorators": true,
+    "declarationMap": true,
     "emitDecoratorMetadata": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "inlineSourceMap": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noUnusedParameters": true,
     "resolveJsonModule": true,
-    "esModuleInterop": true
+    "sourceRoot": "",
   },
-  "include": ["src/**/*.ts", "test/**/*.ts", "bin/*.js"],
+  "include": ["src", "bin/*.js"],
   "extends": "@tsconfig/node14/tsconfig.json"
 }

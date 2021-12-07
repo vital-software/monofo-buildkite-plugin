@@ -1,5 +1,4 @@
 import path from 'path';
-import { mocked } from 'ts-jest/utils';
 import { getBuildkiteInfo } from '../src/buildkite/config';
 import Config from '../src/config';
 import { getBaseBuild, matchConfigs } from '../src/diff';
@@ -9,12 +8,12 @@ import { BASE_BUILD, COMMIT, fakeProcess } from './fixtures';
 jest.mock('../src/git');
 jest.mock('../src/buildkite/client');
 
-const mockRevList = mocked(revList, true);
+const mockRevList = revList as jest.Mock<Promise<string[]>>;
 mockRevList.mockImplementation(() => Promise.resolve([COMMIT]));
 
-const mockMergeBase = mocked(mergeBase, true);
+const mockMergeBase = mergeBase as jest.Mock<Promise<string>>;
 
-const mockCommitExists = mocked(commitExists, true);
+const mockCommitExists = commitExists as jest.Mock<Promise<boolean>>;
 mockCommitExists.mockImplementation(() => Promise.resolve(true));
 
 describe('getBaseBuild', () => {

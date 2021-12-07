@@ -2,7 +2,6 @@ import path from 'path';
 import { createTables, startDb, stopDb } from 'jest-dynalite';
 import { load as loadYaml } from 'js-yaml';
 import _ from 'lodash';
-import { mocked } from 'ts-jest/utils';
 import { CommandStep, Pipeline as BuildkitePipeline, Step } from '../../src/buildkite/types';
 import { CacheMetadataRepository } from '../../src/cache-metadata';
 import Pipeline from '../../src/commands/pipeline';
@@ -19,7 +18,7 @@ mockMergeBase.mockImplementation(() => Promise.resolve('foo'));
 const mockDiff = diff as jest.Mock<Promise<string[]>>;
 mockDiff.mockImplementation(() => Promise.resolve(['foo/README.md', 'baz/abc.ts', '.buildkite/pipeline.changed.yml']));
 
-const mockRevList = mocked(revList, true);
+const mockRevList = revList as jest.Mock<Promise<string[]>>;
 mockRevList.mockImplementation(() => Promise.resolve([COMMIT]));
 
 /**
