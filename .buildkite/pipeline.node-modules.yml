@@ -19,7 +19,7 @@ steps:
       - tar -c --use-compress-program="lz4 -2" -f node-modules.tar.lz4 node_modules
     timeout_in_minutes: 20
     plugins:
-      - docker-compose#v3.7.0:
+      - docker-compose#v3.9.0:
           run: node
       - artifacts#v1.5.0:
           upload: node-modules.tar.lz4
