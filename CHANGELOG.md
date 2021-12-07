@@ -1,3 +1,12 @@
+## [3.1.1](https://github.com/vital-software/monofo/compare/v3.1.0...v3.1.1) (2021-12-07)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @oclif/command to v1.8.9 ([4c0b295](https://github.com/vital-software/monofo/commit/4c0b295b67be74c39d897393b9c28a5f600d14ef))
+* **deps:** update dependency @oclif/config to v1.18.2 ([553a3da](https://github.com/vital-software/monofo/commit/553a3da9ca159fe7b7607d2daef82d4dc9761859))
+* **deps:** update dependency @oclif/plugin-help to v3.2.13 ([502030b](https://github.com/vital-software/monofo/commit/502030bd457c367a9a3a24509e1adddab9655174))
+
 # [3.1.0](https://github.com/vital-software/monofo/compare/v3.0.3...v3.1.0) (2021-12-07)
 
 
