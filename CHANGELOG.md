@@ -1,3 +1,10 @@
+# [3.1.0](https://github.com/vital-software/monofo/compare/v3.0.3...v3.1.0) (2021-12-07)
+
+
+### Features
+
+* change to oclif instead of yargs ([fa215dc](https://github.com/vital-software/monofo/commit/fa215dc60303de9778273cac0f33794d84330526))
+
 ## [3.0.3](https://github.com/vital-software/monofo/compare/v3.0.2...v3.0.3) (2021-12-06)
 
 

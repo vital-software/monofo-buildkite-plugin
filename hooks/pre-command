@@ -21,7 +21,7 @@
 set -euo pipefail
 
 # This version marker is automatically updated to match the published release
-MONOFO_VERSION=3.0.3
+MONOFO_VERSION=3.1.0
 
 BUILDKITE_PLUGIN_MONOFO_GENERATE=${BUILDKITE_PLUGIN_MONOFO_GENERATE:-}
 BUILDKITE_AGENT_ACCESS_TOKEN=${BUILDKITE_AGENT_ACCESS_TOKEN:-}
