@@ -1,20 +1,18 @@
-import fs from 'fs';
 import stream from 'stream';
 import { flags as f } from '@oclif/command';
 import debug from 'debug';
 import execa from 'execa';
 import { tar } from '../artifacts/compression/tar';
 import { ArtifactDeflator } from '../artifacts/deflate';
+import { filesToUpload } from '../artifacts/matcher';
 import { Artifact } from '../artifacts/model';
-import { BaseCommand } from '../command';
-import { splitAsyncIterator } from '../util/async';
+import { BaseCommand, BaseFlags } from '../command';
 import { stdoutReadable } from '../util/exec';
-import { globSet } from '../util/glob';
 import { count } from '../util/helper';
 
 const log = debug('monofo:cmd:upload');
 
-interface UploadFlags {
+interface UploadFlags extends BaseFlags {
   'files-from'?: string;
   null: boolean;
 }
@@ -76,7 +74,7 @@ export default class Upload extends BaseCommand {
   ];
 
   async run() {
-    const { args } = this.parse<UploadFlags, UploadArgs>(Upload);
+    const { args, flags } = this.parse<UploadFlags, UploadArgs>(Upload);
 
     if (!args.output) {
       throw new Error(
@@ -85,19 +83,21 @@ export default class Upload extends BaseCommand {
     }
 
     const artifact = new Artifact(args.output);
-    const files = await this.filesToUpload();
+    const files = await filesToUpload({ globs: args.globs, filesFrom: flags['files-from'], useNull: flags.null });
 
     if (files.length === 0) {
       log('No files to upload: nothing to do');
       return 'No files to upload: nothing to do';
     }
 
+    if (flags.verbose) {
+      log('Files to upload', files);
+    }
+
     log(`Uploading ${count(files, 'path')} as ${args.output}`);
 
-    const input = stream.Readable.from(files.join('\x00'));
-
     const subprocess = execa(await tar(), ['-c', '--files-from', '-', '--null'], {
-      input,
+      input: stream.Readable.from(files.join('\x00')),
     });
 
     const deflator = new ArtifactDeflator();
@@ -112,38 +112,5 @@ export default class Upload extends BaseCommand {
 
     log(`Successfully uploaded ${artifact.name}`);
     return `Uploaded ${artifact.name}`;
-  }
-
-  /**
-   * Takes a bunch of CLI arguments
-   *
-   * Returns a list of the files we should be packaging
-   */
-  private async filesToUpload(): Promise<string[]> {
-    const { args, flags } = this.parse(Upload);
-
-    let matched: string[] = [];
-
-    if (args.globs) {
-      matched = [...matched, ...(await globSet(args.globs))];
-    }
-
-    if (flags['files-from']) {
-      if (flags['files-from'] !== '-' && !fs.existsSync(flags['files-from'])) {
-        throw new Error(`Could not find file to read file list from: ${flags['files-from']}`);
-      }
-
-      const source: stream.Readable =
-        flags['files-from'] === '-' ? process.stdin : fs.createReadStream(flags['files-from'], { encoding: 'utf8' });
-
-      for await (const entry of splitAsyncIterator(source, args.null ? '\x00' : '\n')) {
-        // guards trailing separator causing empty entry
-        if (entry) {
-          matched.push(entry);
-        }
-      }
-    }
-
-    return matched;
   }
 }

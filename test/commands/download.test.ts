@@ -1,4 +1,3 @@
-import BaseCommit from '../../src/commands/base-commit';
 import Download from '../../src/commands/download';
 import { mergeBase, diff, revList } from '../../src/git';
 import { fakeProcess, COMMIT, testRun } from '../fixtures';

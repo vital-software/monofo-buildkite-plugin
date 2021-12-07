@@ -60,7 +60,7 @@ modifiers passed in env vars:
   ];
 
   async run() {
-    const { args, flags, raw } = this.parse<unknown, ArtifactArguments>(Download);
+    const { args } = this.parse<unknown, ArtifactArguments>(Download);
 
     const artifacts: Artifact[] = _.castArray<string>(args.artifacts).map((filename) => new Artifact(filename));
     log(`Donwloading ${artifacts.length} artifacts: ${artifacts.map((a) => a.name).join(', ')}`);
