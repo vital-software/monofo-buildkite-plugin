@@ -1,6 +1,7 @@
+import BaseCommit from '../../src/commands/base-commit';
 import Download from '../../src/commands/download';
 import { mergeBase, diff, revList } from '../../src/git';
-import { fakeProcess, COMMIT } from '../fixtures';
+import { fakeProcess, COMMIT, testRun } from '../fixtures';
 
 jest.mock('../../src/git');
 jest.mock('../../src/buildkite/client');
@@ -19,7 +20,7 @@ describe('cmd download', () => {
     process.env = fakeProcess();
   });
 
-  it('can output help information', async () => {
-    return expect(Download.run(['--help'])).resolves.toContain('Downloads the given list of artifacts');
+  it('returns help output', async () => {
+    return expect(testRun(Download, ['--help'])).rejects.toThrowError('EEXIT: 0');
   });
 });

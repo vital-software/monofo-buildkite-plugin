@@ -1,34 +1,17 @@
 import * as fs from 'fs';
 import { promisify } from 'util';
-import nock = require('nock');
-import rimrafSync = require('rimraf');
-import { ArtifactApi } from '../../src/artifacts/api';
+import rimrafSync from 'rimraf';
 import { ArtifactInflator } from '../../src/artifacts/inflate';
 import { Artifact } from '../../src/artifacts/model';
 import { fakeProcess } from '../fixtures';
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 const rimraf = promisify(rimrafSync);
 
 describe('ArtifactInflator', () => {
-  let api: ArtifactApi;
   let sut: ArtifactInflator;
 
-  beforeAll(() => {
-    nock('https://example.com')
-      .get('/some-object/foo.tar.lz4?bar=baz')
-      .replyWithFile(200, `${__dirname}/fixtures/foo.tar.lz4`, {
-        'Content-Type': 'application/json',
-      });
-  });
-
   beforeEach(() => {
-    const search = jest.fn();
-    api = { search } as unknown as ArtifactApi;
-
-    search.mockImplementation(() => {
-      return Promise.resolve('https://example.com/some-object/foo.tar.lz4?bar=baz');
-    });
-
     sut = new ArtifactInflator();
   });
 
@@ -40,7 +23,7 @@ describe('ArtifactInflator', () => {
     process.env = fakeProcess();
 
     const artifact = new Artifact('foo.tar.lz4');
-    const res = await sut.inflate(fs.createReadStream(`${__dirname}/fixtures/foo.tar.lz4`), artifact);
+    const res = await sut.inflate(fs.createReadStream(`${__dirname}/../fixtures/foo.tar.lz4`), artifact);
 
     expect(res).toBeUndefined();
     expect(fs.existsSync('foo/bar')).toBe(true);
