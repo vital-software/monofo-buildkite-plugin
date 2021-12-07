@@ -30,7 +30,7 @@ steps:
       - yarn install
       - yarn build
     plugins:
-      - vital-software/monofo#v3.1.1:
+      - vital-software/monofo#v3.2.0:
           upload:
             node-modules.tar.lz4:
               filesFrom: node-modules.list
@@ -49,7 +49,7 @@ files by pointing at their parent directories e.g. `node_modules/`)
 ## Downloads
 
 The `download` subcommand accepts a list of artifacts to download. If these
-artifacts end with a supported tarball suffix (`.tar.lz4` or `.tar.caidx`),
+artifacts end with a supported tarball suffix (see compression section below),
 they'll be automatically inflated and extracted in-place. The download and
 extract happens in a `pre-command`, so by the time the `command` runs, the
 necessary files will be in place.
@@ -59,21 +59,22 @@ steps:
   - commands:
       - yarn run some-command
     plugins:
-      - vital-software/monofo#v3.1.1:
+      - vital-software/monofo#v3.2.0:
           download:
             - node-modules.tar.lz4
             - build.tar.cbidx
 ```
 
-
-## Compression and Syncing
+## Compression
 
 Compression is automatically applied during the `upload`, based on the target
 filename for the tarball, and then transparently removed during the `download`.
 The supported compression types are:
 
- - `.tar.lz4`: uses `lz4` to compress the tar
- - `.tar.caidx`: uses `desync` to store the tar in a content-addressed store,
+- `.tar`: uses no compression
+- `.tar.gz`: uses `gzip` to compress the tar
+- `.tar.lz4`: uses `lz4` to compress the tar
+- `.tar.caidx`: uses `desync` to store the tar in a content-addressed store,
   replacing the tarball with an "index file"
 
 ### Desync

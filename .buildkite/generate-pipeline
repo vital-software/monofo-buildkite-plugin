@@ -32,7 +32,7 @@ echo "--- Fetching other branches" >&2
 git fetch -v origin +refs/heads/*:refs/remotes/origin/*
 
 echo "+++ :pipeline: Generating..." >&2
-DEBUG="monofo:*" npx monofo@2.1.0 > "$PIPELINE_FILE"
+DEBUG="monofo:*" npx monofo@3.1.2 > "$PIPELINE_FILE"
 
 echo "--- :pipeline: Result" >&2
 cat "$PIPELINE_FILE"

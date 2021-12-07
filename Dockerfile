@@ -42,6 +42,16 @@ RUN set -ex \
     # smoke test
     && yarn --version
 
+# Install desync
+RUN cd $(mktemp -d) \
+    && curl --silent --show-error --location --remote-header-name --remote-name https://github.com/dominics/desync/releases/download/v0.9.3-rc.5/desync_0.9.3-rc.5_linux_amd64.tar.gz \
+    && tar -xzf desync_0.9.3-rc.5_linux_amd64.tar.gz \
+    && echo 'adbc29540ac3a71614055dec6263f8a1f7014793398d28d0397b5a82770780ed  desync_0.9.3-rc.5_linux_amd64.tar.gz' | sha256sum -c \
+    && mv desync /usr/local/bin \
+    && rm -rf $PWD \
+    # smoke test
+    && desync --help
+
 # Verify versions
 RUN echo "node version: $(node -v)" && \
     echo "npm version: $(npm -v)" && \

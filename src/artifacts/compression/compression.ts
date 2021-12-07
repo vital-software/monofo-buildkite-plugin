@@ -2,7 +2,8 @@ import stream from 'stream';
 import { ExecaChildProcess, ExecaReturnValue } from 'execa';
 
 export interface Compression {
-  extensions: string[];
+  extension: string;
+
   enabled(): Promise<boolean>;
 
   /**
