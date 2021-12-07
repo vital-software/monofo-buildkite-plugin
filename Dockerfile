@@ -8,13 +8,14 @@ RUN apt-get update && \
         apt-transport-https \
         ca-certificates \
         curl \
-        lz4 \
-        gnupg-agent \
-        software-properties-common \
         gettext-base \
         git \
+        gnupg-agent \
         jq \
         less \
+        lz4 \
+        software-properties-common \
+        tar \
         zip && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
