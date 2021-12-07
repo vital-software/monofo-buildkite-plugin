@@ -2,14 +2,13 @@ import path from 'path';
 import { createTables, startDb, stopDb } from 'jest-dynalite';
 import { load as loadYaml } from 'js-yaml';
 import _ from 'lodash';
-import { stdout } from 'stdout-stderr';
 import { mocked } from 'ts-jest/utils';
 import { CommandStep, Pipeline as BuildkitePipeline, Step } from '../../src/buildkite/types';
 import { CacheMetadataRepository } from '../../src/cache-metadata';
 import Pipeline from '../../src/commands/pipeline';
 import { service } from '../../src/dynamodb';
 import { mergeBase, diff, revList } from '../../src/git';
-import { BUILD_ID, BUILD_ID_2, BUILD_ID_3, COMMIT, fakeProcess } from '../fixtures';
+import { BUILD_ID, BUILD_ID_2, BUILD_ID_3, COMMIT, fakeProcess, testRun } from '../fixtures';
 
 jest.mock('../../src/git');
 jest.mock('../../src/buildkite/client');
@@ -38,71 +37,68 @@ function commandSummary(steps: Step[]): string[] {
   });
 }
 
+async function run(args: string[] = []): Promise<BuildkitePipeline> {
+  const { stdout } = await testRun(Pipeline, args);
+  return (await loadYaml(stdout)) as BuildkitePipeline;
+}
+
 describe('monofo pipeline', () => {
   beforeAll(startDb);
   beforeAll(createTables);
   afterAll(stopDb);
 
   it('returns help output', async () => {
-    stdout.start();
-    await Pipeline.run(['--help']);
-    stdout.stop();
-    expect(stdout.output).toContain('Output a merged pipeline.yml');
+    return expect(testRun(Pipeline, ['--help'])).rejects.toThrowError('EEXIT: 0');
   });
 
   it('can be executed with no configuration', async () => {
     process.env = fakeProcess();
     process.chdir(__dirname);
 
-    stdout.start();
-    await Pipeline.run([]);
-    stdout.stop();
-
-    return expect(stdout.output).rejects.toThrowError('No pipeline files');
+    return expect(testRun(Pipeline, [])).rejects.toThrowError('No pipeline files');
   });
 
   it('can be executed with configuration on the default branch', async () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, '../projects/kitchen-sink'));
 
-    await Pipeline.run([])
-      .then((o) => loadYaml(o) as BuildkitePipeline)
-      .then((p) => {
-        expect(p).toBeDefined();
-        expect(commandSummary(p.steps)).toStrictEqual([
-          "echo 'inject for: branch-excluded, excluded, bar, match-all-false, qux, some-long-name'",
-          'echo "changed" > changed',
-          'echo "dependedon" > dependedon',
-          'echo "foo1" > foo1',
-          "echo 'bar was replaced'",
-          'echo "included" > included',
-          'echo "match-all" > match-all',
-          'echo "match-all-mixed" > match-all-mixed',
-          'echo "match-all-true" > match-all-true',
-          'echo "baz1"',
-          'echo "unreferenced" > unref',
-        ]);
-        expect(Object.entries(p.env)).toHaveLength(6);
-        expect(p.env.MONOFO_BASE_BUILD_ID).toBe(BUILD_ID);
-        expect(p.env.MONOFO_BASE_BUILD_COMMIT).toBe(COMMIT);
-        expect(p.env.BAR_WAS_EXCLUDED).toBe('true');
-      });
+    const p = await run([]);
+
+    expect(p).toBeDefined();
+
+    expect(commandSummary(p.steps)).toStrictEqual([
+      "echo 'inject for: branch-excluded, excluded, bar, match-all-false, qux, some-long-name'",
+      'echo "changed" > changed',
+      'echo "dependedon" > dependedon',
+      'echo "foo1" > foo1',
+      "echo 'bar was replaced'",
+      'echo "included" > included',
+      'echo "match-all" > match-all',
+      'echo "match-all-mixed" > match-all-mixed',
+      'echo "match-all-true" > match-all-true',
+      'echo "baz1"',
+      'echo "unreferenced" > unref',
+    ]);
+
+    expect(Object.entries(p.env)).toHaveLength(6);
+    expect(p.env.MONOFO_BASE_BUILD_ID).toBe(BUILD_ID);
+    expect(p.env.MONOFO_BASE_BUILD_COMMIT).toBe(COMMIT);
+    expect(p.env.BAR_WAS_EXCLUDED).toBe('true');
   });
 
   it('can be executed with simple configuration and skipped parts on the default branch', async () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, '../projects/skipped'));
 
-    await Pipeline.run([])
-      .then((o) => loadYaml(o) as BuildkitePipeline)
-      .then((p) => {
-        expect(p).toBeDefined();
-        expect(commandSummary(p.steps)).toStrictEqual([
-          "echo 'inject for: foo, bar'",
-          "echo 'bar was replaced'",
-          "echo 'All build parts were skipped'",
-        ]);
-      });
+    const { stdout } = await testRun(Pipeline, []);
+    const pipeline = (await loadYaml(stdout)) as BuildkitePipeline;
+
+    expect(pipeline).toBeDefined();
+    expect(commandSummary(pipeline.steps)).toStrictEqual([
+      "echo 'inject for: foo, bar'",
+      "echo 'bar was replaced'",
+      "echo 'All build parts were skipped'",
+    ]);
   });
 
   // In this test, we also assert with details on the inject artifacts step
@@ -113,24 +109,22 @@ describe('monofo pipeline', () => {
     });
     process.chdir(path.resolve(__dirname, '../projects/kitchen-sink'));
 
-    await Pipeline.run([])
-      .then((o) => loadYaml(o) as BuildkitePipeline)
-      .then((p) => {
-        expect(p).toBeDefined();
-        expect(commandSummary(p.steps)).toStrictEqual([
-          "echo 'inject for: branch-excluded, changed, dependedon, excluded, foo, match-all, match-all-false, match-all-mixed, match-all-true, qux, baz, unreferenced'",
-          'echo "bar1" | tee bar1',
-          'echo "bar2" | tee bar2',
-          'echo "included" > included',
-          'echo "some-long-name" > some-long-name',
-        ]);
+    const pipeline = await run([]);
 
-        const inject = (p.steps[0] as CommandStep).command;
-        expect(inject[1]).toContain('Copy foo1 from f62a1b4d-10f9-4790-bc1c-e2c3a0c80983 into current build');
-        expect(inject[2]).toContain('Copy qux1 from f62a1b4d-10f9-4790-bc1c-e2c3a0c80983 into current build');
-        expect(inject[3]).toContain('Copy baz1 from f62a1b4d-10f9-4790-bc1c-e2c3a0c80983 into current build');
-        expect(inject[4]).toBe('wait');
-      });
+    expect(pipeline).toBeDefined();
+    expect(commandSummary(pipeline.steps)).toStrictEqual([
+      "echo 'inject for: branch-excluded, changed, dependedon, excluded, foo, match-all, match-all-false, match-all-mixed, match-all-true, qux, baz, unreferenced'",
+      'echo "bar1" | tee bar1',
+      'echo "bar2" | tee bar2',
+      'echo "included" > included',
+      'echo "some-long-name" > some-long-name',
+    ]);
+
+    const inject = (pipeline.steps[0] as CommandStep).command;
+    expect(inject[1]).toContain('Copy foo1 from f62a1b4d-10f9-4790-bc1c-e2c3a0c80983 into current build');
+    expect(inject[2]).toContain('Copy qux1 from f62a1b4d-10f9-4790-bc1c-e2c3a0c80983 into current build');
+    expect(inject[3]).toContain('Copy baz1 from f62a1b4d-10f9-4790-bc1c-e2c3a0c80983 into current build');
+    expect(inject[4]).toBe('wait');
   });
 
   it('can be executed with both PIPELINE_RUN_ALL and PIPELINE_NO_RUN_TASK', async () => {
@@ -141,73 +135,65 @@ describe('monofo pipeline', () => {
     });
     process.chdir(path.resolve(__dirname, '../projects/kitchen-sink'));
 
-    await Pipeline.run([])
-      .then((o) => loadYaml(o) as BuildkitePipeline)
-      .then((p) => {
-        expect(p).toBeDefined();
-        expect(commandSummary(p.steps)).toStrictEqual([
-          "echo 'inject for: branch-excluded, excluded, foo, bar, match-all-false'",
-          'echo "changed" > changed',
-          'echo "dependedon" > dependedon',
-          "echo 'bar was replaced'",
-          'echo "included" > included',
-          'echo "match-all" > match-all',
-          'echo "match-all-mixed" > match-all-mixed',
-          'echo "match-all-true" > match-all-true',
-          'echo "qux1"',
-          'echo "baz1"',
-          'echo "some-long-name" > some-long-name',
-          'echo "unreferenced" > unref',
-        ]);
-      });
+    const pipeline = await run([]);
+
+    expect(pipeline).toBeDefined();
+    expect(commandSummary(pipeline.steps)).toStrictEqual([
+      "echo 'inject for: branch-excluded, excluded, foo, bar, match-all-false'",
+      'echo "changed" > changed',
+      'echo "dependedon" > dependedon',
+      "echo 'bar was replaced'",
+      'echo "included" > included',
+      'echo "match-all" > match-all',
+      'echo "match-all-mixed" > match-all-mixed',
+      'echo "match-all-true" > match-all-true',
+      'echo "qux1"',
+      'echo "baz1"',
+      'echo "some-long-name" > some-long-name',
+      'echo "unreferenced" > unref',
+    ]);
   });
 
   it('can be executed with crossdeps alone', async () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, '../projects/crossdeps'));
 
-    await Pipeline.run([])
-      .then((o) => loadYaml(o) as BuildkitePipeline)
-      .then((p) => {
-        expect(p).toBeDefined();
-        expect(p.steps).toHaveLength(1); // No artifacts step, because only phony artifacts involved
+    const pipeline = await run([]);
 
-        // This had a cross-dependency, but the thing it depended on was skipped
-        // In addition, nothing that was skipped was producing required artifacts
-        // So the artifact step was skipped. This step can now run immediately.
-        expect(p.steps[0].depends_on).toHaveLength(0);
-      });
+    expect(pipeline).toBeDefined();
+    expect(pipeline.steps).toHaveLength(1); // No artifacts step, because only phony artifacts involved
+
+    // This had a cross-dependency, but the thing it depended on was skipped
+    // In addition, nothing that was skipped was producing required artifacts
+    // So the artifact step was skipped. This step can now run immediately.
+    expect(pipeline.steps[0].depends_on).toHaveLength(0);
   });
 
   it('can be executed with flexible structure', async () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, '../projects/flexible-structure'));
 
-    await Pipeline.run([])
-      .then((o) => loadYaml(o) as BuildkitePipeline)
-      .then((p) => {
-        expect(p).toBeDefined();
-        expect(p.steps).toHaveLength(3);
-        expect(p.steps.map((s) => s.key)).toStrictEqual(['foo1Key', 'foo2Key', 'foo3Key']);
-      });
+    const pipeline = await run([]);
+
+    expect(pipeline).toBeDefined();
+    expect(pipeline.steps).toHaveLength(3);
+    expect(pipeline.steps.map((s) => s.key)).toStrictEqual(['foo1Key', 'foo2Key', 'foo3Key']);
   });
 
   it('can be executed with pure components', async () => {
     process.env = fakeProcess();
     process.chdir(path.resolve(__dirname, '../projects/pure'));
 
-    await Pipeline.run([])
-      .then((o) => loadYaml(o) as BuildkitePipeline)
-      .then((p) => {
-        expect(p).toBeDefined();
-        expect(p.steps).toHaveLength(4);
-        expect(p.steps.map((s) => s.key)).toStrictEqual([
-          'anon-step-0f9d3e84a439', // These will change if the hashing algorithm does
-          'anon-step-6da74a8bdeec',
-          'record-success-foo',
-          'record-success-baz',
-        ]);
-      });
+    const pipeline = await run([]);
+
+    expect(pipeline).toBeDefined();
+    expect(pipeline.steps).toHaveLength(4);
+    expect(pipeline.steps.map((s) => s.key)).toStrictEqual([
+      'anon-step-0f9d3e84a439', // These will change if the hashing algorithm does
+      'anon-step-6da74a8bdeec',
+      'record-success-foo',
+      'record-success-baz',
+    ]);
   });
 
   it('can be executed with pure components with cache hits', async () => {
@@ -243,20 +229,18 @@ describe('monofo pipeline', () => {
       }),
     ]);
 
-    await Pipeline.run([])
-      .then((o) => loadYaml(o) as BuildkitePipeline)
-      .then((p) => {
-        expect(p).toBeDefined();
-        expect(commandSummary(p.steps)).toStrictEqual([
-          "echo 'inject for: foo, baz'",
-          "echo 'All build parts were skipped'",
-        ]);
+    const pipeline = await run([]);
 
-        const inject = (p.steps[0] as CommandStep).command;
-        expect(inject[1]).toContain(`Copy foo from ${BUILD_ID_2} into current build`);
-        expect(inject[2]).toContain(`Copy baz from ${BUILD_ID_3} into current build`);
-        expect(inject[3]).toBe('wait');
-      });
+    expect(pipeline).toBeDefined();
+    expect(commandSummary(pipeline.steps)).toStrictEqual([
+      "echo 'inject for: foo, baz'",
+      "echo 'All build parts were skipped'",
+    ]);
+
+    const inject = (pipeline.steps[0] as CommandStep).command;
+    expect(inject[1]).toContain(`Copy foo from ${BUILD_ID_2} into current build`);
+    expect(inject[2]).toContain(`Copy baz from ${BUILD_ID_3} into current build`);
+    expect(inject[3]).toBe('wait');
   });
 
   it('can be executed with pure components with cache hits, but PIPELINE_RUN_ALL forces them to run', async () => {
@@ -292,16 +276,14 @@ describe('monofo pipeline', () => {
       }),
     ]);
 
-    await Pipeline.run([])
-      .then((o) => loadYaml(o) as BuildkitePipeline)
-      .then((p) => {
-        expect(p).toBeDefined();
-        expect(p.steps.map((s) => s.key)).toStrictEqual([
-          'anon-step-0f9d3e84a439', // These will change if the hashing algorithm does
-          'anon-step-6da74a8bdeec',
-          'record-success-foo',
-          'record-success-baz',
-        ]);
-      });
+    const pipeline = await run([]);
+
+    expect(pipeline).toBeDefined();
+    expect(pipeline.steps.map((s) => s.key)).toStrictEqual([
+      'anon-step-0f9d3e84a439', // These will change if the hashing algorithm does
+      'anon-step-6da74a8bdeec',
+      'record-success-foo',
+      'record-success-baz',
+    ]);
   });
 });

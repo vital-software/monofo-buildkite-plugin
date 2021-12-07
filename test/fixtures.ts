@@ -1,3 +1,5 @@
+import Command from '@oclif/command';
+import { stderr as mockStderr, stdout as mockStdout } from 'stdout-stderr';
 import { getBuildkiteInfo } from '../src/buildkite/config';
 import { BuildkiteBuild, BuildkiteEnvironment } from '../src/buildkite/types';
 
@@ -143,4 +145,29 @@ export function fakeBuildkiteBuild(): BuildkiteBuild {
 
 export function fakeBuildkiteBuildsListing(): BuildkiteBuild[] {
   return [fakeBuildkiteBuild()];
+}
+
+export interface RunResult {
+  stdout: string;
+  stderr: string;
+}
+
+export async function testRun(command: typeof Command, args: string[] = []): Promise<RunResult> {
+  mockStdout.print = true;
+  mockStderr.print = true;
+
+  mockStdout.start();
+  mockStderr.start();
+
+  try {
+    await command.run(args);
+  } finally {
+    mockStdout.stop();
+    mockStderr.stop();
+  }
+
+  return {
+    stdout: mockStdout.output,
+    stderr: mockStderr.output,
+  };
 }
