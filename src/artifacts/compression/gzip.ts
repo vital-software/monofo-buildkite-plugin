@@ -1,5 +1,5 @@
 import debug from 'debug';
-import execa, { ExecaChildProcess } from 'execa';
+import execa, { ExecaChildProcess, ExecaReturnValue } from 'execa';
 import { hasBin } from '../../util/exec';
 import { tar } from '../../util/tar';
 import { Compression } from './compression';
@@ -25,13 +25,12 @@ export const gzip: Compression = {
     return hasBin('gzip');
   },
 
-  async inflate(input, outputPath = '.'): Promise<ExecaChildProcess> {
-    const result = execa(await tar(), ['-C', outputPath, '-xzf', '-'], {
-      stdio: [input, 'inherit', 'inherit'],
+  async inflate(input, outputPath = '.'): Promise<ExecaReturnValue> {
+    const result = await execa(await tar(), ['-C', outputPath, '-xzf', '-'], {
+      stdio: [input, 'pipe', 'inherit'],
     });
 
-    // eslint-disable-next-line no-void
-    void result.then(() => log('Finished inflating GZIP archive'));
+    log('Finished inflating GZIP archive');
 
     return result;
   },

@@ -35,41 +35,37 @@ export function deflator(input: stream.Readable, artifact: Artifact): ExecaChild
   }
 }
 
-export async function inflator(input: stream.Readable, artifact: Artifact, outputPath = '.'): Promise<void> {
+export async function inflator(
+  input: stream.Readable,
+  artifact: Artifact,
+  outputPath = '.'
+): Promise<ExecaChildProcess> {
   if (artifact.skip) {
     log(`Skipping download and inflate for ${artifact.name} because skip is enabled`);
-    return;
+    return Promise.resolve(execa('true'));
   }
 
   try {
-    if (artifact.ext === 'tar') {
-      await execa('tar', ['-C', outputPath, '-xf', '-'], { input });
-      return;
+    switch (artifact.ext) {
+      case 'tar':
+        // eslint-disable-next-line @typescript-eslint/return-await
+        return Promise.resolve(execa('tar', ['-C', outputPath, '-xf', '-'], { input }));
+      case 'tar.gz':
+        return await compressors.gzip.inflate(input, outputPath);
+      case 'tar.lz4':
+        return await compressors.lz4.inflate(input, outputPath);
+      case 'tar.caidx':
+        return await compressors.desync.inflate(input, outputPath);
+      default:
+        // eslint-disable-next-line @typescript-eslint/return-await
+        return Promise.resolve(execa('tee', [artifact.filename], { stdout: 'ignore' }));
     }
-
-    if (artifact.ext === 'tar.gz') {
-      await compressors.gzip.inflate(input, outputPath);
-      return;
-    }
-
-    if (artifact.ext === 'tar.lz4') {
-      await compressors.lz4.inflate(input, outputPath);
-      return;
-    }
-
-    if (artifact.ext === 'tar.caidx') {
-      await compressors.desync.inflate(input, outputPath);
-      return;
-    }
-
-    await pipeline(input, fs.createWriteStream(artifact.filename));
-    return;
   } catch (error) {
     log(`Failed to inflate ${artifact.name}`, error);
 
     if (artifact.softFail) {
       log(`Skipping failure for ${artifact.name} because soft fail is enabled`);
-      return;
+      return Promise.resolve(execa('true'));
     }
 
     throw error;

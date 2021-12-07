@@ -1,18 +1,20 @@
 import debug from 'debug';
-import execa from 'execa';
+import execa, { ExecaReturnValue } from 'execa';
 import { hasBin } from '../../util/exec';
 import { tar } from '../../util/tar';
 import { Compression } from './compression';
 
 const log = debug('monofo:artifact:compression:lz4');
 
+let enabled: boolean | undefined;
+
 export const lz4: Compression = {
   extensions: ['lz4'],
 
   deflate(input) {
     const subprocess = execa('lz4', ['-2'], {
-      buffer: true,
-      stdio: [input, 'pipe', 'inherit'],
+      buffer: false,
+      input,
     });
 
     void subprocess.then(() => log('Finished deflating LZ4 file'));
@@ -20,19 +22,22 @@ export const lz4: Compression = {
     return subprocess;
   },
 
-  enabled() {
-    return hasBin('lz4');
+  async enabled() {
+    if (enabled === undefined) {
+      enabled = await hasBin('lz4');
+    }
+    return enabled;
   },
 
-  async inflate(input, outputPath = '.'): Promise<execa.ExecaChildProcess> {
-    const subprocess = execa(await tar(), ['-C', outputPath, '-xv', '--use-compress-program=lz4', '-f', '-'], {
-      buffer: true,
-      stdio: [input, 'pipe', 'inherit'],
+  async inflate(input, outputPath = '.'): Promise<ExecaReturnValue> {
+    log('Inflating .tar.lz4');
+
+    const result = await execa(await tar(), ['-C', outputPath, '-x', '--use-compress-program=lz4', '-f', '-'], {
+      input,
     });
 
-    // eslint-disable-next-line no-void
-    void subprocess.then(() => log('Finished inflating LZ4 file'));
+    log('Finished inflating .tar.lz4 file');
 
-    return subprocess;
+    return result;
   },
 };
