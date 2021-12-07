@@ -2,22 +2,9 @@ import * as fs from 'fs';
 import { promisify } from 'util';
 import { directory } from 'tempy';
 import Upload from '../../src/commands/upload';
-import { mergeBase, diff, revList } from '../../src/git';
-import { fakeProcess, COMMIT, testRun } from '../fixtures';
+import { fakeProcess, testRun } from '../fixtures';
 
 const writeFile = promisify(fs.writeFile);
-
-jest.mock('../../src/git');
-jest.mock('../../src/buildkite/client');
-
-const mockMergeBase = mergeBase as jest.Mock<Promise<string>>;
-mockMergeBase.mockImplementation(() => Promise.resolve(COMMIT));
-
-const mockRevList = revList as jest.Mock<Promise<string[]>>;
-mockRevList.mockImplementation(() => Promise.resolve([COMMIT]));
-
-const mockDiff = diff as jest.Mock<Promise<string[]>>;
-mockDiff.mockImplementation(() => Promise.resolve(['foo/README.md', 'baz/abc.ts']));
 
 describe('cmd upload', () => {
   beforeEach(() => {
@@ -40,14 +27,15 @@ describe('cmd upload', () => {
       await writeFile(`${dir}/bar.txt`, 'baz');
       await writeFile(`${dir}/file-list.null.txt`, 'foo.txt\x00bar.txt');
 
-      const { stdout } = await testRun(Upload, [
+      const { stderr } = await testRun(Upload, [
         '--files-from',
         `${dir}/file-list.null.txt`,
         '--null',
         'some-upload.tar.gz',
       ]);
 
-      expect(stdout).toContain('uploaded');
+      expect(stderr).toContain('Finished deflating .gz file');
+      expect(stderr).toContain('Successfully uploaded some-upload');
     });
   });
 
@@ -58,9 +46,10 @@ describe('cmd upload', () => {
       await writeFile(`${dir}/foo.txt`, 'bar');
       await writeFile(`${dir}/bar.txt`, 'baz');
 
-      const { stdout } = await testRun(Upload, ['some-upload.tar.gz', '*.txt']);
+      const { stderr } = await testRun(Upload, ['some-upload.tar.gz', '*.txt']);
 
-      expect(stdout).toContain('uploaded');
+      expect(stderr).toContain('Finished deflating .gz file');
+      expect(stderr).toContain('Successfully uploaded some-upload');
     });
   });
 });

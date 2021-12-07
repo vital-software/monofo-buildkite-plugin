@@ -1,5 +1,5 @@
 import execa from 'execa';
-import { hasBin } from '../../util/exec';
+import { hasBin } from './exec';
 
 async function tarBin(): Promise<string> {
   if (process.platform === 'darwin') {
@@ -16,7 +16,8 @@ async function tarBin(): Promise<string> {
 }
 
 async function isGnuTar(bin: string): Promise<boolean> {
-  return (await execa(bin, ['--help'])).stderr.startsWith('GNU');
+  const { stdout } = await execa(bin, ['--help']);
+  return stdout.slice(stdout.indexOf('\n') + 1).startsWith('GNU');
 }
 
 let cachedTar: string | undefined;

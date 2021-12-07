@@ -1,4 +1,5 @@
 import Command from '@oclif/command';
+import debug from 'debug';
 import { stderr as mockStderr, stdout as mockStdout } from 'stdout-stderr';
 import { getBuildkiteInfo } from '../src/buildkite/config';
 import { BuildkiteBuild, BuildkiteEnvironment } from '../src/buildkite/types';
@@ -155,14 +156,15 @@ export interface RunResult {
 }
 
 export async function testRun(command: typeof Command, args: string[] = []): Promise<RunResult> {
-  mockStdout.print = true;
-  mockStderr.print = true;
-
-  mockStdout.start();
-  mockStderr.start();
-
   try {
+    mockStdout.start();
+    mockStderr.start();
+    mockStdout.print = true;
+    mockStderr.print = true;
+
+    debug.enable('monofo:*');
     await command.run(args);
+    debug.disable();
   } finally {
     mockStdout.stop();
     mockStderr.stop();

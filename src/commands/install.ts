@@ -16,9 +16,9 @@ function delay(millis: number): Promise<void> {
 }
 
 export default class Install extends BaseCommand {
-  static description = 'install a DynamoDB table to store cache pointers for pure builds';
+  static override description = 'install a DynamoDB table to store cache pointers for pure builds';
 
-  static flags = { ...BaseCommand.flags };
+  static override flags = { ...BaseCommand.flags };
 
   async run(): Promise<string> {
     if (!(await Install.describeTable())) {

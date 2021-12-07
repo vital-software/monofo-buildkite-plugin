@@ -7,9 +7,9 @@ interface HashArgs {
 }
 
 export default class Hash extends BaseCommand {
-  static description = 'hash the specified component and output the value';
+  static override description = 'hash the specified component and output the value';
 
-  static args = [
+  static override args = [
     {
       name: 'pipeline',
       required: true,
@@ -17,7 +17,7 @@ export default class Hash extends BaseCommand {
     },
   ];
 
-  static flags = { ...BaseCommand.flags };
+  static override flags = { ...BaseCommand.flags };
 
   async run(): Promise<void> {
     const {

@@ -6,11 +6,11 @@ interface ListArgs {
 }
 
 export default class List extends BaseCommand {
-  static description = 'list matching files for different parts of the pipeline';
+  static override description = 'list matching files for different parts of the pipeline';
 
-  static flags = { ...BaseCommand.flags };
+  static override flags = { ...BaseCommand.flags };
 
-  static args = [
+  static override args = [
     {
       name: 'componentName',
       description: 'Name of the component to list',

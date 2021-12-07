@@ -7,6 +7,8 @@ services:
         target: /monofo
         type: bind
     image: ${NODE_IMAGE_TAG:-239595706494.dkr.ecr.us-west-2.amazonaws.com/monofo:node-main}
+    environment:
+      - DEBUG
 
   plugin-lint:
     image: buildkite/plugin-linter

@@ -1,18 +1,5 @@
 import Download from '../../src/commands/download';
-import { mergeBase, diff, revList } from '../../src/git';
-import { fakeProcess, COMMIT, testRun } from '../fixtures';
-
-jest.mock('../../src/git');
-jest.mock('../../src/buildkite/client');
-
-const mockMergeBase = mergeBase as jest.Mock<Promise<string>>;
-mockMergeBase.mockImplementation(() => Promise.resolve(COMMIT));
-
-const mockRevList = revList as jest.Mock<Promise<string[]>>;
-mockRevList.mockImplementation(() => Promise.resolve([COMMIT]));
-
-const mockDiff = diff as jest.Mock<Promise<string[]>>;
-mockDiff.mockImplementation(() => Promise.resolve(['foo/README.md', 'baz/abc.ts']));
+import { fakeProcess, testRun } from '../fixtures';
 
 describe('cmd download', () => {
   beforeEach(() => {

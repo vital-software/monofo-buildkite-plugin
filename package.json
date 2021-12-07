@@ -46,8 +46,7 @@
   },
   "files": [
     "/bin",
-    "/dist",
-    "/yarn.lock",
+    "/dist/src",
     "/oclif.manifest.json"
   ],
   "dependencies": {
@@ -98,8 +97,6 @@
     "cz-conventional-changelog": "3.3.0",
     "eslint": "8.4.1",
     "eslint-config-airbnb-typescript": "16.1.0",
-    "eslint-config-oclif": "4.0.0",
-    "eslint-config-oclif-typescript": "1.0.2",
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-import": "2.25.3",
     "eslint-plugin-jest": "25.3.0",
