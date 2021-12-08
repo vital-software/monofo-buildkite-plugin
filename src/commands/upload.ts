@@ -4,6 +4,7 @@ import { promisify } from 'util';
 import { flags as f } from '@oclif/command';
 import debug from 'debug';
 import execa, { ExecaChildProcess } from 'execa';
+import { upload } from '../artifacts/api';
 import { deflator } from '../artifacts/compression';
 import { filesToUpload } from '../artifacts/matcher';
 import { Artifact } from '../artifacts/model';
@@ -98,7 +99,7 @@ locally cached
 
     if (files.length === 0) {
       log('No files to upload: nothing to do');
-      return 'No files to upload: nothing to do';
+      return;
     }
 
     if (flags.verbose) {
@@ -113,13 +114,15 @@ locally cached
       buffer: false,
     });
 
-    log('Waiting for deflate');
+    log('Starting to deflate');
     const subprocess2: ExecaChildProcess = deflator(stdoutReadable(subprocess), artifact);
 
-    log('Waiting for subprocess');
+    log('Waiting for archive and deflate to be complete');
     await pipeline(stdoutReadable(subprocess2), output);
 
+    log('Uploading to Buildkite');
+    await upload(artifact);
+
     log(`Successfully uploaded ${artifact.name}`);
-    return `Uploaded ${artifact.name}`;
   }
 }

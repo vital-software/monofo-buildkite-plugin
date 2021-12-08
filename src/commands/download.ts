@@ -1,9 +1,7 @@
-import stream from 'stream';
 import debug from 'debug';
 import _ from 'lodash';
-import { ArtifactApi } from '../artifacts/api';
+import { download } from '../artifacts/api';
 import { inflator } from '../artifacts/compression';
-import { ArtifactDownloader } from '../artifacts/download';
 import { Artifact } from '../artifacts/model';
 import { BaseCommand } from '../command';
 
@@ -51,12 +49,9 @@ modifiers passed in env vars:
     const artifacts: Artifact[] = _.castArray<string>(args.artifacts).map((filename) => new Artifact(filename));
     log(`Downloading ${artifacts.length} artifacts: ${artifacts.map((artifact) => artifact.name).join(', ')}`);
 
-    const downloader = new ArtifactDownloader(new ArtifactApi());
-
     return Promise.all(
       artifacts.map(async (artifact) => {
-        const download: stream.Readable = await downloader.download(artifact);
-        await inflator(download, artifact);
+        await inflator(await download(artifact), artifact);
       })
     ).then(() => 'All done');
   }

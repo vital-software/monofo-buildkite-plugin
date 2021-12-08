@@ -19,7 +19,7 @@
     "build:after:manifest": "OCLIF_TS_NODE=0 oclif-dev manifest",
     "build:after:readme": "oclif-dev readme --multi --dir=docs/commands",
     "build:watch": "run-s \"build:ts -w\"",
-    "clean": "rm -rf dist/ output/",
+    "clean": "rm -rf dist/ output/ oclif.manifest.json .combined-docs.md",
     "commit": "git-cz",
     "git:sync": "git push plugin +refs/remotes/origin/*:refs/heads/* +refs/tags/*:refs/tags/*",
     "git:sync:setup": "git remote add plugin git@github.com:vital-software/monofo-buildkite-plugin.git",

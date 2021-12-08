@@ -1,10 +1,16 @@
 import * as fs from 'fs';
 import { promisify } from 'util';
 import { directory } from 'tempy';
+import { upload } from '../../src/artifacts/api';
 import Upload from '../../src/commands/upload';
 import { fakeProcess, testRun } from '../fixtures';
 
 const writeFile = promisify(fs.writeFile);
+
+jest.mock('../../src/artifacts/api');
+
+const mockUpload = upload as jest.Mock<Promise<unknown>>;
+mockUpload.mockImplementation(() => Promise.resolve('done'));
 
 describe('cmd upload', () => {
   beforeEach(() => {
