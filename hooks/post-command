@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Pre-command hook
+# Post-command hook
 #
 # This script just interprets a couple of key settings, and then calls into the
 # relevant sub-script in lib/
@@ -9,6 +9,11 @@ set -euo pipefail
 BUILDKITE_PLUGIN_MONOFO_UPLOAD=${BUILDKITE_PLUGIN_MONOFO_UPLOAD:-}
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+if [[ "${MONOFO_HOOK_DEBUG:-0}" -eq 1 ]]; then
+  set -x
+  env | grep BUILDKITE_PLUGIN
+fi
 
 if [[ -n "${BUILDKITE_PLUGIN_MONOFO_UPLOAD}" ]]; then
   # shellcheck source=./lib/upload.bash

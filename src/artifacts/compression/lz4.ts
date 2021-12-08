@@ -12,14 +12,10 @@ export const lz4: Compression = {
   extension: 'lz4',
 
   deflate(input) {
-    const subprocess = execa('lz4', ['-2'], {
+    return execa('lz4', ['-2'], {
       buffer: false,
       input,
     });
-
-    void subprocess.then(() => log('Finished deflating LZ4 file'));
-
-    return subprocess;
   },
 
   async enabled() {

@@ -40,7 +40,7 @@ generateFakePackage() {
   [[ $? -eq 0 ]]
 }
 
-@test "pre-command works with fake package" {
+@test "download works with fake package" {
   # Mock passing curl
   echo "#!/usr/bin/env bash" > "$BATS_TMPDIR/curl"
   echo "cat $BATS_TMPDIR/typescript.tar.gz" >> "$BATS_TMPDIR/curl"
