@@ -28,9 +28,6 @@ MONOFO=$(monofo "pipeline")
 PIPELINE_FILE="$(mktemp /tmp/generate-pipeline.XXXXXX)"
 BUILDKITE_AGENT_ACCESS_TOKEN=${BUILDKITE_AGENT_ACCESS_TOKEN:-}
 
-# Should be able to figure out version to use from BUILDKITE_PLUGIN_CONFIGURATION
-echo "${BUILDKITE_PLUGIN_CONFIGURATION:-}"
-
 echo "--- Fetching other branches" >&2
 git fetch -v origin +refs/heads/*:refs/remotes/origin/*
 

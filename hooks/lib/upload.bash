@@ -6,7 +6,12 @@ set -euo pipefail
 source "$_lib_script_dir/run.bash"
 MONOFO=$(monofo)
 
-# Deflates and uploads artifacts
+if [[ -z "${BUILDKITE_PLUGIN_CONFIGURATION:-}" ]]; then
+  echo "Expected BUILDKITE_PLUGIN_CONFIGURATION to be set" >&2
+  exit 1
+fi
+
+# Archives, deflates and uploads artifacts
 #
 # Does so:
 #  - in parallel across all the artifacts that need to be built
@@ -31,16 +36,9 @@ fi
 # call `monofo upload` in parallel
 
 # Example: BUILDKITE_PLUGIN_CONFIGURATION='{"upload":{"build.tar.caidx":["dist/**","another/dist/**"],"node-modules.tar.lz4":{"filesFrom":"node-modules.list","null":true}}}'
-BUILDKITE_PLUGIN_CONFIGURATION="${BUILDKITE_PLUGIN_CONFIGURATION:-}"
-
-if [[ -z "$BUILDKITE_PLUGIN_CONFIGURATION" ]]; then
-  echo "Expected BUILDKITE_PLUGIN_CONFIGURATION to contain JSON configuration" >&2
-  exit 2
-fi
-
 
 pids=()
-files=$(echo "$BUILDKITE_PLUGIN_CONFIGURATION" | jq -r -c '.upload|to_entries|.[]')
+files=$(echo "$BUILDKITE_PLUGIN_CONFIGURATION" | jq -rc '.upload | to_entries | .[]')
 
 for file in $files; do
   (

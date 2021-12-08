@@ -6,22 +6,26 @@
 
 set -euo pipefail
 
-BUILDKITE_PLUGIN_MONOFO_GENERATE=${BUILDKITE_PLUGIN_MONOFO_GENERATE:-}
-BUILDKITE_PLUGIN_MONOFO_DOWNLOAD=${BUILDKITE_PLUGIN_MONOFO_DOWNLOAD:-}
-
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 if [[ "${MONOFO_HOOK_DEBUG:-0}" -eq 1 ]]; then
   set -x
-  env | grep BUILDKITE_PLUGIN
 fi
 
-if [[ -n "${BUILDKITE_PLUGIN_MONOFO_GENERATE}" && "$BUILDKITE_PLUGIN_MONOFO_GENERATE" == "pipeline" ]]; then
+if [[ -z "$BUILDKITE_PLUGIN_CONFIGURATION" ]]; then
+  echo "Expected BUILDKITE_PLUGIN_CONFIGURATION to be set" >&2
+  exit 1
+fi
+
+pipeline=$(jq -cr '.generate == "pipeline"' <<< "$BUILDKITE_PLUGIN_CONFIGURATION")
+download=$(jq -cr 'has("download")' <<< "$BUILDKITE_PLUGIN_CONFIGURATION")
+
+if [[ "$pipeline" == "true" ]]; then
   # shellcheck source=./lib/generate.bash
   source "${SCRIPT_DIR}/lib/generate.bash"
 fi
 
-if [[ -n "${BUILDKITE_PLUGIN_MONOFO_DOWNLOAD}" ]]; then
+if [[ "$download" == "true" ]]; then
   # shellcheck source=./lib/download.bash
   source "${SCRIPT_DIR}/lib/download.bash"
 fi

@@ -6,18 +6,27 @@ set -euo pipefail
 source "$_lib_script_dir/run.bash"
 MONOFO=$(monofo)
 
-BUILDKITE_PLUGIN_MONOFO_DOWNLOAD="${BUILDKITE_PLUGIN_MONOFO_DOWNLOAD:-}"
+if [[ -z "${BUILDKITE_PLUGIN_CONFIGURATION:-}" ]]; then
+  echo "Expected BUILDKITE_PLUGIN_CONFIGURATION to be set" >&2
+  exit 1
+fi
 
 # Downloads and inflates artifacts
 #
-# The only format supported is a simple list of artifact filenames, so we can
-# rely on the default Buildkite YAML to env var system
+# The only format supported is a simple list of artifact filenames
+#
+# Example: BUILDKITE_PLUGIN_CONFIGURATION='{"download":["build.tar.caidx","node-modules.tar.lz4"]}'
 
 if [[ "${MONOFO_HOOK_DEBUG:-0}" -eq 1 ]]; then
   set -x
 fi
 
-env | grep MONOFO >&2
+flags=()
+files=$(echo "$BUILDKITE_PLUGIN_CONFIGURATION" | jq -rc '.download | .[]')
 
-# shellcheck disable=SC2086,SC2046
-eval $MONOFO download $BUILDKITE_PLUGIN_MONOFO_DOWNLOAD
+for file in $files; do
+  flags+=("$file")
+done
+
+echo "Going to run ${MONOFO} ${flags[*]}" >&2
+${MONOFO} "${flags[@]}"
