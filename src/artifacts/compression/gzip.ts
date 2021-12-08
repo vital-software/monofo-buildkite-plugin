@@ -12,15 +12,10 @@ export const gzip: Compression = {
   extension: 'gz',
 
   deflate(input) {
-    const subprocess = execa('gzip', [], {
+    return execa('gzip', [], {
       buffer: false,
       input,
     });
-
-    // eslint-disable-next-line no-void
-    void subprocess.then(() => log('Finished deflating .gz file'));
-
-    return subprocess;
   },
 
   async enabled() {

@@ -11,6 +11,11 @@ BUILDKITE_PLUGIN_MONOFO_DOWNLOAD=${BUILDKITE_PLUGIN_MONOFO_DOWNLOAD:-}
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
+if [[ "${MONOFO_HOOK_DEBUG:-0}" -eq 1 ]]; then
+  set -x
+  env | grep BUILDKITE_PLUGIN
+fi
+
 if [[ -n "${BUILDKITE_PLUGIN_MONOFO_GENERATE}" && "$BUILDKITE_PLUGIN_MONOFO_GENERATE" == "pipeline" ]]; then
   # shellcheck source=./lib/generate.bash
   source "${SCRIPT_DIR}/lib/generate.bash"

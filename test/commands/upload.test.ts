@@ -40,7 +40,6 @@ describe('cmd upload', () => {
         'some-upload.tar.gz',
       ]);
 
-      expect(stderr).toContain('Finished deflating .gz file');
       expect(stderr).toContain('Successfully uploaded some-upload');
     });
   });
@@ -54,7 +53,6 @@ describe('cmd upload', () => {
 
       const { stderr } = await testRun(Upload, ['some-upload.tar.gz', '*.txt']);
 
-      expect(stderr).toContain('Finished deflating .gz file');
       expect(stderr).toContain('Successfully uploaded some-upload');
     });
   });
