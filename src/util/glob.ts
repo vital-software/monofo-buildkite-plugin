@@ -40,7 +40,7 @@ export function glob(pattern: string, opts: IOptions = {}): Promise<string[]> {
 export function globSet(patterns: string[], opts: IOptions = {}): Promise<string[]> {
   return Promise.all(patterns.map(async (pattern) => glob(pattern, opts))).then((r) => {
     const flat = [...new Set(r.flat())];
-    log(`Found ${count(flat, 'matching file')}`);
+    log(`Found ${count(flat, 'matching path')}`);
     return flat;
   });
 }

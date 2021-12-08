@@ -18,7 +18,7 @@ export class Artifact {
     [this.name] = this.filename.split('.');
     this.ext = this.filename.split('.').slice(1).join('.'); // Not extname() because that only gives the last ext
 
-    const envName = _.upperCase(_.snakeCase(this.name));
+    const envName = _.snakeCase(this.name).toUpperCase();
 
     this.skip = Boolean(process.env?.[`MONOFO_ARTIFACT_${envName}_SKIP`]);
     this.softFail = Boolean(process.env?.[`MONOFO_ARTIFACT_${envName}_SOFT_FAIL`]);

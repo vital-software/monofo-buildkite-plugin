@@ -12,3 +12,5 @@ steps:
     plugins:
       - docker-compose#v3.9.0:
           run: plugin-lint
+    soft_fail: # until we can fix https://github.com/buildkite-plugins/buildkite-plugin-linter/issues/409
+      - exit_status: 1
