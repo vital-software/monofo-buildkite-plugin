@@ -4,7 +4,7 @@
   "description": "Dynamic Buildkite pipeline generator for monorepos",
   "author": "Dominic Scheirlinck <dominic@vitaler.com>",
   "bin": {
-    "monofo": "./bin/monofo.js"
+    "monofo": "./bin/run"
   },
   "main": "dist/src/index.js",
   "repository": "https://github.com/vital-software/monofo",
