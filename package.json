@@ -54,7 +54,7 @@
     "@oclif/command": "1.8.9",
     "@oclif/config": "1.18.2",
     "@oclif/plugin-autocomplete": "0.3.0",
-    "@oclif/plugin-help": "3.2.13",
+    "@oclif/plugin-help": "3.2.14",
     "@oclif/plugin-not-found": "1.2.5",
     "@oclif/plugin-which": "1.0.3",
     "aws-sdk": "2.1044.0",
