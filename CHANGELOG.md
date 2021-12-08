@@ -1,3 +1,10 @@
+## [3.1.4](https://github.com/vital-software/monofo/compare/v3.1.3...v3.1.4) (2021-12-08)
+
+
+### Bug Fixes
+
+* **core:** fix incorrect bin reference ([693f333](https://github.com/vital-software/monofo/commit/693f3338a69b5106da4ef663f0e74efe4000d09d))
+
 ## [3.1.3](https://github.com/vital-software/monofo/compare/v3.1.2...v3.1.3) (2021-12-08)
 
 
