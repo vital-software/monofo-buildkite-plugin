@@ -175,3 +175,7 @@ export async function testRun(command: typeof Command, args: string[] = []): Pro
     stderr: mockStderr.output,
   };
 }
+
+export function getFixturePath(fileName: string): string {
+  return `${__dirname}/fixtures/${fileName}`;
+}

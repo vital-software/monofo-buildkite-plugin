@@ -7,7 +7,7 @@ import tempy from 'tempy';
 import { Compression, compressors, inflator } from '../../src/artifacts/compression';
 import { Artifact } from '../../src/artifacts/model';
 import { stdoutReadable } from '../../src/util/exec';
-import { fakeProcess } from '../fixtures';
+import { fakeProcess, getFixturePath } from '../fixtures';
 
 const writeFile = promisify(fs.writeFile);
 const rimraf = promisify(rimrafSync);
@@ -31,7 +31,7 @@ describe('compression', () => {
     it('can download and inflate .tar.lz4 files correctly', async () => {
       const artifact = new Artifact('foo.tar.lz4');
 
-      const res = await inflator(fs.createReadStream(`${__dirname}/../fixtures/foo.tar.lz4`), artifact);
+      const res = await inflator(fs.createReadStream(getFixturePath('foo.tar.lz4')), artifact);
       expect(res.exitCode).toBe(0);
 
       expect(fs.existsSync(`${dir}`)).toBe(true);
