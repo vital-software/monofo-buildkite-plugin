@@ -40,13 +40,16 @@ modifiers passed in env vars:
       name: 'artifacts',
       description: 'A list of artifact files to retrieve and extract',
       required: true,
+      multiple: true,
     },
   ];
 
-  async run() {
-    const { args } = this.parse<unknown, ArtifactArguments>(Download);
+  static override flags = { ...BaseCommand.flags };
 
-    const artifacts: Artifact[] = _.castArray<string>(args.artifacts).map((filename) => new Artifact(filename));
+  async run() {
+    const { argv } = this.parse<unknown, ArtifactArguments>(Download);
+
+    const artifacts: Artifact[] = _.castArray<string>(argv).map((filename) => new Artifact(filename));
     log(`Downloading ${artifacts.length} artifacts: ${artifacts.map((artifact) => artifact.name).join(', ')}`);
 
     return Promise.all(
