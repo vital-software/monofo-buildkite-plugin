@@ -25,10 +25,17 @@ teardown() {
   rm -rf "$BATS_TMPDIR/npx"
 }
 
-@test "calls npx when generating a pipeline" {
-  export BUILDKITE_PLUGIN_MONOFO_GENERATE="pipeline"
+@test "calls into pipeline when given config" {
+  export BUILDKITE_PLUGIN_CONFIGURATION='{"generate":"pipeline"}'
   run "$SUT"
 
   [[ "$output" = *"npx output"* ]] || ( echo "Failed to match: $output" >&3 && exit 2 )
   [[ "$output" = *"git output"* ]] || ( echo "Failed to match: $output" >&3 && exit 2 )
+}
+
+@test "calls into download when given config" {
+  export BUILDKITE_PLUGIN_CONFIGURATION='{"download":["node-modules.tar.lz4"]}'
+  run "$SUT"
+
+  [[ "$output" = *"npx output"* ]] || ( echo "Failed to match: $output" >&3 && exit 2 )
 }
