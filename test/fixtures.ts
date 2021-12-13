@@ -1,6 +1,7 @@
 import Command from '@oclif/command';
 import debug from 'debug';
 import { stderr as mockStderr, stdout as mockStdout } from 'stdout-stderr';
+import tempy from 'tempy';
 import { getBuildkiteInfo } from '../src/buildkite/config';
 import { BuildkiteBuild, BuildkiteEnvironment } from '../src/buildkite/types';
 
@@ -20,7 +21,12 @@ export const BASE_BUILD: BuildkiteBuild = {
 };
 
 export function fakeProcess(merge: Record<string, string> = {}): NodeJS.ProcessEnv {
+  const MONOFO_DESYNC_CACHE = tempy.directory();
+
   return {
+    MONOFO_DESYNC_CACHE,
+    MONOFO_DESYNC_STORE: MONOFO_DESYNC_CACHE,
+
     MOCK_DYNAMODB_ENDPOINT: process.env?.MOCK_DYNAMODB_ENDPOINT,
 
     BUILDKITE_BUILD_ID: BUILD_ID,

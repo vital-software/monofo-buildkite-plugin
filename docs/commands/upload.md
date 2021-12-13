@@ -52,4 +52,4 @@ EXAMPLE
   $ find . -name node_modules -type d -prune -print0 | monofo upload --files-from - --null
 ```
 
-_See code: [dist/src/commands/upload.ts](https://github.com/vital-software/monofo/blob/v3.1.1/dist/src/commands/upload.ts)_
+_See code: [dist/src/commands/upload.ts](https://github.com/vital-software/monofo/blob/v3.1.4/dist/src/commands/upload.ts)_

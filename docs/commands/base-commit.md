@@ -24,4 +24,4 @@ EXAMPLE
   6c4fe0eda8b93de6764c3f99758505f0e4370103
 ```
 
-_See code: [dist/src/commands/base-commit.ts](https://github.com/vital-software/monofo/blob/v3.1.1/dist/src/commands/base-commit.ts)_
+_See code: [dist/src/commands/base-commit.ts](https://github.com/vital-software/monofo/blob/v3.1.4/dist/src/commands/base-commit.ts)_

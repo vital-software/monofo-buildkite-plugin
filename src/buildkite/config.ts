@@ -56,6 +56,9 @@ declare global {
 
       MONOFO_DEFAULT_BRANCH?: string;
       MONOFO_INTEGRATION_BRANCH?: string;
+
+      MONOFO_DESYNC_STORE: string;
+      MONOFO_DESYNC_CACHE: string;
     }
   }
 }
