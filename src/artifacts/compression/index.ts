@@ -1,6 +1,8 @@
 import stream from 'stream';
 import debug from 'debug';
 import execa, { ExecaChildProcess } from 'execa';
+import { stdoutReadable } from '../../util/exec';
+import { tar } from '../../util/tar';
 import { Artifact } from '../model';
 import { Compression } from './compression';
 import { desync } from './desync';
@@ -16,14 +18,29 @@ export const compressors: Record<string, Compression> = {
   lz4,
 };
 
+export async function canProcess(artifact: Artifact): Promise<boolean> {
+  switch (artifact.ext) {
+    case 'tar':
+      return true;
+    case 'tar.gz':
+      return compressors.gzip.enabled();
+    case 'tar.lz4':
+      return compressors.lz4.enabled();
+    case 'tar.caidx':
+      return compressors.desync.enabled();
+    default:
+      return false;
+  }
+}
+
 /**
  * @param input A .tar file contents being streamed at the deflator
  * @param artifact The eventual artifact we're hoping to produce
  */
-export function deflator(input: stream.Readable, artifact: Artifact): ExecaChildProcess {
+export async function deflator(input: stream.Readable, artifact: Artifact): Promise<stream.Readable> {
   switch (artifact.ext) {
     case 'tar':
-      return execa('cat', [], { input });
+      return stdoutReadable(execa('cat', [], { input }));
     case 'tar.gz':
       return compressors.gzip.deflate(input);
     case 'tar.lz4':
@@ -59,7 +76,7 @@ export async function inflator(
         return await compressors.desync.inflate(input, outputPath);
       default:
         // eslint-disable-next-line @typescript-eslint/return-await
-        return Promise.resolve(execa('tee', [artifact.filename], { stdout: 'ignore' }));
+        return Promise.resolve(execa('tee', [artifact.filename], { input }));
     }
   } catch (error) {
     log(`Failed to inflate ${artifact.name}`, error);

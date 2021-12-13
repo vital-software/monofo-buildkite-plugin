@@ -4,6 +4,7 @@ import { download } from '../artifacts/api';
 import { inflator } from '../artifacts/compression';
 import { Artifact } from '../artifacts/model';
 import { BaseCommand } from '../command';
+import { count } from '../util/helper';
 
 const log = debug('monofo:cmd:download');
 
@@ -50,7 +51,7 @@ modifiers passed in env vars:
     const { argv } = this.parse<unknown, ArtifactArguments>(Download);
 
     const artifacts: Artifact[] = _.castArray<string>(argv).map((filename) => new Artifact(filename));
-    log(`Downloading ${artifacts.length} artifacts: ${artifacts.map((artifact) => artifact.name).join(', ')}`);
+    log(`Downloading ${count(artifacts, 'artifact')}: ${artifacts.map((artifact) => artifact.name).join(', ')}`);
 
     return Promise.all(
       artifacts.map(async (artifact) => {

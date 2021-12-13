@@ -5,7 +5,7 @@ import { flags as f } from '@oclif/command';
 import debug from 'debug';
 import execa, { ExecaChildProcess } from 'execa';
 import { upload } from '../artifacts/api';
-import { deflator } from '../artifacts/compression';
+import { canProcess, deflator } from '../artifacts/compression';
 import { filesToUpload } from '../artifacts/matcher';
 import { Artifact } from '../artifacts/model';
 import { BaseCommand, BaseFlags } from '../command';
@@ -29,8 +29,6 @@ interface UploadArgs {
 
 /**
  * Upload command
- *
-
  */
 export default class Upload extends BaseCommand {
   /**
@@ -107,7 +105,7 @@ locally cached
     }
 
     log(`Uploading ${count(files, 'path')} as ${args.output}`);
-    const output = fs.createWriteStream(artifact.filename);
+    const output = await Upload.getOutputStream(artifact);
 
     const subprocess: ExecaChildProcess = execa(await tar(), ['-c', '--files-from', '-', '--null'], {
       input: stream.Readable.from(files.join('\x00')),
@@ -115,14 +113,22 @@ locally cached
     });
 
     log('Starting to deflate');
-    const subprocess2: ExecaChildProcess = deflator(stdoutReadable(subprocess), artifact);
-
-    log('Waiting for archive and deflate to be complete');
-    await pipeline(stdoutReadable(subprocess2), output);
+    await deflator(stdoutReadable(subprocess), artifact).then(async (deflated: stream.Readable) => {
+      log('Waiting for archive and deflate to be complete');
+      await pipeline(deflated, output);
+    });
 
     log('Uploading to Buildkite');
     await upload(artifact);
 
     log(`Successfully uploaded ${artifact.name}`);
+  }
+
+  private static async getOutputStream(artifact: Artifact): Promise<stream.Writable> {
+    if (!(await canProcess(artifact))) {
+      throw new Error(`Cannot process artifact type ${artifact.ext} for ${artifact.name}: not supported`);
+    }
+
+    return fs.createWriteStream(artifact.filename);
   }
 }

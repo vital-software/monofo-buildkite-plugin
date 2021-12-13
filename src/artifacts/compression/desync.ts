@@ -1,22 +1,27 @@
+import fs from 'fs';
 import stream from 'stream';
+import { promisify } from 'util';
 import debug from 'debug';
-import execa, { ExecaChildProcess, ExecaReturnValue } from 'execa';
+import execa, { ExecaReturnValue } from 'execa';
+import tempy from 'tempy';
 import { hasBin } from '../../util/exec';
 import { Compression } from './compression';
 
-const log = debug('monofo:artifact:compression:desync');
+const pipeline = promisify(stream.pipeline);
+
+const log = debug('monofo:artifact:compression:desynw');
 
 let enabled: boolean | undefined;
 
-/**
- * @todo replace with desync config file
- */
-function getFlags({ cache = true, store = true } = {}): string[] {
-  return [
-    ...(cache && process.env?.MONOFO_DESYNC_CACHE ? ['-c', process.env.MONOFO_DESYNC_CACHE] : []),
-    ...(store && process.env?.MONOFO_DESYNC_STORE ? ['-s', process.env.MONOFO_DESYNC_STORE] : []),
-    ...(process.env?.MONOFO_DESYNC_FLAGS || '').split(' '),
-  ];
+function store(): string {
+  if (!process.env?.MONOFO_DESYNC_STORE) {
+    throw new Error('Could not get store details from MONOFO_DESYNC_STORE');
+  }
+  return process.env.MONOFO_DESYNC_STORE;
+}
+
+function cacheFlags(): string[] {
+  return process.env.MONOFO_DESYNC_CACHE ? ['-c', process.env.MONOFO_DESYNC_CACHE] : [];
 }
 
 export const desync: Compression = {
@@ -24,7 +29,7 @@ export const desync: Compression = {
 
   async enabled() {
     if (enabled === undefined) {
-      enabled = Boolean(process.env?.MONOFO_DESYNC_STORE) && (await hasBin('desync'));
+      enabled = Boolean(store()) && (await hasBin('desync'));
     }
     return enabled;
   },
@@ -35,12 +40,23 @@ export const desync: Compression = {
    * - Expects a stream of the contents of a tar archive to be given as the input parameter
    * - Writes an index file to the given output path
    */
-  deflate(input: stream.Readable): ExecaChildProcess<string> {
-    return execa('desync', ['tar', '--input-format', 'tar', '--index', ...getFlags({ cache: false }), '-', '-'], {
+  async deflate(input: stream.Readable): Promise<stream.Readable> {
+    // write the tar input stream to the temp tar
+    const tempTar = tempy.file();
+    const tempIndex = tempy.file();
+
+    await pipeline(input, fs.createWriteStream(tempTar));
+
+    // run it into desync, storing it remotely, and causing the index file to be created
+    await execa('desync', ['tar', '--input-format', 'tar', '--index', '-s', store(), tempIndex, tempTar], {
       buffer: false,
       input,
     });
-    // TODO: after producing index: desync chop -s /some/local/store somefile.tar.caidx somefile.tar
+
+    // `chop` it into the local cache as well
+    await execa('desync', ['chop', '-s', process.env.MONOFO_DESYNC_CACHE, tempIndex, tempTar]);
+
+    return fs.createReadStream(tempIndex);
   },
 
   /**
@@ -53,7 +69,7 @@ export const desync: Compression = {
    * @return ExecaChildProcess The result of running desync untar
    */
   async inflate(input: stream.Readable, outputPath = '.'): Promise<ExecaReturnValue> {
-    const result = await execa('desync', ['untar', '--index', ...getFlags(), '-', outputPath], {
+    const result = await execa('desync', ['untar', '--index', '-s', store(), ...cacheFlags(), '-', outputPath], {
       input,
     });
 

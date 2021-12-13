@@ -1,6 +1,6 @@
 import debug from 'debug';
-import execa, { ExecaReturnValue } from 'execa';
-import { hasBin } from '../../util/exec';
+import execa, { ExecaChildProcess, ExecaReturnValue } from 'execa';
+import { hasBin, stdoutReadable } from '../../util/exec';
 import { tar } from '../../util/tar';
 import { Compression } from './compression';
 
@@ -12,10 +12,12 @@ export const lz4: Compression = {
   extension: 'lz4',
 
   deflate(input) {
-    return execa('lz4', ['-2'], {
+    const child: ExecaChildProcess = execa('lz4', ['-2'], {
       buffer: false,
       input,
     });
+
+    return Promise.resolve(stdoutReadable(child));
   },
 
   async enabled() {

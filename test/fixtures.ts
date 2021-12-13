@@ -21,6 +21,9 @@ export const BASE_BUILD: BuildkiteBuild = {
 
 export function fakeProcess(merge: Record<string, string> = {}): NodeJS.ProcessEnv {
   return {
+    MONOFO_DESYNC_CACHE: '/var/cache/desync-test-cache',
+    MONOFO_DESYNC_STORE: '/var/cache/desync-test-store',
+
     MOCK_DYNAMODB_ENDPOINT: process.env?.MOCK_DYNAMODB_ENDPOINT,
 
     BUILDKITE_BUILD_ID: BUILD_ID,

@@ -1,6 +1,6 @@
 import debug from 'debug';
-import execa, { ExecaReturnValue } from 'execa';
-import { hasBin } from '../../util/exec';
+import execa, { ExecaChildProcess, ExecaReturnValue } from 'execa';
+import { hasBin, stdoutReadable } from '../../util/exec';
 import { tar } from '../../util/tar';
 import { Compression } from './compression';
 
@@ -12,10 +12,14 @@ export const gzip: Compression = {
   extension: 'gz',
 
   deflate(input) {
-    return execa('gzip', [], {
-      buffer: false,
-      input,
-    });
+    return Promise.resolve(
+      stdoutReadable(
+        execa('gzip', [], {
+          buffer: false,
+          input,
+        })
+      )
+    );
   },
 
   async enabled() {

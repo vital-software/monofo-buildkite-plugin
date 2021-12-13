@@ -8,14 +8,7 @@ jest.mock('../../src/artifacts/api');
 
 const mockDownload = download as jest.Mock<Promise<unknown>>;
 mockDownload.mockImplementation((artifact: Artifact) => {
-  switch (artifact.name) {
-    case 'foo':
-      return Promise.resolve(fs.createReadStream(getFixturePath('foo.tar.lz4')));
-    case 'bar':
-      return Promise.resolve(fs.createReadStream(getFixturePath('bar.tar.gz')));
-    default:
-      throw new Error('Unknown mock fixture name');
-  }
+  return Promise.resolve(fs.createReadStream(getFixturePath(artifact.filename)));
 });
 
 describe('cmd download', () => {
@@ -31,18 +24,30 @@ describe('cmd download', () => {
     await expect(testRun(Download, [])).rejects.toThrowError('Missing 1 required arg');
   });
 
-  it('downloads a single file', async () => {
+  it('downloads a single archive and inflates it', async () => {
     const { stderr } = await testRun(Download, ['-v', 'foo.tar.lz4']);
-    expect(stderr).toContain('Downloading 1 artifacts: foo');
+    expect(stderr).toContain('Downloading 1 artifact: foo');
     expect(stderr).toContain('Finished inflating .tar.lz4 archive');
     expect(fs.existsSync('foo/bar')).toBe(true);
   });
 
-  it('downloads a multiple files', async () => {
+  it('downloads a multiple archives and inflates them', async () => {
     const { stderr } = await testRun(Download, ['-v', 'foo.tar.lz4', 'bar.tar.gz']);
     expect(stderr).toContain('Downloading 2 artifacts: foo, bar');
     expect(stderr).toContain('Finished inflating .tar.lz4 archive');
     expect(fs.existsSync('foo/bar')).toBe(true);
     expect(fs.existsSync('bar/baz')).toBe(true);
+  });
+
+  it('can process non-archive files', async () => {
+    const { stderr } = await testRun(Download, ['-v', 'baz']);
+    expect(stderr).toContain('Downloading 1 artifact: baz');
+    expect(fs.existsSync('baz')).toBe(true);
+  });
+
+  it('can process uncompressed tar files', async () => {
+    const { stderr } = await testRun(Download, ['-v', 'qux.tar']);
+    expect(stderr).toContain('Downloading 1 artifact: qux');
+    expect(fs.existsSync('qux/quux')).toBe(true);
   });
 });

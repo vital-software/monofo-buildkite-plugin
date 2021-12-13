@@ -4,7 +4,7 @@ import { promisify } from 'util';
 import execa from 'execa';
 import rimrafSync from 'rimraf';
 import tempy from 'tempy';
-import { Compression, compressors, inflator } from '../../src/artifacts/compression';
+import { Compression, compressors, deflator, inflator } from '../../src/artifacts/compression';
 import { Artifact } from '../../src/artifacts/model';
 import { stdoutReadable } from '../../src/util/exec';
 import { fakeProcess, getFixturePath } from '../fixtures';
@@ -51,7 +51,7 @@ describe('compression', () => {
       const source = fs.createReadStream('test.tar');
       const destination = fs.createWriteStream(compressed);
 
-      await pipeline(stdoutReadable(compression.deflate(source)), destination);
+      await compression.deflate(source).then(async (deflated) => pipeline(deflated, destination));
 
       expect(fs.existsSync(`test.tar.${compression.extension}`)).toBe(true);
     });
