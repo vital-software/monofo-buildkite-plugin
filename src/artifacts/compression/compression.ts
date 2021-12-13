@@ -1,5 +1,5 @@
 import stream from 'stream';
-import { ExecaChildProcess, ExecaReturnValue } from 'execa';
+import { ExecaReturnValue } from 'execa';
 
 export interface Compression {
   extension: string;
@@ -12,7 +12,9 @@ export interface Compression {
   inflate(input: stream.Readable, outputPath?: string): Promise<ExecaReturnValue>;
 
   /**
-   * deflate returns a child process for awaiting, because we probably want to redirect its stdout
+   * deflate returns a child process for awaiting
+   *
+   * the stdout of the child process is expected to contain the deflated stream
    */
-  deflate(input: stream.Readable): ExecaChildProcess;
+  deflate(input: stream.Readable): Promise<stream.Readable>;
 }

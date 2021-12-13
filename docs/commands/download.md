@@ -5,16 +5,17 @@ Downloads the given list of artifacts, inflating them if they are suitable archi
 
 Receives a list of references to files
 
-We support two special cases:
-  - if .tar.caidx, we inflate the artifact from desync, and extract in-place
+We support a few special cases:
+  - if .tar.gz, we inflate the artifact using gzip, and extract in-place
   - if .tar.lz4, we inflate the artifact using lz4, and extract in-place
+  - if .caidx, we inflate the artifact from desync, and extract in-place
 
-In both cases, we don't support a "from/to" style configuration, only a list. For each artifact, we support three
-modifiers passed in env vars:
+In all cases, we don't support a "from/to" style configuration, only a list of artifacts - this is because they are all
+expected to be inflated in the working directory. For each artifact, we support three modifiers passed in env vars:
 
-  - MONOFO_ARTIFACT_<NAME>_SOFT_FAIL=0|1
-  - MONOFO_ARTIFACT_<NAME>_SKIP=0|1
-  - MONOFO_ARTIFACT_<NAME>_BUILD_ID=<build UUID>
+  - MONOFO_ARTIFACT_<NAME>_SOFT_FAIL=0|1 - allows failures to download this artifact
+  - MONOFO_ARTIFACT_<NAME>_SKIP=0|1 - allows skipping an artifact dynamically
+  - MONOFO_ARTIFACT_<NAME>_BUILD_ID=<build UUID> - allows selecting a specific build to pull the artifact from
 
 * [`monofo monofo download <artifacts...>`](#monofo-monofo-download-artifacts)
 
@@ -38,16 +39,18 @@ OPTIONS
 DESCRIPTION
   Receives a list of references to files
 
-  We support two special cases:
-    - if .tar.caidx, we inflate the artifact from desync, and extract in-place
+  We support a few special cases:
+    - if .tar.gz, we inflate the artifact using gzip, and extract in-place
     - if .tar.lz4, we inflate the artifact using lz4, and extract in-place
+    - if .caidx, we inflate the artifact from desync, and extract in-place
 
-  In both cases, we don't support a "from/to" style configuration, only a list. For each artifact, we support three
-  modifiers passed in env vars:
+  In all cases, we don't support a "from/to" style configuration, only a list of artifacts - this is because they are 
+  all
+  expected to be inflated in the working directory. For each artifact, we support three modifiers passed in env vars:
 
-    - MONOFO_ARTIFACT_<NAME>_SOFT_FAIL=0|1
-    - MONOFO_ARTIFACT_<NAME>_SKIP=0|1
-    - MONOFO_ARTIFACT_<NAME>_BUILD_ID=<build UUID>
+    - MONOFO_ARTIFACT_<NAME>_SOFT_FAIL=0|1 - allows failures to download this artifact
+    - MONOFO_ARTIFACT_<NAME>_SKIP=0|1 - allows skipping an artifact dynamically
+    - MONOFO_ARTIFACT_<NAME>_BUILD_ID=<build UUID> - allows selecting a specific build to pull the artifact from
 ```
 
-_See code: [dist/src/commands/download.ts](https://github.com/vital-software/monofo/blob/v3.1.1/dist/src/commands/download.ts)_
+_See code: [dist/src/commands/download.ts](https://github.com/vital-software/monofo/blob/v3.1.4/dist/src/commands/download.ts)_

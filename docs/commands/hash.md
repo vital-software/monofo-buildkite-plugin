@@ -23,4 +23,4 @@ OPTIONS
   -v, --verbose      Run with verbose logging
 ```
 
-_See code: [dist/src/commands/hash.ts](https://github.com/vital-software/monofo/blob/v3.1.1/dist/src/commands/hash.ts)_
+_See code: [dist/src/commands/hash.ts](https://github.com/vital-software/monofo/blob/v3.1.4/dist/src/commands/hash.ts)_

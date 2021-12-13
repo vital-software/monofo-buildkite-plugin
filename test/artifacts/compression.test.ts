@@ -4,7 +4,7 @@ import { promisify } from 'util';
 import execa from 'execa';
 import rimrafSync from 'rimraf';
 import tempy from 'tempy';
-import { Compression, compressors, inflator } from '../../src/artifacts/compression';
+import { Compression, compressors, deflator, inflator } from '../../src/artifacts/compression';
 import { Artifact } from '../../src/artifacts/model';
 import { stdoutReadable } from '../../src/util/exec';
 import { fakeProcess, getFixturePath } from '../fixtures';
@@ -42,18 +42,22 @@ describe('compression', () => {
   describe('round-trip', () => {
     it.each([['gzip'], ['lz4'], ['desync']])('compression algorithm: %s', async (algo) => {
       const compression: Compression = compressors[algo];
-      const compressed = `test.tar.${compression.extension}`;
+      const compressed = `${dir}/test.${compression.extension}`;
 
-      await writeFile(`${dir}/foo.txt`, 'Some test file');
-      await writeFile(`${dir}/bar.txt`, 'Some other test file');
-      await execa('tar', ['-cf', 'test.tar', `${dir}/foo.txt`, `${dir}/bar.txt`]);
+      await compression.deflate(fs.createReadStream(getFixturePath('qux.tar'))).then(async (deflated) => {
+        const dest = fs.createWriteStream(compressed);
+        await pipeline(deflated, dest);
+        dest.close();
+      });
 
-      const source = fs.createReadStream('test.tar');
-      const destination = fs.createWriteStream(compressed);
+      expect(fs.existsSync(compressed)).toBe(true);
 
-      await pipeline(stdoutReadable(compression.deflate(source)), destination);
+      console.log('Compressed at: ', compressed);
+      console.log('to be decomped to', dir);
 
-      expect(fs.existsSync(`test.tar.${compression.extension}`)).toBe(true);
+      await compression.inflate(fs.createReadStream(compressed), dir);
+
+      expect(fs.existsSync(`${dir}/qux/quux`)).toBe(true);
     });
   });
 });
