@@ -26,7 +26,7 @@ steps:
       - seek-oss/aws-sm#v2.2.1: # for example, but your secret management might be e.g. via S3 bucket or "env" file instead
           env:
             BUILDKITE_API_ACCESS_TOKEN: "global/buildkite-api-access-token"
-      - vital-software/monofo#v3.2.0:
+      - vital-software/monofo#v3.3.0-beta.1:
           generate: pipeline
 ```
 

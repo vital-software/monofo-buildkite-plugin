@@ -1,3 +1,16 @@
+# [3.3.0-beta.1](https://github.com/vital-software/monofo/compare/v3.2.0...v3.3.0-beta.1) (2021-12-14)
+
+
+### Bug Fixes
+
+* back to previous escaping ([5f60295](https://github.com/vital-software/monofo/commit/5f602958a9d73995f216da2b4de981c323b9263a))
+* the broken version in the run.bash lib ([938d52e](https://github.com/vital-software/monofo/commit/938d52e44b4f4135539c97308156a8a2a33dede1))
+
+
+### Features
+
+* force beta release ([48f5f34](https://github.com/vital-software/monofo/commit/48f5f349c8a8bc3838300e671fe48f8e704bb437))
+
 # [3.2.0](https://github.com/vital-software/monofo/compare/v3.1.4...v3.2.0) (2021-12-14)
 
 
