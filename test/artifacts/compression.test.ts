@@ -52,9 +52,6 @@ describe('compression', () => {
 
       expect(fs.existsSync(compressed)).toBe(true);
 
-      console.log('Compressed at: ', compressed);
-      console.log('to be decomped to', dir);
-
       await compression.inflate(fs.createReadStream(compressed), dir);
 
       expect(fs.existsSync(`${dir}/qux/quux`)).toBe(true);
