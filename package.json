@@ -165,8 +165,8 @@
               "files": [
                 "README.md",
                 "docs/artifacts.md",
+                "docs/plugin.md",
                 "docs/pure.md",
-                "docs/plugin.md"
               ],
               "from": "vital-software/monofo#v[-0-9a-z.]*:",
               "to": "vital-software/monofo#v${nextRelease.version}:",
