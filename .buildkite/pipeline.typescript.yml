@@ -20,13 +20,13 @@ steps:
       - node-modules
     commands:
       - yarn build
-      - tar -c --use-compress-program="lz4 -2" -f typescript.tar.lz4 dist/
     timeout_in_minutes: 20
     plugins:
-      - improbable-eng/metahook#v0.4.1:
-          pre-command: buildkite-agent artifact download node-modules.tar.lz4 . && tar -x --use-compress-program=lz4 -f node-modules.tar.lz4 && rm -rf node-modules.tar.lz4
       - docker-compose#v3.9.0:
           run: node
-      - artifacts#v1.5.0:
+      - vital-software/monofo#v3.2.1:
+          download:
+            - node-modules.tar.lz4
           upload:
-            - typescript.tar.lz4
+            typescript.tar.lz4:
+              - ./dist/

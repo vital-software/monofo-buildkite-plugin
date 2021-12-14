@@ -19,11 +19,10 @@ monorepo:
 templates:
   # Plugin templates
   - &pre-command
-    improbable-eng/metahook#v0.4.1:
-      pre-command: >
-        buildkite-agent artifact download node-modules.tar.lz4 . && tar -x --use-compress-program=lz4 -f node-modules.tar.lz4 && rm -rf node-modules.tar.lz4 &
-        buildkite-agent artifact download typescript.tar.lz4 . && tar -x --use-compress-program=lz4 -f typescript.tar.lz4 && rm -rf typescript.tar.lz4 &
-        wait
+    vital-software/monofo#v3.2.1:
+      download:
+        - node-modules.tar.lz4
+        - typescript.tar.lz4
   - &dc
     docker-compose#v3.9.0:
       run: node
