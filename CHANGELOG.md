@@ -1,3 +1,12 @@
+# [3.2.0-beta.1](https://github.com/vital-software/monofo/compare/v3.1.4...v3.2.0-beta.1) (2021-12-14)
+
+
+### Features
+
+* added deflate command ([a4c2462](https://github.com/vital-software/monofo/commit/a4c2462e698220a154edbfe2a79ba444ac873b09))
+* use chop to prefill local cache dir ([fc914f5](https://github.com/vital-software/monofo/commit/fc914f56316f2e7dd05c288ab09d2a406248eb90))
+* **core:** move artifact hooks into monofo ([6f4da5e](https://github.com/vital-software/monofo/commit/6f4da5e865780ae57766a506d99b51dac94ea480))
+
 ## [3.1.4](https://github.com/vital-software/monofo/compare/v3.1.3...v3.1.4) (2021-12-08)
 
 
