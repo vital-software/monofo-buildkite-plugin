@@ -35,7 +35,7 @@ steps:
             node-modules.tar.lz4:
               filesFrom: node-modules.list
               null:      true
-            build.tar.caidx:
+            build.caidx:
               - "dist/**"
               - "another/dist/**"
 ```
@@ -74,7 +74,7 @@ The supported compression types are:
 - `.tar`: uses no compression
 - `.tar.gz`: uses `gzip` to compress the tar
 - `.tar.lz4`: uses `lz4` to compress the tar
-- `.tar.caidx`: uses `desync` to store the tar in a content-addressed store,
+- `.caidx`: uses `desync` to store the tar in a content-addressed store,
   replacing the tarball with an "index file"
 
 ### Desync

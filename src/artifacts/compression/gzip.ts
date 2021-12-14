@@ -9,7 +9,7 @@ const log = debug('monofo:artifact:compression:gzip');
 let enabled: boolean | undefined;
 
 export const gzip: Compression = {
-  extension: 'gz',
+  extension: 'tar.gz',
 
   deflate(input) {
     return Promise.resolve(

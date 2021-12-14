@@ -41,11 +41,11 @@ export async function deflator(input: stream.Readable, artifact: Artifact): Prom
   switch (artifact.ext) {
     case 'tar':
       return stdoutReadable(execa('cat', [], { input }));
-    case 'tar.gz':
+    case compressors.gzip.extension:
       return compressors.gzip.deflate(input);
-    case 'tar.lz4':
+    case compressors.lz4.extension:
       return compressors.lz4.deflate(input);
-    case 'tar.caidx':
+    case compressors.desync.extension:
       return compressors.desync.deflate(input);
 
     default:
@@ -68,11 +68,11 @@ export async function inflator(
       case 'tar':
         // eslint-disable-next-line @typescript-eslint/return-await
         return Promise.resolve(execa('tar', ['-C', outputPath, '-xf', '-'], { input }));
-      case 'tar.gz':
+      case compressors.gzip.extension:
         return await compressors.gzip.inflate(input, outputPath);
-      case 'tar.lz4':
+      case compressors.lz4.extension:
         return await compressors.lz4.inflate(input, outputPath);
-      case 'tar.caidx':
+      case compressors.desync.extension:
         return await compressors.desync.inflate(input, outputPath);
       default:
         // eslint-disable-next-line @typescript-eslint/return-await
