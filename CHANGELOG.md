@@ -1,3 +1,16 @@
+# [3.2.0](https://github.com/vital-software/monofo/compare/v3.1.4...v3.2.0) (2021-12-14)
+
+
+### Bug Fixes
+
+* **hooks:** add missing download keyword ([4c7d852](https://github.com/vital-software/monofo/commit/4c7d852c746a7c59408002028faf4bad5f516d3f))
+
+
+### Features
+
+* added deflate command ([17fe0f8](https://github.com/vital-software/monofo/commit/17fe0f8e67b093c35484b6a475940fc127aadb08))
+* **core:** move artifact hooks into monofo ([4175ffc](https://github.com/vital-software/monofo/commit/4175ffc5a9fb5ee33b3833ee5132d3a863bbdbe7))
+
 ## [3.1.4](https://github.com/vital-software/monofo/compare/v3.1.3...v3.1.4) (2021-12-08)
 
 
