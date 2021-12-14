@@ -54,7 +54,7 @@ locally cached
     `$ find . -name node_modules -type d -prune -print0 | monofo upload --files-from - --null`,
   ];
 
-  static override usage = 'monofo upload <output> [globs...]';
+  static override usage = 'upload <output> [globs...]';
 
   static override flags = {
     ...BaseCommand.flags,

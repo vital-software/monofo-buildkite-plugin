@@ -35,7 +35,7 @@ expected to be inflated in the working directory. For each artifact, we support 
    */
   static override strict = false;
 
-  static override usage = 'monofo download <artifacts...>';
+  static override usage = 'download <artifacts...>';
 
   static override args = [
     {

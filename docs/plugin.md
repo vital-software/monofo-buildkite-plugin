@@ -24,7 +24,7 @@ steps:
 Internally, the hook scripts use `npx` to invoke Monofo, with a static version
 matching whatever you specify in your pipeline.yml.
 
-This is achieved by updated the `hook/` scripts (using a semantic-release plugin)
+This is achieved by updating the `hook/` scripts (using a semantic-release plugin)
 before release, so that the tagged copy of the script, by default uses the
 version you ask for. However, `npx` supports interesting version specifiers,
 like `beta` or `latest`, and if you want to use one of those, you can specify
