@@ -1,3 +1,10 @@
+## [3.2.1](https://github.com/vital-software/monofo/compare/v3.2.0...v3.2.1) (2021-12-14)
+
+
+### Bug Fixes
+
+* replace broken version in the run.bash lib ([b8e35fe](https://github.com/vital-software/monofo/commit/b8e35fe5bcb28ba49c6afcf59b32ed4cb45b4b80))
+
 # [3.2.0](https://github.com/vital-software/monofo/compare/v3.1.4...v3.2.0) (2021-12-14)
 
 
