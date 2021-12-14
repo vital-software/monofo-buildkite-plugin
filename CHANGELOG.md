@@ -1,3 +1,10 @@
+## [3.2.2](https://github.com/vital-software/monofo/compare/v3.2.1...v3.2.2) (2021-12-14)
+
+
+### Bug Fixes
+
+* update expected list of file extensions ([fcebbdc](https://github.com/vital-software/monofo/commit/fcebbdcaf9700574fae518bdc3b27b9627efde64))
+
 ## [3.2.1](https://github.com/vital-software/monofo/compare/v3.2.0...v3.2.1) (2021-12-14)
 
 
