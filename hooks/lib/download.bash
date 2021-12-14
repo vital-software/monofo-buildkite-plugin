@@ -15,13 +15,13 @@ fi
 #
 # The only format supported is a simple list of artifact filenames
 #
-# Example: BUILDKITE_PLUGIN_CONFIGURATION='{"download":["build.tar.caidx","node-modules.tar.lz4"]}'
+# Example: BUILDKITE_PLUGIN_CONFIGURATION='{"download":["build.caidx","node-modules.tar.lz4"]}'
 
 if [[ "${MONOFO_HOOK_DEBUG:-0}" -eq 1 ]]; then
   set -x
 fi
 
-flags=()
+flags=(download)
 files=$(echo "$BUILDKITE_PLUGIN_CONFIGURATION" | jq -rc '.download | .[]')
 
 for file in $files; do
