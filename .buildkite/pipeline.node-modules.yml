@@ -1,6 +1,7 @@
 env:
   BUILDKITE_PLUGIN_DOCKER_COMPOSE_CONFIG_0: "docker-compose.yml"
   BUILDKITE_PLUGIN_DOCKER_COMPOSE_CONFIG_1: "docker-compose.buildkite.yml"
+  MONOFO_HOOK_DEBUG: "1"
 
 monorepo:
   pure: true
@@ -14,13 +15,13 @@ steps:
     key: node-modules
     depends_on:
       - node-image
-    commands:
-      - yarn install --frozen-lockfile
-      - tar -c --use-compress-program="lz4 -2" -f node-modules.tar.lz4 node_modules
+    command: yarn install --frozen-lockfile
     timeout_in_minutes: 20
     plugins:
       - docker-compose#v3.9.0:
           run: node
-      - artifacts#v1.5.0:
-          upload: node-modules.tar.lz4
+      - vital-software/monofo#v3.2.1:
+          upload:
+            node-modules.tar.lz4:
+              - ./node_modules/
 
