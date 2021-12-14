@@ -43,10 +43,8 @@ files=$(echo "$BUILDKITE_PLUGIN_CONFIGURATION" | jq -rc '.upload | to_entries | 
 for file in $files; do
   (
     config_file="$(echo "$file" | jq -rc '.key')"
-
-    flags=(upload "$config_file")
-
     config_type="$(echo "$file" | jq -rc '.value | if type == "array" then "globs" else "file-list" end')"
+    flags=(upload "$config_file")
 
     case "$config_type" in
       globs)
