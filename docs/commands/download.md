@@ -17,15 +17,15 @@ expected to be inflated in the working directory. For each artifact, we support 
   - MONOFO_ARTIFACT_<NAME>_SKIP=0|1 - allows skipping an artifact dynamically
   - MONOFO_ARTIFACT_<NAME>_BUILD_ID=<build UUID> - allows selecting a specific build to pull the artifact from
 
-* [`monofo monofo download <artifacts...>`](#monofo-monofo-download-artifacts)
+* [`monofo download <artifacts...>`](#monofo-download-artifacts)
 
-## `monofo monofo download <artifacts...>`
+## `monofo download <artifacts...>`
 
 Downloads the given list of artifacts, inflating them if they are suitable archives
 
 ```
 USAGE
-  $ monofo monofo download <artifacts...>
+  $ monofo download <artifacts...>
 
 ARGUMENTS
   ARTIFACTS  A list of artifact files to retrieve and extract

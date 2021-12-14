@@ -14,15 +14,15 @@ Then this command is designed to stream things to the eventual destination,
 process any necessary deflation of the resulting tar archive, and ensure it's
 locally cached
 
-* [`monofo monofo upload <output> [globs...]`](#monofo-monofo-upload-output-globs)
+* [`monofo upload <output> [globs...]`](#monofo-upload-output-globs)
 
-## `monofo monofo upload <output> [globs...]`
+## `monofo upload <output> [globs...]`
 
 Produces a compressed tarball artifact from a given list of globs, and uploads it to Buildkite Artifacts
 
 ```
 USAGE
-  $ monofo monofo upload <output> [globs...]
+  $ monofo upload <output> [globs...]
 
 ARGUMENTS
   OUTPUT  The output file to produce (foo.tar.lz4 or bar.caidx, etc.)
