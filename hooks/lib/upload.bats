@@ -9,7 +9,7 @@ setup() {
 
   # Mock npx
   echo "#!/usr/bin/env bash" > "$BATS_TMPDIR/npx"
-  echo "if [[ \$1 = \"monofo@\"* ]]; then echo \"npx output\"; else echo \"Unknown npx utility \$1\" >&2; exit 2; fi" >> "$BATS_TMPDIR/npx"
+  echo "if [[ \$1 = \"monofo@\"* && \$2 = \"upload\" ]]; then echo \"npx output\"; else echo \"Unknown npx utility \$1\" >&2; exit 2; fi" >> "$BATS_TMPDIR/npx"
   chmod +x "$BATS_TMPDIR/npx"
 }
 
