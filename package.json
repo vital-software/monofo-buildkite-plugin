@@ -165,7 +165,8 @@
               "files": [
                 "README.md",
                 "docs/artifacts.md",
-                "docs/pure.md"
+                "docs/pure.md",
+                "docs/plugin.md"
               ],
               "from": "vital-software/monofo#v[-0-9a-z.]*:",
               "to": "vital-software/monofo#v${nextRelease.version}:",
@@ -181,6 +182,12 @@
                   "hasChanged": true,
                   "numMatches": 2,
                   "numReplacements": 2
+                },
+                {
+                  "file": "docs/plugin.md",
+                  "hasChanged": true,
+                  "numMatches": 1,
+                  "numReplacements": 1
                 },
                 {
                   "file": "docs/pure.md",
@@ -216,7 +223,9 @@
           "assets": [
             "CHANGELOG.md",
             "docs/artifacts.md",
+            "docs/plugin.md",
             "docs/pure.md",
+            "docs/commands/*.md",
             "hooks/lib/run.bash",
             "package.json",
             "README.md"
