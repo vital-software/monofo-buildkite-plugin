@@ -15,7 +15,7 @@ configuration:
     upload:
       type: object
       patternProperties:
-        '^[^/]*\.tar(\.lz4|\.caidx)?$':
+        '^[^/]+$':
           oneOf:
             - type: array
               items:
