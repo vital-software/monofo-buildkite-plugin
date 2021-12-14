@@ -18,7 +18,7 @@ teardown() {
 }
 
 @test "calls monofo upload when called with config" {
-  export BUILDKITE_PLUGIN_CONFIGURATION='{"upload":{"build.tar.caidx":["dist/**","another/dist/**"],"node-modules.tar.lz4":{"filesFrom":"node-modules.list","null":true}}}'
+  export BUILDKITE_PLUGIN_CONFIGURATION='{"upload":{"build.caidx":["dist/**","another/dist/**"],"node-modules.tar.lz4":{"filesFrom":"node-modules.list","null":true}}}'
 
   # shellcheck source=./upload.bash
   output="$(source $SUT)"

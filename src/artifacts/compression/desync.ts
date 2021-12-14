@@ -15,8 +15,16 @@ function store(): string {
   return process.env.MONOFO_DESYNC_STORE;
 }
 
-function cacheFlags(): string[] {
-  return process.env.MONOFO_DESYNC_CACHE ? ['--cache', process.env.MONOFO_DESYNC_CACHE] : [];
+function cacheFlags(as = 'cache'): string[] {
+  return process.env.MONOFO_DESYNC_CACHE ? [`--${as}`, process.env.MONOFO_DESYNC_CACHE] : [];
+}
+
+function tarFlags() {
+  return ['tar', '--tar-add-root', '--input-format', 'tar', '--index', '--store', store(), ...cacheFlags('store')];
+}
+
+function untarFlags() {
+  return ['untar', '--no-same-owner', '--index', '--store', store(), ...cacheFlags()];
 }
 
 export const desync: Compression = {
@@ -38,25 +46,10 @@ export const desync: Compression = {
   deflate(input: stream.Readable): Promise<stream.Readable> {
     return Promise.resolve(
       stdoutReadable(
-        execa(
-          'desync',
-          [
-            'tar',
-            '--input-format',
-            'tar',
-            '--index',
-            '--store',
-            store(),
-            '--store',
-            process.env.MONOFO_DESYNC_CACHE,
-            '-',
-            '-',
-          ],
-          {
-            buffer: false,
-            input,
-          }
-        )
+        execa('desync', [...tarFlags(), '-', '-'], {
+          buffer: false,
+          input,
+        })
       )
     );
   },
@@ -71,7 +64,7 @@ export const desync: Compression = {
    * @return ExecaChildProcess The result of running desync untar
    */
   async inflate(input: stream.Readable, outputPath = '.'): Promise<ExecaReturnValue> {
-    const result = await execa('desync', ['untar', '--index', '--store', store(), ...cacheFlags(), '-', outputPath], {
+    const result = await execa('desync', [...untarFlags(), '-', outputPath], {
       input,
     });
 
