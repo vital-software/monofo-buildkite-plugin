@@ -202,7 +202,7 @@
               "files": [
                 "hooks/lib/run.bash"
               ],
-              "from": "export MONOFO_VERSION=\\${MONOFO_VERSION:-[-0-9a-z.]+}",
+              "from": "export MONOFO_VERSION=\\$\\{MONOFO_VERSION:-[-0-9a-z.]+\\}",
               "to": "export MONOFO_VERSION=<%= '${MONOFO_VERSION:-' + nextRelease.version + '}' %>",
               "results": [
                 {
