@@ -18,18 +18,14 @@ export async function search(artifact: Artifact): Promise<string> {
     'search',
     artifact.filename,
     '--format',
-    `$'%u\\n'`,
+    '%u',
     artifact.buildId ? `--build` : '',
     artifact.buildId ? artifact.buildId : '',
   ];
 
   log(`Calling buildkite-agent ${args.join(' ')}`);
 
-  return (
-    await execa('buildkite-agent', args, {
-      stdio: ['pipe', 'pipe', 'inherit'],
-    })
-  ).stdout.split('\n')[0];
+  return (await execa('buildkite-agent', args)).stdout.split('\n')[0];
 }
 
 /**
