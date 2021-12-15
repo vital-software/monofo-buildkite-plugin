@@ -7,9 +7,9 @@ setup() {
   PATH="$BATS_TMPDIR:$PATH"
   SUT="$PROJECT_ROOT/hooks/lib/generate.bash"
 
-  # Mock npx monofo
+  # Mock npx --quiet --shell sh monofo pipeline [arguments...]
   echo "#!/usr/bin/env bash" > "$BATS_TMPDIR/npx"
-  echo "if [[ \$1 == """monofo@*""" ]]; then echo \"npx output\"; else echo 'no good' >&3; echo \$1 >&3; exit 2; fi" >> "$BATS_TMPDIR/npx"
+  echo "if [[ \$4 = \"monofo@\"* && \$5 = \"pipeline\" ]]; then echo \"npx output\"; else echo 'no good' >&3; echo \$1 >&3; exit 2; fi" >> "$BATS_TMPDIR/npx"
   chmod +x "$BATS_TMPDIR/npx"
 
   # Mock git

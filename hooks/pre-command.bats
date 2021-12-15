@@ -9,9 +9,9 @@ setup() {
 
   export PATH="$BATS_TMPDIR:$PATH"
 
-  # Mock npx monofo
+  # Mock npx --quiet --shell sh monofo <subcommand> [arguments...]
   echo "#!/usr/bin/env bash" > "$BATS_TMPDIR/npx"
-  echo "if [[ \$1 == """monofo@*""" ]]; then echo \"npx output\"; else echo 'no good' >&3; echo \$1 >&3; exit 2; fi" >> "$BATS_TMPDIR/npx"
+  echo "if [[ \$4 == """monofo@*""" ]]; then echo \"npx output\"; else echo 'no good' >&3; echo \$4 >&3; exit 2; fi" >> "$BATS_TMPDIR/npx"
   chmod +x "$BATS_TMPDIR/npx"
 
   # Mock git
