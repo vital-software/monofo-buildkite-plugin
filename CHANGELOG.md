@@ -1,3 +1,15 @@
+# [3.3.0](https://github.com/vital-software/monofo/compare/v3.2.4...v3.3.0) (2021-12-15)
+
+
+### Bug Fixes
+
+* defensively ensure steps is an array ([8b269ef](https://github.com/vital-software/monofo/commit/8b269ef892394e0cbc75192008062fa518e13ce0))
+
+
+### Features
+
+* support using monofo as the configuration object name ([ff34090](https://github.com/vital-software/monofo/commit/ff340903d9e4d8d69e3eeceb996894a67bf919c9))
+
 ## [3.2.4](https://github.com/vital-software/monofo/compare/v3.2.3...v3.2.4) (2021-12-15)
 
 

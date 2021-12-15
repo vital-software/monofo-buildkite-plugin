@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # This version marker is automatically updated to match the published release
-export MONOFO_VERSION=${MONOFO_VERSION:-3.2.4}
+export MONOFO_VERSION=${MONOFO_VERSION:-3.3.0}
 
 # This turns on debugging for monofo, which is important to see what's going on
 export DEBUG="monofo:*"
