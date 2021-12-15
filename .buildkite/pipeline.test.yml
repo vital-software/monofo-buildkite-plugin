@@ -37,17 +37,20 @@ templates:
     retry:
       manual:
         permit_on_passed: true
-    plugins:
-      - *pre-command
-      - *dc
 
 steps:
   - label: ":jest: Test"
     key: test
     command: yarn test
     <<: *step
+    plugins:
+      - *pre-command
+      - *dc
 
   - label: ":eslint: Lint"
     key: lint
     command: yarn lint
     <<: *step
+    plugins:
+      - *pre-command
+      - *dc
