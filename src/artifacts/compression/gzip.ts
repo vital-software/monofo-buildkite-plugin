@@ -22,11 +22,14 @@ export const gzip: Compression = {
     );
   },
 
-  async enabled() {
+  async checkEnabled() {
     if (enabled === undefined) {
       enabled = await hasBin('gzip');
     }
-    return enabled;
+
+    if (!enabled) {
+      throw new Error('GZip compression disabled due to no gzip binary found on PATH');
+    }
   },
 
   async inflate(input, outputPath = '.'): Promise<ExecaReturnValue> {

@@ -20,11 +20,14 @@ export const lz4: Compression = {
     return Promise.resolve(stdoutReadable(child));
   },
 
-  async enabled() {
+  async checkEnabled() {
     if (enabled === undefined) {
       enabled = await hasBin('lz4');
     }
-    return enabled;
+
+    if (!enabled) {
+      throw new Error('LZ4 compression is disabled due to no lz4 binary found on PATH');
+    }
   },
 
   async inflate(input, outputPath = '.'): Promise<ExecaReturnValue> {

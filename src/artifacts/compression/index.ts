@@ -18,18 +18,23 @@ export const compressors: Record<string, Compression> = {
   lz4,
 };
 
-export async function canProcess(artifact: Artifact): Promise<boolean> {
+export async function checkEnabled(artifact: Artifact): Promise<void> {
   switch (artifact.ext) {
-    case 'tar':
-      return true;
     case 'tar.gz':
-      return compressors.gzip.enabled();
+      await compressors.gzip.checkEnabled();
+      break;
     case 'tar.lz4':
-      return compressors.lz4.enabled();
+      await compressors.lz4.checkEnabled();
+      break;
     case 'tar.caidx':
-      return compressors.desync.enabled();
+      await compressors.desync.checkEnabled();
+      break;
+    case 'tar':
+      log(`No compression handled for tar archive: ${artifact.filename}`);
+      break;
     default:
-      return false;
+      log(`No compression handled for artifact: ${artifact.filename}`);
+      break;
   }
 }
 

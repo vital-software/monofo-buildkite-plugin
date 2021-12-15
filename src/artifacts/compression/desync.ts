@@ -30,11 +30,18 @@ function untarFlags() {
 export const desync: Compression = {
   extension: 'caidx',
 
-  async enabled() {
-    if (enabled === undefined) {
-      enabled = Boolean(store()) && (await hasBin('desync'));
+  async checkEnabled() {
+    if (!store()) {
+      throw new Error('Desync compression disabled due to no MONOFO_DESYNC_STORE given');
     }
-    return enabled;
+
+    if (enabled === undefined) {
+      enabled = await hasBin('desync');
+    }
+
+    if (!enabled) {
+      throw new Error('Desync compression disabled due to missing desync bin on PATH');
+    }
   },
 
   /**

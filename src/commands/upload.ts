@@ -5,7 +5,7 @@ import { flags as f } from '@oclif/command';
 import debug from 'debug';
 import execa, { ExecaChildProcess } from 'execa';
 import { upload } from '../artifacts/api';
-import { canProcess, deflator } from '../artifacts/compression';
+import { checkEnabled, deflator } from '../artifacts/compression';
 import { filesToUpload } from '../artifacts/matcher';
 import { Artifact } from '../artifacts/model';
 import { BaseCommand, BaseFlags } from '../command';
@@ -125,9 +125,7 @@ locally cached
   }
 
   private static async getOutputStream(artifact: Artifact): Promise<stream.Writable> {
-    if (!(await canProcess(artifact))) {
-      throw new Error(`Cannot process artifact type ${artifact.ext} for ${artifact.name}: not supported`);
-    }
+    await checkEnabled(artifact);
 
     return fs.createWriteStream(artifact.filename);
   }

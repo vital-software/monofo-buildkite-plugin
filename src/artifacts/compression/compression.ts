@@ -4,7 +4,10 @@ import { ExecaReturnValue } from 'execa';
 export interface Compression {
   extension: string;
 
-  enabled(): Promise<boolean>;
+  /**
+   * throw Error if the compression is not enabled
+   */
+  checkEnabled(): Promise<void>;
 
   /**
    * inflate just does the inflation, in place
