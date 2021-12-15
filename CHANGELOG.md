@@ -1,3 +1,12 @@
+## [3.2.3](https://github.com/vital-software/monofo/compare/v3.2.2...v3.2.3) (2021-12-15)
+
+
+### Bug Fixes
+
+* give more context about why a compression was disabled ([914e177](https://github.com/vital-software/monofo/commit/914e17706f6107a5ef1e8d20d6060cc9a6dce589))
+* use --quiet flag to npx too ([ccb9bf6](https://github.com/vital-software/monofo/commit/ccb9bf6f7456614f3ef0a72b68e9c80e0ae36aa4))
+* use `-s sh` option to npx ([d183013](https://github.com/vital-software/monofo/commit/d18301342bc2b4ffe10e920876839767bfd683ed))
+
 ## [3.2.2](https://github.com/vital-software/monofo/compare/v3.2.1...v3.2.2) (2021-12-14)
 
 
