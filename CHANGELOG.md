@@ -1,3 +1,12 @@
+## [3.3.1](https://github.com/vital-software/monofo/compare/v3.3.0...v3.3.1) (2021-12-15)
+
+
+### Bug Fixes
+
+* use correct expected file extension for caidx ([eaf66f8](https://github.com/vital-software/monofo/commit/eaf66f81df34d207d494a9ef28318d65f1874955))
+* **deps:** update dependency @oclif/plugin-not-found to v2 ([774b677](https://github.com/vital-software/monofo/commit/774b677988d49c04aa2bd436076e478904ed1134))
+* **deps:** update dependency @oclif/plugin-which to v2 ([4302ae7](https://github.com/vital-software/monofo/commit/4302ae79d520e67791efe5d3b6e7209c97a8f78a))
+
 # [3.3.0](https://github.com/vital-software/monofo/compare/v3.2.4...v3.3.0) (2021-12-15)
 
 
