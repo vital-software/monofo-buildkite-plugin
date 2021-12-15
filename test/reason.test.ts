@@ -47,6 +47,7 @@ describe('config.reason', () => {
       { name: 'bar', included: false, reason: 'no matching changes' },
       { name: 'included', included: true, reason: 'been forced to by PIPELINE_RUN_INCLUDED' },
       { name: 'match-all', included: true, reason: '4 matching changes: all files match' },
+      { name: 'match-all-env', included: true, reason: '4 matching changes: all files match' },
       { name: 'match-all-false', included: false, reason: 'no matching changes' },
       { name: 'match-all-mixed', included: true, reason: '4 matching changes: all files match' },
       { name: 'match-all-true', included: true, reason: '4 matching changes: all files match' },
@@ -75,6 +76,7 @@ describe('config.reason', () => {
       { name: 'bar', included: true, reason: 'been forced to by PIPELINE_RUN_ALL' },
       { name: 'included', included: true, reason: 'been forced to by PIPELINE_RUN_INCLUDED' },
       { name: 'match-all', included: true, reason: 'been forced to by PIPELINE_RUN_ALL' },
+      { name: 'match-all-env', included: true, reason: 'been forced to by PIPELINE_RUN_ALL' },
       {
         name: 'match-all-false',
         included: false,
@@ -107,6 +109,7 @@ describe('config.reason', () => {
       { name: 'bar', included: false, reason: 'been forced NOT to by PIPELINE_RUN_ONLY' },
       { name: 'included', included: true, reason: 'been forced to by PIPELINE_RUN_INCLUDED' },
       { name: 'match-all', included: false, reason: 'been forced NOT to by PIPELINE_RUN_ONLY' },
+      { name: 'match-all-env', included: false, reason: 'been forced NOT to by PIPELINE_RUN_ONLY' },
       { name: 'match-all-false', included: false, reason: 'been forced NOT to by PIPELINE_RUN_ONLY' },
       { name: 'match-all-mixed', included: false, reason: 'been forced NOT to by PIPELINE_RUN_ONLY' },
       { name: 'match-all-true', included: false, reason: 'been forced NOT to by PIPELINE_RUN_ONLY' },
@@ -142,6 +145,7 @@ describe('config.reason', () => {
       { name: 'bar', included: true, reason: 'no previous successful build, fallback to being included' },
       { name: 'included', included: true, reason: 'no previous successful build, fallback to being included' },
       { name: 'match-all', included: true, reason: 'no previous successful build, fallback to being included' },
+      { name: 'match-all-env', included: true, reason: 'no previous successful build, fallback to being included' },
       {
         name: 'match-all-false',
         included: false,

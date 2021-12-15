@@ -1,0 +1,5 @@
+monorepo:
+  matches: '**'
+
+env:
+  MATCH_ALL_ENV: '1'
