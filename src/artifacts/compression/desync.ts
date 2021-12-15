@@ -75,7 +75,7 @@ export const desync: Compression = {
       input,
     });
 
-    log('Finished desync untar operation');
+    log('Finished inflating desync .caidx');
 
     return result;
   },

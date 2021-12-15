@@ -20,12 +20,14 @@ export const BASE_BUILD: BuildkiteBuild = {
   web_url: 'https://example.com',
 };
 
-export function fakeProcess(merge: Record<string, string> = {}): NodeJS.ProcessEnv {
-  const MONOFO_DESYNC_CACHE = tempy.directory();
+export function getFixturePath(fileName: string): string {
+  return `${__dirname}/fixtures/${fileName}`;
+}
 
+export function fakeProcess(merge: Record<string, string> = {}): NodeJS.ProcessEnv {
   return {
-    MONOFO_DESYNC_CACHE,
-    MONOFO_DESYNC_STORE: MONOFO_DESYNC_CACHE,
+    MONOFO_DESYNC_CACHE: tempy.directory(),
+    MONOFO_DESYNC_STORE: getFixturePath('desync-store'),
 
     MOCK_DYNAMODB_ENDPOINT: process.env?.MOCK_DYNAMODB_ENDPOINT,
 
@@ -180,8 +182,4 @@ export async function testRun(command: typeof Command, args: string[] = []): Pro
     stdout: mockStdout.output,
     stderr: mockStderr.output,
   };
-}
-
-export function getFixturePath(fileName: string): string {
-  return `${__dirname}/fixtures/${fileName}`;
 }

@@ -38,11 +38,15 @@ describe('cmd download', () => {
     await expect(testRun(Download, [])).rejects.toThrowError('Missing 1 required arg');
   });
 
-  it('downloads a single archive and inflates it', async () => {
-    const { stderr } = await testRun(Download, ['-v', 'foo.tar.lz4']);
-    expect(stderr).toContain('Downloading 1 artifact: foo');
-    expect(stderr).toContain('Finished inflating .tar.lz4 archive');
-    expect(fs.existsSync('foo/bar')).toBe(true);
+  it.each([
+    ['foo.tar.lz4', 'foo/bar'],
+    ['bar.tar.gz', 'bar/baz'],
+    ['beep.caidx', 'beep/boop'],
+  ])('downloads a single archive and inflates it: %s inflates %s', async (fixture, inflatedFileToExpect) => {
+    const { stderr } = await testRun(Download, ['-v', fixture]);
+    expect(stderr).toContain('Downloading 1 artifact');
+    expect(stderr).toContain('Finished inflating');
+    expect(fs.existsSync(inflatedFileToExpect)).toBe(true);
   });
 
   it('downloads a multiple archives and inflates them', async () => {
