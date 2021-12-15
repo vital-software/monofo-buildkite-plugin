@@ -1,8 +1,13 @@
 import fs from 'fs';
+import { promisify } from 'util';
+import rimrafCb from 'rimraf';
+import tempy from 'tempy';
 import { download } from '../../src/artifacts/api';
 import { Artifact } from '../../src/artifacts/model';
 import Download from '../../src/commands/download';
 import { fakeProcess, getFixturePath, testRun } from '../fixtures';
+
+const rimraf = promisify(rimrafCb);
 
 jest.mock('../../src/artifacts/api');
 
@@ -12,8 +17,17 @@ mockDownload.mockImplementation((artifact: Artifact) => {
 });
 
 describe('cmd download', () => {
+  let dir: string;
+
   beforeEach(() => {
+    dir = tempy.directory();
+    process.chdir(dir);
+
     process.env = fakeProcess();
+  });
+
+  afterEach(async () => {
+    await rimraf(dir);
   });
 
   it('returns help output', async () => {
