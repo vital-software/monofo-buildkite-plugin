@@ -20,13 +20,13 @@ export const compressors: Record<string, Compression> = {
 
 export async function checkEnabled(artifact: Artifact): Promise<void> {
   switch (artifact.ext) {
-    case 'tar.gz':
+    case compressors.gzip.extension:
       await compressors.gzip.checkEnabled();
       break;
-    case 'tar.lz4':
+    case compressors.lz4.extension:
       await compressors.lz4.checkEnabled();
       break;
-    case 'tar.caidx':
+    case compressors.desync.extension:
       await compressors.desync.checkEnabled();
       break;
     case 'tar':

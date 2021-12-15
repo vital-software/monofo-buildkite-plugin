@@ -35,7 +35,7 @@ fi
 # In either case, for each top level upload key (artifact-to-upload) we want to
 # call `monofo upload` in parallel
 
-# Example: BUILDKITE_PLUGIN_CONFIGURATION='{"upload":{"build.tar.caidx":["dist/**","another/dist/**"],"node-modules.tar.lz4":{"filesFrom":"node-modules.list","null":true}}}'
+# Example: BUILDKITE_PLUGIN_CONFIGURATION='{"upload":{"build.caidx":["dist/**","another/dist/**"],"node-modules.tar.lz4":{"filesFrom":"node-modules.list","null":true}}}'
 
 pids=()
 files=$(echo "$BUILDKITE_PLUGIN_CONFIGURATION" | jq -rc '.upload | to_entries | .[]')
