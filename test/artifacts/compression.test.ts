@@ -41,6 +41,8 @@ describe('compression', () => {
       const compression: Compression = compressors[algo];
       const compressed = `${dir}/test.${compression.extension}`;
 
+      await expect(compression.checkEnabled()).resolves.toBeUndefined();
+
       await compression.deflate(fs.createReadStream(getFixturePath('qux.tar'))).then(async (deflated) => {
         const dest = fs.createWriteStream(compressed);
         await pipeline(deflated, dest);
