@@ -79,7 +79,7 @@ describe('monofo pipeline', () => {
       'echo "unreferenced" > unref',
     ]);
 
-    expect(Object.entries(p.env)).toHaveLength(6);
+    expect(Object.entries(p.env)).toHaveLength(7);
     expect(p.env.MONOFO_BASE_BUILD_ID).toBe(BUILD_ID);
     expect(p.env.MONOFO_BASE_BUILD_COMMIT).toBe(COMMIT);
     expect(p.env.BAR_WAS_EXCLUDED).toBe('true');
@@ -112,7 +112,7 @@ describe('monofo pipeline', () => {
 
     expect(pipeline).toBeDefined();
     expect(commandSummary(pipeline.steps)).toStrictEqual([
-      "echo 'inject for: branch-excluded, changed, dependedon, excluded, foo, match-all, match-all-false, match-all-mixed, match-all-true, qux, baz, unreferenced'",
+      "echo 'inject for: branch-excluded, changed, dependedon, excluded, foo, match-all, match-all-env, match-all-false, match-all-mixed, match-all-true, qux, baz, unreferenced'",
       'echo "bar1" | tee bar1',
       'echo "bar2" | tee bar2',
       'echo "included" > included',

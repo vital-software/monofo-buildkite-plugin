@@ -81,7 +81,7 @@ describe('matchConfigs', () => {
       matchConfigs(BASE_BUILD, configs, changedFiles);
       const changes = configs.map((r) => r.changes);
 
-      expect(changes).toHaveLength(15);
+      expect(changes).toHaveLength(16);
       expect(changes).toStrictEqual([
         changedFiles,
         [],
@@ -90,6 +90,7 @@ describe('matchConfigs', () => {
         ['foo/README.md'],
         [],
         [],
+        changedFiles,
         changedFiles,
         [],
         changedFiles,
@@ -112,8 +113,8 @@ describe('matchConfigs', () => {
       matchConfigs(BASE_BUILD, configs, changedFiles);
       const changes = configs.map((r) => r.changes);
 
-      expect(changes).toHaveLength(15);
-      expect(changes).toStrictEqual([[], [], [], [], [], [], [], [], [], [], [], [], [], [], []]);
+      expect(changes).toHaveLength(16);
+      expect(changes).toStrictEqual([[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]);
     });
   });
 });
