@@ -56,7 +56,11 @@ export default class Config {
     public readonly monorepo: MonorepoConfig,
     public steps: Step[],
     public readonly env: Record<string, string>
-  ) {}
+  ) {
+    if (!_.isArray(this.steps)) {
+      throw new Error('Expected steps to be an array');
+    }
+  }
 
   /**
    * Base build we're comparing against, if one can be found. If one can't, we'll enter fallback mode and run
@@ -197,7 +201,7 @@ export default class Config {
     ];
   }
 
-  private static async readYaml(file: ConfigFile): Promise<Config> {
+  private static async readYaml(file: ConfigFile): Promise<Partial<Config>> {
     const buffer = await fs.readFile(join(file.basePath, file.path));
 
     try {
@@ -205,13 +209,13 @@ export default class Config {
 
       if (typeof result !== 'object') {
         log(`Expected object for pipeline configuration in ${file.path}, got ${typeof result}, skipping`);
-        return {} as unknown as Config;
+        return {};
       }
 
-      return result as unknown as Config;
+      return result as Partial<Config>;
     } catch (err) {
       log(`Could not load YAML from ${file.path}, skipping`);
-      return {} as unknown as Config;
+      return {};
     }
   }
 
@@ -232,7 +236,7 @@ export default class Config {
       return undefined;
     }
 
-    if (_.isArray(env)) {
+    if (_.isArray(config.env)) {
       // Fail noisily rather than missing the merge of the env vars
       throw new Error('TODO: monofo cannot cope with env being an array yet (split to object)');
     }
@@ -260,8 +264,8 @@ export default class Config {
         pure: monorepo.pure || false,
         branches: monorepo.branches,
       },
-      config.steps,
-      config.env
+      config.steps || [],
+      config.env || {}
     );
   }
 
