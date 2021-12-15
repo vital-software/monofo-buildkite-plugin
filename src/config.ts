@@ -40,9 +40,9 @@ const EMPTY_CONFIG: MonorepoConfig = {
   branches: '',
 };
 
-const KNOWN_CONFIG_PROPERTIES = Object.keys(EMPTY_CONFIG);
+const KNOWN_CONFIG_PROPERTIES: string[] = Object.keys(EMPTY_CONFIG).concat(['monofo']);
 
-const FALLBACK_CHANGES = ['fallback'];
+const FALLBACK_CHANGES: string[] = ['fallback'];
 
 /**
  * Value object representing a parsed YAML pipeline configuration, with associated metadata and decision information
@@ -224,7 +224,13 @@ export default class Config {
   }
 
   public static async read(file: ConfigFile): Promise<Config | undefined> {
-    const { monorepo, steps, env } = await Config.readYaml(file);
+    const config = (await Config.readYaml(file)) as Partial<Config> & { monofo?: MonorepoConfig };
+    const monorepo = config.monorepo ?? config.monofo;
+
+    if (!monorepo || typeof monorepo !== 'object') {
+      log(`Skipping ${file.path} because it has no monorepo configuration`);
+      return undefined;
+    }
 
     if (_.isArray(env)) {
       // Fail noisily rather than missing the merge of the env vars
@@ -236,11 +242,6 @@ export default class Config {
     if (!name) {
       log(`Skipping ${file.path} because it has no pipeline name`);
       return Promise.resolve(undefined);
-    }
-
-    if (!monorepo || typeof monorepo !== 'object') {
-      log(`Skipping ${name} because it has no monorepo configuration`);
-      return undefined;
     }
 
     Config.logUnknownProperties(monorepo);
@@ -259,8 +260,8 @@ export default class Config {
         pure: monorepo.pure || false,
         branches: monorepo.branches,
       },
-      steps,
-      env
+      config.steps,
+      config.env
     );
   }
 
