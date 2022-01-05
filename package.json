@@ -50,7 +50,7 @@
     "/oclif.manifest.json"
   ],
   "dependencies": {
-    "@oclif/command": "1.8.9",
+    "@oclif/command": "1.8.16",
     "@oclif/config": "1.18.2",
     "@oclif/plugin-autocomplete": "1.0.0",
     "@oclif/plugin-help": "3.3.1",
