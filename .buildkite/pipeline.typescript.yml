@@ -24,7 +24,7 @@ steps:
     plugins:
       - docker-compose#v3.9.0:
           run: node
-      - vital-software/monofo#v3.2.1:
+      - vital-software/monofo#v3.3.1:
           download:
             - node-modules.tar.lz4
           upload:
