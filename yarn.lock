@@ -1419,7 +1419,7 @@
     is-wsl "^2.1.1"
     tslib "^2.0.0"
 
-"@oclif/core@1.0.10", "@oclif/core@^1.0.10", "@oclif/core@^1.0.7", "@oclif/core@^1.0.8":
+"@oclif/core@1.0.10", "@oclif/core@^1.0.10", "@oclif/core@^1.0.8":
   version "1.0.10"
   resolved "https://registry.yarnpkg.com/@oclif/core/-/core-1.0.10.tgz#5fd01d572e44d372b7279ee0f49b4860e14b6e4e"
   integrity sha512-L+IcNU3NoYxwz5hmHfcUlOJ3dpgHRsIj1kAmI9CKEJHq5gBVKlP44Ot179Jke1jKRKX2g9N42izbmlh0SNpkkw==
@@ -1574,13 +1574,13 @@
     fast-levenshtein "^3.0.0"
     lodash "^4.17.21"
 
-"@oclif/plugin-which@2.0.2":
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/@oclif/plugin-which/-/plugin-which-2.0.2.tgz#9fdf2d8fd060f486877c9a17cdad203ecbb3fedd"
-  integrity sha512-ibv8CpxK4yFO0xjxI7jlgkZOgQC+7Zb2yHGeo57MmybqDVafQU65JX6m3LUZ2D3LbLtOwaHuiM/xx3o61e2+1w==
+"@oclif/plugin-which@2.0.4":
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/@oclif/plugin-which/-/plugin-which-2.0.4.tgz#3bbdbd63eec3d2e954fe16b537c3dd14050c8d13"
+  integrity sha512-e4q/SuWZJMbfDQ1xaqj4S3k7x7HA1ESXyXypg1gXd1EyzRVBwluf7edjY+KiexEfcAJF+IX/+4mENmp9aQrcDA==
   dependencies:
-    "@oclif/core" "^1.0.7"
-    cli-ux "^6.0.3"
+    "@oclif/core" "^1.0.10"
+    cli-ux "^6.0.6"
     tslib "^2.0.0"
 
 "@oclif/screen@^1.0.4", "@oclif/screen@^1.0.4 ":
@@ -3219,7 +3219,7 @@ cli-ux@6.0.5:
     supports-hyperlinks "^2.1.0"
     tslib "^2.0.0"
 
-cli-ux@6.0.6, cli-ux@^6.0.3:
+cli-ux@6.0.6, cli-ux@^6.0.6:
   version "6.0.6"
   resolved "https://registry.yarnpkg.com/cli-ux/-/cli-ux-6.0.6.tgz#00536bf6038f195b0a1a2589f61ce5e625e75870"
   integrity sha512-CvL4qmV78VhnbyHTswGjpDSQtU+oj3hT9DP9L6yMOwiTiNv0nMjMEV/8zou4CSqO6PtZ2A8qnlZDgAc07Js+aw==
