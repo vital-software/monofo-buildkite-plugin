@@ -1,3 +1,10 @@
+## [3.3.4](https://github.com/vital-software/monofo/compare/v3.3.3...v3.3.4) (2022-01-06)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @oclif/plugin-autocomplete to v1.1.0 ([beef68d](https://github.com/vital-software/monofo/commit/beef68d53df6f1aa994cde3f4707dc154e8c9e0a))
+
 ## [3.3.3](https://github.com/vital-software/monofo/compare/v3.3.2...v3.3.3) (2022-01-06)
 
 
