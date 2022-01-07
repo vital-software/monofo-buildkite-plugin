@@ -53,4 +53,4 @@ DESCRIPTION
     - MONOFO_ARTIFACT_<NAME>_BUILD_ID=<build UUID> - allows selecting a specific build to pull the artifact from
 ```
 
-_See code: [dist/src/commands/download.ts](https://github.com/vital-software/monofo/blob/v3.1.4/dist/src/commands/download.ts)_
+_See code: [dist/src/commands/download.ts](https://github.com/vital-software/monofo/blob/v3.3.4/dist/src/commands/download.ts)_

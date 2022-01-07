@@ -23,4 +23,4 @@ OPTIONS
   -v, --verbose      Run with verbose logging
 ```
 
-_See code: [dist/src/commands/list.ts](https://github.com/vital-software/monofo/blob/v3.1.4/dist/src/commands/list.ts)_
+_See code: [dist/src/commands/list.ts](https://github.com/vital-software/monofo/blob/v3.3.4/dist/src/commands/list.ts)_

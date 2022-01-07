@@ -104,29 +104,35 @@ locally cached
       log('Files to upload', files);
     }
 
+    await checkEnabled(artifact);
+
     log(`Uploading ${count(files, 'path')} as ${args.output}`);
-    const output = await Upload.getOutputStream(artifact);
+    const output = fs.createWriteStream(artifact.filename);
 
     const subprocess: ExecaChildProcess = execa(await tar(), ['-c', '--files-from', '-', '--null'], {
       input: stream.Readable.from(files.join('\x00')),
+      stderr: 'inherit',
       buffer: false,
     });
 
     log('Starting to deflate');
-    await deflator(stdoutReadable(subprocess), artifact).then(async (deflated: stream.Readable) => {
-      log('Waiting for archive and deflate to be complete');
-      await pipeline(deflated, output);
-    });
+    const defl = deflator(stdoutReadable(subprocess), artifact);
+
+    await subprocess;
+
+    log('Waiting for pipeline to output');
+    await pipeline(stdoutReadable(defl), output);
+
+    log('Waiting for deflate');
+    await defl;
+
+    output.close();
+
+    log(`Archive deflated at ${args.output}`);
 
     log('Uploading to Buildkite');
     await upload(artifact);
 
     log(`Successfully uploaded ${artifact.name}`);
-  }
-
-  private static async getOutputStream(artifact: Artifact): Promise<stream.Writable> {
-    await checkEnabled(artifact);
-
-    return fs.createWriteStream(artifact.filename);
   }
 }

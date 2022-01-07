@@ -5,6 +5,7 @@ import rimrafCb from 'rimraf';
 import tempy from 'tempy';
 import { Compression, compressors, inflator } from '../../src/artifacts/compression';
 import { Artifact } from '../../src/artifacts/model';
+import { stdoutReadable } from '../../src/util/exec';
 import { fakeProcess, getFixturePath } from '../fixtures';
 
 const rimraf = promisify(rimrafCb);
@@ -43,11 +44,16 @@ describe('compression', () => {
 
       await expect(compression.checkEnabled()).resolves.toBeUndefined();
 
-      await compression.deflate(fs.createReadStream(getFixturePath('qux.tar'))).then(async (deflated) => {
-        const dest = fs.createWriteStream(compressed);
-        await pipeline(deflated, dest);
-        dest.close();
-      });
+      const tarFixture = fs.createReadStream(getFixturePath('qux.tar'));
+
+      const defl = compression.deflate(tarFixture);
+
+      const dest = fs.createWriteStream(compressed);
+      await pipeline(stdoutReadable(defl), dest);
+
+      await defl;
+
+      dest.close();
 
       expect(fs.existsSync(compressed)).toBe(true);
 

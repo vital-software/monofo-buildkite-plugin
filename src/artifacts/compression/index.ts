@@ -42,10 +42,10 @@ export async function checkEnabled(artifact: Artifact): Promise<void> {
  * @param input A .tar file contents being streamed at the deflator
  * @param artifact The eventual artifact we're hoping to produce
  */
-export async function deflator(input: stream.Readable, artifact: Artifact): Promise<stream.Readable> {
+export function deflator(input: stream.Readable, artifact: Artifact): ExecaChildProcess {
   switch (artifact.ext) {
     case 'tar':
-      return stdoutReadable(execa('cat', [], { input }));
+      return execa('cat', [], { input, buffer: false, stderr: 'inherit' });
     case compressors.gzip.extension:
       return compressors.gzip.deflate(input);
     case compressors.lz4.extension:
@@ -72,7 +72,7 @@ export async function inflator(
     switch (artifact.ext) {
       case 'tar':
         // eslint-disable-next-line @typescript-eslint/return-await
-        return Promise.resolve(execa('tar', ['-C', outputPath, '-xf', '-'], { input }));
+        return Promise.resolve(execa('tar', ['-C', outputPath, '-xf', '-'], { input, stderr: 'inherit' }));
       case compressors.gzip.extension:
         return await compressors.gzip.inflate(input, outputPath);
       case compressors.lz4.extension:
@@ -81,7 +81,7 @@ export async function inflator(
         return await compressors.desync.inflate(input, outputPath);
       default:
         // eslint-disable-next-line @typescript-eslint/return-await
-        return Promise.resolve(execa('tee', [artifact.filename], { input }));
+        return Promise.resolve(execa('tee', [artifact.filename], { input, stderr: 'inherit' }));
     }
   } catch (error) {
     log(`Failed to inflate ${artifact.name}`, error);

@@ -25,7 +25,7 @@ export async function search(artifact: Artifact): Promise<string> {
 
   log(`Calling buildkite-agent ${args.join(' ')}`);
 
-  return (await execa('buildkite-agent', args)).stdout.split('\n')[0];
+  return (await execa('buildkite-agent', args, { stderr: 'inherit' })).stdout.split('\n')[0];
 }
 
 /**

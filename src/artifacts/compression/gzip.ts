@@ -11,15 +11,14 @@ let enabled: boolean | undefined;
 export const gzip: Compression = {
   extension: 'tar.gz',
 
-  deflate(input) {
-    return Promise.resolve(
-      stdoutReadable(
-        execa('gzip', [], {
-          buffer: false,
-          input,
-        })
-      )
-    );
+  deflate(input): ExecaChildProcess {
+    log('Deflating .tar.gz archive');
+
+    return execa('gzip', [], {
+      input,
+      buffer: false,
+      stderr: 'inherit',
+    });
   },
 
   async checkEnabled() {
@@ -37,6 +36,7 @@ export const gzip: Compression = {
 
     const result = await execa(await tar(), ['-C', outputPath, '-xzf', '-'], {
       input,
+      stderr: 'inherit',
     });
 
     log('Finished inflating .tar.gz archive');

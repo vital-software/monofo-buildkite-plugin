@@ -1,3 +1,4 @@
+import stream from 'stream';
 import debug from 'debug';
 import execa, { ExecaChildProcess, ExecaReturnValue } from 'execa';
 import { hasBin, stdoutReadable } from '../../util/exec';
@@ -11,13 +12,14 @@ let enabled: boolean | undefined;
 export const lz4: Compression = {
   extension: 'tar.lz4',
 
-  deflate(input) {
-    const child: ExecaChildProcess = execa('lz4', ['-2'], {
-      buffer: false,
-      input,
-    });
+  deflate(input): ExecaChildProcess {
+    log('Deflating .tar.lz4 archive');
 
-    return Promise.resolve(stdoutReadable(child));
+    return execa('lz4', ['-2'], {
+      input,
+      buffer: false,
+      stderr: 'inherit',
+    });
   },
 
   async checkEnabled() {
@@ -35,6 +37,7 @@ export const lz4: Compression = {
 
     const result = await execa(await tar(), ['-C', outputPath, '-x', '--use-compress-program=lz4', '-f', '-'], {
       input,
+      stderr: 'inherit',
     });
 
     log('Finished inflating .tar.lz4 archive');

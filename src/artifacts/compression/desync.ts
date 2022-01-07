@@ -1,6 +1,6 @@
 import stream from 'stream';
 import debug from 'debug';
-import execa, { ExecaReturnValue } from 'execa';
+import execa, { ExecaChildProcess, ExecaReturnValue } from 'execa';
 import { hasBin, stdoutReadable } from '../../util/exec';
 import { Compression } from './compression';
 
@@ -50,15 +50,14 @@ export const desync: Compression = {
    * - Expects a stream of the contents of a tar archive to be given as the input parameter
    * - Writes an index file to the given output path
    */
-  deflate(input: stream.Readable): Promise<stream.Readable> {
-    return Promise.resolve(
-      stdoutReadable(
-        execa('desync', [...tarFlags(), '-', '-'], {
-          buffer: false,
-          input,
-        })
-      )
-    );
+  deflate(input: stream.Readable): ExecaChildProcess {
+    log(`Deflating .caidx archive with desync ${tarFlags().join(' ')} - -`);
+
+    return execa('desync', [...tarFlags(), '-', '-'], {
+      input,
+      buffer: false,
+      stderr: 'inherit',
+    });
   },
 
   /**
@@ -73,6 +72,7 @@ export const desync: Compression = {
   async inflate(input: stream.Readable, outputPath = '.'): Promise<ExecaReturnValue> {
     const result = await execa('desync', [...untarFlags(), '-', outputPath], {
       input,
+      stderr: 'inherit',
     });
 
     log('Finished inflating desync .caidx');

@@ -20,4 +20,4 @@ OPTIONS
   -v, --verbose      Run with verbose logging
 ```
 
-_See code: [dist/src/commands/uninstall.ts](https://github.com/vital-software/monofo/blob/v3.1.4/dist/src/commands/uninstall.ts)_
+_See code: [dist/src/commands/uninstall.ts](https://github.com/vital-software/monofo/blob/v3.3.4/dist/src/commands/uninstall.ts)_
