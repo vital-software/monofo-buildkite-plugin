@@ -1,16 +1,13 @@
 import fs from 'fs';
-import stream from 'stream';
 import { promisify } from 'util';
 import execa from 'execa';
 import rimrafCb from 'rimraf';
 import tempy from 'tempy';
 import { Compression, compressors, inflator } from '../../src/artifacts/compression';
 import { Artifact } from '../../src/artifacts/model';
-import { stdoutReadable } from '../../src/util/exec';
 import { fakeProcess, getFixturePath } from '../fixtures';
 
 const rimraf = promisify(rimrafCb);
-const pipeline = promisify(stream.pipeline);
 
 describe('compression', () => {
   let dir: string;
