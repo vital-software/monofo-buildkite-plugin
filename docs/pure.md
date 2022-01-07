@@ -20,7 +20,7 @@ steps:
       - yarn install
       - find . -type d -name node_modules -prune -print0 > node-modules.list
     plugins:
-      - vital-software/monofo#v3.3.6:
+      - vital-software/monofo#v3.3.7:
           upload:
             node-modules.tar.lz4:
               filesFrom: node-modules.list

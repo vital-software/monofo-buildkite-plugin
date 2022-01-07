@@ -1,3 +1,10 @@
+## [3.3.7](https://github.com/vital-software/monofo/compare/v3.3.6...v3.3.7) (2022-01-07)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @oclif/plugin-not-found to v2.2.4 ([d53319a](https://github.com/vital-software/monofo/commit/d53319a62d2b493596207cde02dccf9d1cb00e74))
+
 ## [3.3.6](https://github.com/vital-software/monofo/compare/v3.3.5...v3.3.6) (2022-01-07)
 
 
