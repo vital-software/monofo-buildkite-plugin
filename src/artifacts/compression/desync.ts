@@ -33,7 +33,7 @@ function cacheFlags(as = 'cache'): string[] {
 }
 
 function tarFlags() {
-  return ['tar', '--tar-add-root', '--input-format', 'tar', '--index', '--store', store(), ...cacheFlags('store')];
+  return ['tar', '--tar-add-root', '--input-format', 'tar', '--index', '--store', store()];
 }
 
 function untarFlags() {
@@ -104,7 +104,6 @@ export const desync: Compression = {
 
     const result = await execa('desync', [...untarFlags(), '-', outputPath], {
       input,
-      stderr: 'inherit',
     });
 
     log('Finished inflating desync .caidx');

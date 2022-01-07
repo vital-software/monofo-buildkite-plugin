@@ -23,5 +23,3 @@ if [[ "$upload" == "true" ]]; then
   # shellcheck source=./lib/upload.bash
   source "${SCRIPT_DIR}/lib/upload.bash"
 fi
-
-exit 0

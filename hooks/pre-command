@@ -29,5 +29,3 @@ if [[ "$download" == "true" ]]; then
   # shellcheck source=./lib/download.bash
   source "${SCRIPT_DIR}/lib/download.bash"
 fi
-
-exit 0

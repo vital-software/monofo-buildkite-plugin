@@ -31,7 +31,6 @@ export const lz4: Compression = {
 
     const result = await execa(await tar(), ['-C', outputPath, '-x', '--use-compress-program=lz4', '-f', '-'], {
       input,
-      stderr: 'inherit',
     });
 
     log('Finished inflating .tar.lz4 archive');

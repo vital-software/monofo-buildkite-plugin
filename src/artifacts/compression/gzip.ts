@@ -31,7 +31,6 @@ export const gzip: Compression = {
 
     const result = await execa(await tar(), ['-C', outputPath, '-xzf', '-'], {
       input,
-      stderr: 'inherit',
     });
 
     log('Finished inflating .tar.gz archive');
