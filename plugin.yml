@@ -6,6 +6,7 @@ requirements:
   - aws
   - npx
   - mktemp
+  - bash
 configuration:
   properties:
     generate:
