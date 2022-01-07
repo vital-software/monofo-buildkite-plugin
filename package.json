@@ -54,7 +54,7 @@
     "@oclif/config": "1.18.2",
     "@oclif/plugin-autocomplete": "1.1.1",
     "@oclif/plugin-help": "5.1.10",
-    "@oclif/plugin-not-found": "2.2.3",
+    "@oclif/plugin-not-found": "2.2.4",
     "@oclif/plugin-which": "2.0.5",
     "aws-sdk": "2.1051.0",
     "bluebird": "3.7.2",
