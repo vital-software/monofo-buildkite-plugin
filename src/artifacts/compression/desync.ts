@@ -1,18 +1,31 @@
+import fs from 'fs';
 import stream from 'stream';
+import util from 'util';
 import debug from 'debug';
 import execa, { ExecaChildProcess, ExecaReturnValue } from 'execa';
 import { hasBin } from '../../util/exec';
 import { Compression } from './compression';
 
+const mkdir = util.promisify(fs.mkdir);
+
 const log = debug('monofo:artifact:compression:desync');
 
 let enabled: boolean | undefined;
 
+class MissingConfigError extends Error {}
+
 function store(): string {
   if (!process.env?.MONOFO_DESYNC_STORE) {
-    throw new Error('Could not get store details from MONOFO_DESYNC_STORE');
+    throw new MissingConfigError('Could not get store details from MONOFO_DESYNC_STORE');
   }
   return process.env.MONOFO_DESYNC_STORE;
+}
+
+function cache(): string {
+  if (!process.env.MONOFO_DESYNC_CACHE) {
+    throw new MissingConfigError('Could not get cache details from MONOFO_DESYNC_CACHE');
+  }
+  return process.env.MONOFO_DESYNC_CACHE;
 }
 
 function cacheFlags(as = 'cache'): string[] {
@@ -25,6 +38,29 @@ function tarFlags() {
 
 function untarFlags() {
   return ['untar', '--no-same-owner', '--index', '--store', store(), ...cacheFlags()];
+}
+
+/**
+ * Recursively creates a directory if it doesn't exist, ignoring any path parts that do exist
+ *
+ * @param maybeDir function returning string because it'll throw if there's no such configured store/cache directory type
+ */
+async function ensureExists(maybeDir: () => string) {
+  try {
+    const dir = maybeDir();
+
+    // Only local caches/stores
+    if (dir.indexOf(':') !== -1 || dir.startsWith('s3')) {
+      return;
+    }
+
+    if (dir) {
+      await mkdir(dir, { recursive: true });
+    }
+  } catch (err: unknown) {
+    if (err instanceof MissingConfigError) return;
+    throw err;
+  }
 }
 
 export const desync: Compression = {
@@ -42,6 +78,9 @@ export const desync: Compression = {
     if (!enabled) {
       throw new Error('Desync compression disabled due to missing desync bin on PATH');
     }
+
+    await ensureExists(() => store());
+    await ensureExists(() => cache());
   },
 
   /**
