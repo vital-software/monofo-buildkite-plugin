@@ -72,15 +72,15 @@ export const desync: Compression = {
     }
 
     if (enabled === undefined) {
+      await ensureExists(() => store());
+      await ensureExists(() => cache());
+
       enabled = await hasBin('desync');
     }
 
     if (!enabled) {
       throw new Error('Desync compression disabled due to missing desync bin on PATH');
     }
-
-    await ensureExists(() => store());
-    await ensureExists(() => cache());
   },
 
   /**
