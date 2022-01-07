@@ -34,9 +34,9 @@ describe('cmd upload', () => {
       await writeFile(`${dir}/file-list.null.txt`, 'foo.txt\x00bar.txt');
 
       const { stderr } = await testRun(Upload, [
+        '--null',
         '--files-from',
         `${dir}/file-list.null.txt`,
-        '--null',
         'some-upload.tar.gz',
       ]);
 

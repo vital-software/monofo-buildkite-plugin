@@ -1,6 +1,7 @@
 import fs from 'fs';
 import stream from 'stream';
 import { promisify } from 'util';
+import execa from 'execa';
 import rimrafCb from 'rimraf';
 import tempy from 'tempy';
 import { Compression, compressors, inflator } from '../../src/artifacts/compression';
@@ -44,16 +45,8 @@ describe('compression', () => {
 
       await expect(compression.checkEnabled()).resolves.toBeUndefined();
 
-      const tarFixture = fs.createReadStream(getFixturePath('qux.tar'));
-
-      const defl = compression.deflate(tarFixture);
-
-      const dest = fs.createWriteStream(compressed);
-      await pipeline(stdoutReadable(defl), dest);
-
-      await defl;
-
-      dest.close();
+      const command: string[] = [getFixturePath('qux.tar'), '|', ...compression.deflateCmd(), '>', compressed];
+      await execa('cat', command, { shell: true });
 
       expect(fs.existsSync(compressed)).toBe(true);
 

@@ -85,18 +85,9 @@ export const desync: Compression = {
 
   /**
    * Deflate a tar file, creating a content-addressed index file
-   *
-   * - Expects a stream of the contents of a tar archive to be given as the input parameter
-   * - Writes an index file to the given output path
    */
-  deflate(input: stream.Readable): ExecaChildProcess {
-    log(`Deflating .caidx archive with desync ${tarFlags().join(' ')} - -`);
-
-    return execa('desync', [...tarFlags(), '-', '-'], {
-      input,
-      buffer: false,
-      stderr: 'inherit',
-    });
+  deflateCmd(): string[] {
+    return ['desync', ...tarFlags(), '-', '-'];
   },
 
   /**
@@ -109,6 +100,8 @@ export const desync: Compression = {
    * @return ExecaChildProcess The result of running desync untar
    */
   async inflate(input: stream.Readable, outputPath = '.'): Promise<ExecaReturnValue> {
+    log(`Inflating .caidx archive: desync ${untarFlags().join(' ')} - ${outputPath}`);
+
     const result = await execa('desync', [...untarFlags(), '-', outputPath], {
       input,
       stderr: 'inherit',

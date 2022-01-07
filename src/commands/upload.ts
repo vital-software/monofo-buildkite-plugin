@@ -1,21 +1,16 @@
-import fs from 'fs';
 import stream from 'stream';
-import { promisify } from 'util';
 import { flags as f } from '@oclif/command';
 import debug from 'debug';
-import execa, { ExecaChildProcess } from 'execa';
+import execa from 'execa';
 import { upload } from '../artifacts/api';
-import { checkEnabled, deflator } from '../artifacts/compression';
+import { checkEnabled, deflateCmd } from '../artifacts/compression';
 import { filesToUpload } from '../artifacts/matcher';
 import { Artifact } from '../artifacts/model';
 import { BaseCommand, BaseFlags } from '../command';
-import { stdoutReadable } from '../util/exec';
 import { count } from '../util/helper';
 import { tar } from '../util/tar';
 
 const log = debug('monofo:cmd:upload');
-
-const pipeline = promisify(stream.pipeline);
 
 interface UploadFlags extends BaseFlags {
   'files-from'?: string;
@@ -107,30 +102,28 @@ locally cached
     await checkEnabled(artifact);
 
     log(`Uploading ${count(files, 'path')} as ${args.output}`);
-    const output = fs.createWriteStream(artifact.filename);
 
     const tarBin = await tar();
     const tarArgs = ['-c', '--null', '--files-from', '-'];
-    log(`Producing tar via ${tarBin} ${tarArgs.join(' ')} < files-to-upload`);
 
-    const subprocess: ExecaChildProcess = execa(await tar(), tarArgs, {
+    const allArgs: string[] = [
+      '-o',
+      'pipefail',
+      ';',
+      tarBin,
+      ...tarArgs,
+      '|',
+      ...deflateCmd(artifact),
+      '>',
+      artifact.filename,
+    ];
+
+    log(`Going to deflate, using set ${allArgs.join(' ')} < files-to-upload`);
+
+    await execa('set', allArgs, {
       input: stream.Readable.from(files.join('\x00')),
-      stderr: 'inherit',
-      buffer: false,
+      shell: true,
     });
-
-    log('Starting to deflate');
-    const defl = deflator(stdoutReadable(subprocess), artifact);
-
-    await subprocess;
-
-    log('Waiting for pipeline to output');
-    await pipeline(stdoutReadable(defl), output);
-
-    log('Waiting for deflate');
-    await defl;
-
-    output.close();
 
     log(`Archive deflated at ${args.output}`);
 

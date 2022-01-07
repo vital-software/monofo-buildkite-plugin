@@ -1,7 +1,6 @@
 import stream from 'stream';
 import debug from 'debug';
 import execa, { ExecaChildProcess } from 'execa';
-import { stdoutReadable } from '../../util/exec';
 import { tar } from '../../util/tar';
 import { Artifact } from '../model';
 import { Compression } from './compression';
@@ -38,21 +37,16 @@ export async function checkEnabled(artifact: Artifact): Promise<void> {
   }
 }
 
-/**
- * @param input A .tar file contents being streamed at the deflator
- * @param artifact The eventual artifact we're hoping to produce
- */
-export function deflator(input: stream.Readable, artifact: Artifact): ExecaChildProcess {
+export function deflateCmd(artifact: Artifact): string[] {
   switch (artifact.ext) {
     case 'tar':
-      return execa('cat', [], { input, buffer: false, stderr: 'inherit' });
+      return ['cat'];
     case compressors.gzip.extension:
-      return compressors.gzip.deflate(input);
+      return compressors.gzip.deflateCmd();
     case compressors.lz4.extension:
-      return compressors.lz4.deflate(input);
+      return compressors.lz4.deflateCmd();
     case compressors.desync.extension:
-      return compressors.desync.deflate(input);
-
+      return compressors.desync.deflateCmd();
     default:
       throw new Error(`Unsupported artifact format: ${artifact.ext}`);
   }

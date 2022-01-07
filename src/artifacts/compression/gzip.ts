@@ -1,6 +1,7 @@
+import stream from 'stream';
 import debug from 'debug';
-import execa, { ExecaChildProcess, ExecaReturnValue } from 'execa';
-import { hasBin, stdoutReadable } from '../../util/exec';
+import execa, { ExecaReturnValue } from 'execa';
+import { hasBin } from '../../util/exec';
 import { tar } from '../../util/tar';
 import { Compression } from './compression';
 
@@ -11,14 +12,8 @@ let enabled: boolean | undefined;
 export const gzip: Compression = {
   extension: 'tar.gz',
 
-  deflate(input): ExecaChildProcess {
-    log('Deflating .tar.gz archive');
-
-    return execa('gzip', [], {
-      input,
-      buffer: false,
-      stderr: 'inherit',
-    });
+  deflateCmd(): string[] {
+    return ['gzip'];
   },
 
   async checkEnabled() {
@@ -31,8 +26,8 @@ export const gzip: Compression = {
     }
   },
 
-  async inflate(input, outputPath = '.'): Promise<ExecaReturnValue> {
-    log('Inflating .tar.gz archive');
+  async inflate(input: stream.Readable, outputPath = '.'): Promise<ExecaReturnValue> {
+    log(`Inflating .tar.gz archive: ${await tar()} -C ${outputPath} -xzf -`);
 
     const result = await execa(await tar(), ['-C', outputPath, '-xzf', '-'], {
       input,
