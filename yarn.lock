@@ -1599,10 +1599,10 @@
     fast-levenshtein "^3.0.0"
     lodash "^4.17.21"
 
-"@oclif/plugin-which@2.0.4":
-  version "2.0.4"
-  resolved "https://registry.yarnpkg.com/@oclif/plugin-which/-/plugin-which-2.0.4.tgz#3bbdbd63eec3d2e954fe16b537c3dd14050c8d13"
-  integrity sha512-e4q/SuWZJMbfDQ1xaqj4S3k7x7HA1ESXyXypg1gXd1EyzRVBwluf7edjY+KiexEfcAJF+IX/+4mENmp9aQrcDA==
+"@oclif/plugin-which@2.0.5":
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/@oclif/plugin-which/-/plugin-which-2.0.5.tgz#88ca968bae3538a3ff0371cafd272daf3b26d2f7"
+  integrity sha512-6hFeIXPHyX7yj75Z7QC9RSH4FD0hubDCxrumRwp41jeeCdywbf08R/D9eSHkKxz/nvQGDeTwY0z2M5rvRW7bIA==
   dependencies:
     "@oclif/core" "^1.0.10"
     cli-ux "^6.0.6"
