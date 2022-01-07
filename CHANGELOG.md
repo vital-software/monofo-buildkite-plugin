@@ -1,3 +1,10 @@
+## [3.4.1](https://github.com/vital-software/monofo/compare/v3.4.0...v3.4.1) (2022-01-07)
+
+
+### Bug Fixes
+
+* check enabled before inflating too ([1cf0ede](https://github.com/vital-software/monofo/commit/1cf0edeac4bc32116b7227c0c6a56b4121e2bef7))
+
 # [3.4.0](https://github.com/vital-software/monofo/compare/v3.3.7...v3.4.0) (2022-01-07)
 
 
