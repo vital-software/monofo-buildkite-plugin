@@ -1,7 +1,6 @@
 import stream from 'stream';
 import debug from 'debug';
 import execa, { ExecaChildProcess } from 'execa';
-import { tar } from '../../util/tar';
 import { Artifact } from '../model';
 import { Compression } from './compression';
 import { desync } from './desync';

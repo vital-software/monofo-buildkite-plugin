@@ -2,7 +2,7 @@ import fs from 'fs';
 import stream from 'stream';
 import util from 'util';
 import debug from 'debug';
-import execa, { ExecaChildProcess, ExecaReturnValue } from 'execa';
+import execa, { ExecaReturnValue } from 'execa';
 import { hasBin } from '../../util/exec';
 import { Compression } from './compression';
 
