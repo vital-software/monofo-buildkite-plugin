@@ -1,3 +1,15 @@
+# [3.4.0](https://github.com/vital-software/monofo/compare/v3.3.7...v3.4.0) (2022-01-07)
+
+
+### Bug Fixes
+
+* specify bash as the shell, so we can always use pipefail ([ce7c39b](https://github.com/vital-software/monofo/commit/ce7c39bf30aadc4cd207eccfea2d9b19d32f32c4))
+
+
+### Features
+
+* create store/cache directories locally if they don't already exist ([c5ead64](https://github.com/vital-software/monofo/commit/c5ead6400dd387a34f89c5b4d25a38b85591fd71))
+
 ## [3.3.7](https://github.com/vital-software/monofo/compare/v3.3.6...v3.3.7) (2022-01-07)
 
 
