@@ -109,7 +109,11 @@ locally cached
     log(`Uploading ${count(files, 'path')} as ${args.output}`);
     const output = fs.createWriteStream(artifact.filename);
 
-    const subprocess: ExecaChildProcess = execa(await tar(), ['-c', '--null', '--files-from', '-'], {
+    const tarBin = await tar();
+    const tarArgs = ['-c', '--null', '--files-from', '-'];
+    log(`Producing tar via ${tarBin} ${tarArgs.join(' ')} < files-to-upload`);
+
+    const subprocess: ExecaChildProcess = execa(await tar(), tarArgs, {
       input: stream.Readable.from(files.join('\x00')),
       stderr: 'inherit',
       buffer: false,

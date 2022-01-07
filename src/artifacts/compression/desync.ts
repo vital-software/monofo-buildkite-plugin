@@ -1,7 +1,7 @@
 import stream from 'stream';
 import debug from 'debug';
 import execa, { ExecaChildProcess, ExecaReturnValue } from 'execa';
-import { hasBin, stdoutReadable } from '../../util/exec';
+import { hasBin } from '../../util/exec';
 import { Compression } from './compression';
 
 const log = debug('monofo:artifact:compression:desync');
