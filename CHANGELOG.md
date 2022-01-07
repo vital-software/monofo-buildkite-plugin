@@ -1,3 +1,10 @@
+## [3.4.2](https://github.com/vital-software/monofo/compare/v3.4.1...v3.4.2) (2022-01-07)
+
+
+### Bug Fixes
+
+* only store to single store during tar ([3c97f54](https://github.com/vital-software/monofo/commit/3c97f5462c8fae8499069a5eef42d99b95873911))
+
 ## [3.4.1](https://github.com/vital-software/monofo/compare/v3.4.0...v3.4.1) (2022-01-07)
 
 
