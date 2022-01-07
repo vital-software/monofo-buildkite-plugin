@@ -1,3 +1,11 @@
+## [3.3.5](https://github.com/vital-software/monofo/compare/v3.3.4...v3.3.5) (2022-01-07)
+
+
+### Bug Fixes
+
+* incorrect order of tar operations ([f9e78a1](https://github.com/vital-software/monofo/commit/f9e78a17a92b4e3315a1ec3dcd309688dc9d6d69))
+* make deflate operations return child process ([b014023](https://github.com/vital-software/monofo/commit/b014023068888e6e9481a79a54c0404cd045ea8d))
+
 ## [3.3.4](https://github.com/vital-software/monofo/compare/v3.3.3...v3.3.4) (2022-01-06)
 
 
