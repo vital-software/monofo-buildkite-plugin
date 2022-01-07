@@ -43,7 +43,7 @@ describe('compression', () => {
       await expect(compression.checkEnabled()).resolves.toBeUndefined();
 
       const command: string[] = [getFixturePath('qux.tar'), '|', ...compression.deflateCmd(), '>', compressed];
-      await execa('cat', command, { shell: true });
+      await execa('cat', command, { shell: 'bash' });
 
       expect(fs.existsSync(compressed)).toBe(true);
 

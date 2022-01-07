@@ -122,7 +122,7 @@ locally cached
 
     await execa('set', allArgs, {
       input: stream.Readable.from(files.join('\x00')),
-      shell: true,
+      shell: 'bash',
     });
 
     log(`Archive deflated at ${args.output}`);
