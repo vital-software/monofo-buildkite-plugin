@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import { promisify } from 'util';
-import { directory } from 'tempy';
+import tempy from 'tempy';
 import { upload } from '../../src/artifacts/api';
 import Upload from '../../src/commands/upload';
 import { fakeProcess, testRun } from '../fixtures';
@@ -26,7 +26,7 @@ describe('cmd upload', () => {
   });
 
   it('can upload a list of files, null separated', async () => {
-    await directory.task(async (dir) => {
+    await tempy.directory.task(async (dir) => {
       process.chdir(dir);
 
       await writeFile(`${dir}/foo.txt`, 'bar');
@@ -45,7 +45,7 @@ describe('cmd upload', () => {
   });
 
   it('can upload a with globs', async () => {
-    await directory.task(async (dir) => {
+    await tempy.directory.task(async (dir: string) => {
       process.chdir(dir);
 
       await writeFile(`${dir}/foo.txt`, 'bar');

@@ -1,8 +1,10 @@
 import fs from 'fs';
+import path from 'path';
 import stream from 'stream';
 import util from 'util';
 import debug from 'debug';
 import execa, { ExecaReturnValue } from 'execa';
+import tempy from 'tempy';
 import { hasBin } from '../../util/exec';
 import { Compression } from './compression';
 
@@ -63,6 +65,41 @@ async function ensureExists(maybeDir: () => string) {
   }
 }
 
+/**
+ * When using STS credentials, these are set:
+ *
+ * AWS_ACCESS_KEY_ID=ASIAABCDEFABCDEF
+ * AWS_SECRET_ACCESS_KEY=(40 chars)
+ * AWS_SESSION_TOKEN=(392 chars)
+ *
+ * But we can only get Desync to use the session token via the credentials file:
+ *  https://github.com/folbricht/desync/blob/651a6cea14a080326bb64b28b82c14495c2028ff/cmd/desync/config.go#L67
+ *
+ * So, we write out a temporary credentials file and mutate process.env to refer to it
+ */
+function ensureConfig() {
+  const configDir = tempy.directory();
+  const configFile = path.join(configDir, 'credentials');
+
+  if (process.env.AWS_SESSION_TOKEN && process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY) {
+    log('Creating desync config file to allow for use of STS credentials');
+
+    const credentials = fs.createWriteStream(configFile, { mode: 0o600 });
+    credentials.write(`[profile_desync]\n`);
+    credentials.write(`aws_access_key_id = ${process.env.AWS_ACCESS_KEY_ID}\n`);
+    credentials.write(`aws_secret_access_key = ${process.env.AWS_SECRET_ACCESS_KEY}\n`);
+    credentials.write(`aws_session_token = ${process.env.AWS_SESSION_TOKEN}\n`);
+    credentials.end();
+
+    process.env.AWS_PROFILE = 'desync';
+    process.env.AWS_SHARED_CREDENTIALS_FILE = configFile;
+
+    delete process.env.AWS_SESSION_TOKEN;
+    delete process.env.AWS_ACCESS_KEY_ID;
+    delete process.env.AWS_SECRET_ACCESS_KEY;
+  }
+}
+
 export const desync: Compression = {
   extension: 'caidx',
 
@@ -72,6 +109,8 @@ export const desync: Compression = {
     }
 
     if (enabled === undefined) {
+      ensureConfig();
+
       await ensureExists(() => store());
       await ensureExists(() => cache());
 
