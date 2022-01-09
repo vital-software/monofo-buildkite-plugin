@@ -1,3 +1,10 @@
+## [3.4.3](https://github.com/vital-software/monofo/compare/v3.4.2...v3.4.3) (2022-01-09)
+
+
+### Bug Fixes
+
+* add support for STS credentials via config file ([2ba3caa](https://github.com/vital-software/monofo/commit/2ba3caa4903dae17714d40fc588d84ff93e50aa4))
+
 ## [3.4.2](https://github.com/vital-software/monofo/compare/v3.4.1...v3.4.2) (2022-01-07)
 
 
