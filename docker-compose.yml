@@ -8,6 +8,13 @@ services:
         type: bind
     image: ${NODE_IMAGE_TAG:-239595706494.dkr.ecr.us-west-2.amazonaws.com/monofo:node-main}
     environment:
+      - AWS_ACCESS_KEY_ID
+      - AWS_DEFAULT_REGION
+      - AWS_PROFILE
+      - AWS_REGION
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_SESSION_TOKEN
+      - AWS_SHARED_CREDENTIALS_FILE
       - DEBUG
       - MONOFO_VERSION
       - MONOFO_HOOK_DEBUG
