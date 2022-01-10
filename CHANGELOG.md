@@ -1,3 +1,10 @@
+## [3.5.2](https://github.com/vital-software/monofo/compare/v3.5.1...v3.5.2) (2022-01-10)
+
+
+### Bug Fixes
+
+* rimraf the config dir on process exit ([4fbe6e3](https://github.com/vital-software/monofo/commit/4fbe6e37ab55b8b90025868e7f8c6773dcfd245d))
+
 ## [3.5.1](https://github.com/vital-software/monofo/compare/v3.5.0...v3.5.1) (2022-01-10)
 
 
