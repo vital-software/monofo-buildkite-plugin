@@ -7,7 +7,7 @@ monorepo:
   pure: true
   expects:
     - node-modules.caidx
-    - typescript.tar.lz4
+    - typescript.caidx
   matches:
     - "**/*.ts"
     - "test/**/*.yml"
@@ -42,7 +42,7 @@ steps:
       - vital-software/monofo#v3.5.3:
           download:
             - node-modules.caidx
-            - typescript.tar.lz4
+            - typescript.caidx
       - *dc
 
   - label: ":eslint: Lint"
@@ -53,5 +53,5 @@ steps:
       - vital-software/monofo#v3.5.3:
           download:
             - node-modules.caidx
-            - typescript.tar.lz4
+            - typescript.caidx
       - *dc
