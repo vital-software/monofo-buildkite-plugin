@@ -1,7 +1,6 @@
 env:
   BUILDKITE_PLUGIN_DOCKER_COMPOSE_CONFIG_0: "docker-compose.yml"
   BUILDKITE_PLUGIN_DOCKER_COMPOSE_CONFIG_1: "docker-compose.buildkite.yml"
-  MONOFO_HOOK_DEBUG: "1"
 
 monorepo:
   pure: true
