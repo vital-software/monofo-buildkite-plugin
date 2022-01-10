@@ -1,3 +1,16 @@
+# [3.5.0](https://github.com/vital-software/monofo/compare/v3.4.4...v3.5.0) (2022-01-10)
+
+
+### Bug Fixes
+
+* add more logging of instance metadata process ([dafa3c7](https://github.com/vital-software/monofo/commit/dafa3c7ffd3f93ae7590e865ea5c5188013f54ba))
+* load instance profile credentials if needed ([fda1cfc](https://github.com/vital-software/monofo/commit/fda1cfc00b20101d57a0a182510b9cb569b36e8f))
+
+
+### Features
+
+* convert to aws-sdk v3 ([e6ec251](https://github.com/vital-software/monofo/commit/e6ec251f17115448831ff1599e50fb1653b9a5bb))
+
 ## [3.4.4](https://github.com/vital-software/monofo/compare/v3.4.3...v3.4.4) (2022-01-10)
 
 
