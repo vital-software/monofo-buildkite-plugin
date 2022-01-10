@@ -1,3 +1,10 @@
+## [3.5.1-alpha.2](https://github.com/vital-software/monofo/compare/v3.5.1-alpha.1...v3.5.1-alpha.2) (2022-01-10)
+
+
+### Bug Fixes
+
+* allow deflate to control how output is written ([3ba1f8b](https://github.com/vital-software/monofo/commit/3ba1f8b0dab182f8bca499d024bba6c9208043e9))
+
 ## [3.5.1-alpha.1](https://github.com/vital-software/monofo/compare/v3.5.0...v3.5.1-alpha.1) (2022-01-10)
 
 
