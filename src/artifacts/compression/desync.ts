@@ -29,6 +29,10 @@ function cache(): string {
   return process.env.MONOFO_DESYNC_CACHE;
 }
 
+function region(): string {
+  return process.env.S3_REGION || process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION || 'us-west-2';
+}
+
 function cacheFlags(as = 'cache'): string[] {
   return process.env.MONOFO_DESYNC_CACHE ? [`--${as}`, process.env.MONOFO_DESYNC_CACHE] : [];
 }
@@ -71,6 +75,7 @@ async function writeConfigFile(credentials: Credentials, configFile: string): Pr
     `[profile_desync]
 aws_access_key_id = ${credentials.accessKeyId}
 aws_secret_access_key = ${credentials.secretAccessKey}
+region = ${region()}
 ${credentials.sessionToken ? `aws_session_token = ${credentials.sessionToken}\n` : ''}`,
     { mode: 0o600 }
   );
@@ -96,11 +101,10 @@ async function ensureConfigExists(): Promise<void> {
 
   const configDir = tempy.directory();
   const configFile = path.join(configDir, 'credentials');
-  const region = process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION;
 
-  if (region && !process.env.S3_REGION) {
-    log(`Setting S3_REGION=${region}`);
-    process.env.S3_REGION = region;
+  if (!process.env.S3_REGION) {
+    log(`Setting S3_REGION=${region()}`);
+    process.env.S3_REGION = region();
   }
 
   /*
