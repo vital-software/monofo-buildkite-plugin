@@ -1,6 +1,4 @@
-env:
-  BUILDKITE_PLUGIN_DOCKER_COMPOSE_CONFIG_0: "docker-compose.yml"
-  BUILDKITE_PLUGIN_DOCKER_COMPOSE_CONFIG_1: "docker-compose.buildkite.yml"
+---
 
 monorepo:
   pure: true
@@ -16,10 +14,14 @@ steps:
       - node-image
     command: yarn install --frozen-lockfile
     timeout_in_minutes: 20
+    env:
+      MONOFO_ARTIFACT_NODE_MODULES_BUILD_ID: $MONOFO_BASE_BUILD_ID
+      MONOFO_ARTIFACT_NODE_MODULES_SOFT_FAIL: 1 # because only used for pre-cache
     plugins:
       - docker-compose#v3.9.0:
           run: node
-      - vital-software/monofo#v3.5.3:
+      - vital-software/monofo#v3.6.1:
+          download: node-modules.caidx # pre-cache the old node_modules into place before yarn install
           upload:
             node-modules.caidx:
               - ./node_modules/
