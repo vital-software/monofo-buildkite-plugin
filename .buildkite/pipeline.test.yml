@@ -1,7 +1,4 @@
-env:
-  NODE_ENV: development
-  BUILDKITE_PLUGIN_DOCKER_COMPOSE_CONFIG_0: "docker-compose.yml"
-  BUILDKITE_PLUGIN_DOCKER_COMPOSE_CONFIG_1: "docker-compose.buildkite.yml"
+---
 
 monorepo:
   pure: true
@@ -39,7 +36,7 @@ steps:
     command: yarn test
     <<: *step
     plugins:
-      - vital-software/monofo#v3.5.3:
+      - vital-software/monofo#v3.6.1:
           download:
             - node-modules.caidx
             - typescript.caidx
@@ -50,7 +47,7 @@ steps:
     command: yarn lint
     <<: *step
     plugins:
-      - vital-software/monofo#v3.5.3:
+      - vital-software/monofo#v3.6.1:
           download:
             - node-modules.caidx
             - typescript.caidx
