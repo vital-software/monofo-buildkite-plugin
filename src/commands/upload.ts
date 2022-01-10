@@ -104,17 +104,7 @@ locally cached
     const tarBin = await tar();
     const tarArgs = ['-c', '--null', '--files-from', '-'];
 
-    const allArgs: string[] = [
-      '-o',
-      'pipefail',
-      ';',
-      tarBin,
-      ...tarArgs,
-      '|',
-      ...(await deflateCmd(artifact)),
-      '>',
-      artifact.filename,
-    ];
+    const allArgs: string[] = ['-o', 'pipefail', ';', tarBin, ...tarArgs, '|', ...(await deflateCmd(artifact))];
 
     log(`Going to deflate, using set ${allArgs.join(' ')} < files-to-upload`);
 

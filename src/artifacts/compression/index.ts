@@ -19,13 +19,13 @@ export const compressors: Record<string, Compression> = {
 export function deflateCmd(artifact: Artifact): Promise<string[]> {
   switch (artifact.ext) {
     case 'tar':
-      return Promise.resolve(['cat']);
+      return Promise.resolve(['cat', '>', artifact.filename]);
     case compressors.gzip.extension:
-      return compressors.gzip.deflateCmd();
+      return compressors.gzip.deflateCmd(artifact.filename);
     case compressors.lz4.extension:
-      return compressors.lz4.deflateCmd();
+      return compressors.lz4.deflateCmd(artifact.filename);
     case compressors.desync.extension:
-      return compressors.desync.deflateCmd();
+      return compressors.desync.deflateCmd(artifact.filename);
     default:
       throw new Error(`Unsupported artifact format: ${artifact.ext}`);
   }

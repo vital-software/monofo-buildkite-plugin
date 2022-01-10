@@ -41,33 +41,8 @@ function cacheFlags(as = 'cache'): string[] {
   return process.env.MONOFO_DESYNC_CACHE ? [`--${as}`, process.env.MONOFO_DESYNC_CACHE] : [];
 }
 
-function tarFlags() {
-  return [
-    'tar',
-    '--config',
-    configPath,
-    '--verbose',
-    '--tar-add-root',
-    '--input-format',
-    'tar',
-    '--index',
-    '--store',
-    store(),
-  ];
-}
-
 function untarFlags() {
-  return [
-    'untar',
-    '--config',
-    configPath,
-    '--verbose',
-    '--no-same-owner',
-    '--index',
-    '--store',
-    store(),
-    ...cacheFlags(),
-  ];
+  return [];
 }
 
 /**
@@ -111,7 +86,7 @@ async function writeConfigFile(): Promise<void> {
     JSON.stringify(
       {
         's3-credentials': {
-          'https://s3.us-west-2.amazonaws.com': {
+          'https://s3-us-west-2.amazonaws.com': {
             'aws-credentials-file': credentialsPath,
             'aws-region': region(),
             'aws-profile': 'profile_desync',
@@ -214,10 +189,24 @@ export const desync: Compression = {
   /**
    * Deflate a tar file, creating a content-addressed index file
    */
-  async deflateCmd(): Promise<string[]> {
+  async deflateCmd(outputPath: string): Promise<string[]> {
     await checkEnabled();
 
-    return ['desync', ...tarFlags(), '-', '-'];
+    return [
+      'desync',
+      'tar',
+      '--config',
+      configPath,
+      '--verbose',
+      '--tar-add-root',
+      '--input-format',
+      'tar',
+      '--index',
+      '--store',
+      store(),
+      outputPath,
+      '-',
+    ];
   },
 
   /**
@@ -234,9 +223,25 @@ export const desync: Compression = {
 
     log(`Inflating .caidx archive: desync ${untarFlags().join(' ')} - ${outputPath}`);
 
-    const result = await execa('desync', [...untarFlags(), '-', outputPath], {
-      input,
-    });
+    const result = await execa(
+      'desync',
+      [
+        'untar',
+        '--config',
+        configPath,
+        '--verbose',
+        '--no-same-owner',
+        '--index',
+        '--store',
+        store(),
+        ...cacheFlags(),
+        '-',
+        outputPath,
+      ],
+      {
+        input,
+      }
+    );
 
     log('Finished inflating desync .caidx');
 
