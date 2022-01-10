@@ -112,7 +112,11 @@ describe('config.reason', () => {
       { name: 'match-all-env', included: false, reason: 'been forced NOT to by PIPELINE_RUN_ONLY' },
       { name: 'match-all-false', included: false, reason: 'been forced NOT to by PIPELINE_RUN_ONLY' },
       { name: 'match-all-mixed', included: false, reason: 'been forced NOT to by PIPELINE_RUN_ONLY' },
-      { name: 'match-all-true', included: false, reason: 'been forced NOT to by PIPELINE_RUN_ONLY' },
+      {
+        name: 'match-all-true',
+        included: true,
+        reason: 'been opted-out of PIPELINE_RUN_ONLY via monorepo.matches === true',
+      },
       { name: 'qux', included: false, reason: 'been forced NOT to by PIPELINE_RUN_ONLY' },
       { name: 'baz', included: false, reason: 'been forced NOT to by PIPELINE_RUN_ONLY' },
       { name: 'some-long-name', included: false, reason: 'been forced NOT to by PIPELINE_RUN_ONLY' },

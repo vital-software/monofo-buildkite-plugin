@@ -58,11 +58,13 @@ function updateDecisionsForEnvVars(configs: Config[]): void {
     }
 
     if (process.env?.PIPELINE_RUN_ONLY) {
-      const included = config.monorepo.name === process.env?.PIPELINE_RUN_ONLY;
-      config.decide(
-        included,
-        new Reason(included ? IncludeReasonType.FORCED : ExcludeReasonType.FORCED, ['PIPELINE_RUN_ONLY'])
-      );
+      if (config.monorepo.matches === true) {
+        config.decide(true, new Reason(IncludeReasonType.PIPELINE_ONLY_OPT_OUT));
+      } else if (config.monorepo.name === process.env?.PIPELINE_RUN_ONLY) {
+        config.decide(true, new Reason(IncludeReasonType.FORCED, ['PIPELINE_RUN_ONLY']));
+      } else {
+        config.decide(false, new Reason(ExcludeReasonType.FORCED, ['PIPELINE_RUN_ONLY']));
+      }
     }
 
     const envVarName = config.envVarName();
