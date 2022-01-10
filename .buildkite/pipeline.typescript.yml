@@ -24,7 +24,7 @@ steps:
     plugins:
       - docker-compose#v3.9.0:
           run: node
-      - vital-software/monofo#v3.5.2:
+      - vital-software/monofo#v3.5.3:
           download:
             - node-modules.caidx
           upload:
