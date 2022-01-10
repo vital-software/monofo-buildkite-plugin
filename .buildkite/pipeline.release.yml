@@ -25,7 +25,7 @@ steps:
       - vital-software/monofo#v3.5.3:
           download:
             - node-modules.caidx
-            - typescript.tar.lz4
+            - typescript.caidx
       - docker-compose#v3.9.0:
           run: node
       - seek-oss/aws-sm#v2.3.1:

@@ -10,7 +10,7 @@ monorepo:
     - tsconfig.json
     - package.json
     - yarn.lock
-  produces: typescript.tar.lz4
+  produces: typescript.caidx
 
 steps:
   - name: ":typescript: Build"
@@ -28,5 +28,5 @@ steps:
           download:
             - node-modules.caidx
           upload:
-            typescript.tar.lz4:
+            typescript.caidx:
               - ./dist/
