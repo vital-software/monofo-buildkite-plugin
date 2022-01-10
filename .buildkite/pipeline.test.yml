@@ -18,11 +18,6 @@ monorepo:
 
 templates:
   # Plugin templates
-  - &pre-command
-    vital-software/monofo#v3.2.1:
-      download:
-        - node-modules.tar.lz4
-        - typescript.tar.lz4
   - &dc
     docker-compose#v3.9.0:
       run: node
@@ -44,7 +39,10 @@ steps:
     command: yarn test
     <<: *step
     plugins:
-      - *pre-command
+      - vital-software/monofo#v3.4.3:
+          download:
+            - node-modules.tar.lz4
+            - typescript.tar.lz4
       - *dc
 
   - label: ":eslint: Lint"
@@ -52,5 +50,8 @@ steps:
     command: yarn lint
     <<: *step
     plugins:
-      - *pre-command
+      - vital-software/monofo#v3.4.3:
+          download:
+            - node-modules.tar.lz4
+            - typescript.tar.lz4
       - *dc
