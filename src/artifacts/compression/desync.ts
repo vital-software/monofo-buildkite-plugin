@@ -53,10 +53,6 @@ function cacheFlags(as = 'cache'): string[] {
   return process.env.MONOFO_DESYNC_CACHE ? [`--${as}`, process.env.MONOFO_DESYNC_CACHE] : [];
 }
 
-function untarFlags() {
-  return [];
-}
-
 /**
  * Recursively creates a directory if it doesn't exist, ignoring any path parts that do exist
  *
@@ -233,27 +229,25 @@ export const desync: Compression = {
   async inflate(input: stream.Readable, outputPath = '.'): Promise<ExecaReturnValue> {
     await checkEnabled();
 
-    log(`Inflating .caidx archive: desync ${untarFlags().join(' ')} - ${outputPath}`);
+    const allArgs = [
+      'untar',
+      '--config',
+      configPath,
+      '--verbose',
+      '--no-same-owner',
+      '--index',
+      '--store',
+      store(),
+      ...cacheFlags(),
+      '-',
+      outputPath,
+    ];
 
-    const result = await execa(
-      'desync',
-      [
-        'untar',
-        '--config',
-        configPath,
-        '--verbose',
-        '--no-same-owner',
-        '--index',
-        '--store',
-        store(),
-        ...cacheFlags(),
-        '-',
-        outputPath,
-      ],
-      {
-        input,
-      }
-    );
+    log(`Inflating .caidx archive: desync ${allArgs.join(' ')}`);
+
+    const result = await execa('desync', allArgs, {
+      input,
+    });
 
     log('Finished inflating desync .caidx');
 
