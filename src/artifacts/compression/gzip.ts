@@ -3,6 +3,7 @@ import debug from 'debug';
 import execa, { ExecaReturnValue } from 'execa';
 import { hasBin } from '../../util/exec';
 import { tar } from '../../util/tar';
+import { Artifact } from '../model';
 import { Compression } from './compression';
 
 const log = debug('monofo:artifact:compression:gzip');
@@ -22,9 +23,9 @@ async function checkEnabled() {
 export const gzip: Compression = {
   extension: 'tar.gz',
 
-  async deflateCmd(): Promise<string[]> {
+  async deflateCmd(outputPath: string): Promise<string[]> {
     await checkEnabled();
-    return ['gzip'];
+    return ['gzip', '>', outputPath];
   },
 
   async inflate(input: stream.Readable, outputPath = '.'): Promise<ExecaReturnValue> {

@@ -40,7 +40,7 @@ describe('compression', () => {
       const compression: Compression = compressors[algo];
       const compressed = `${dir}/test.${compression.extension}`;
 
-      const command: string[] = [getFixturePath('qux.tar'), '|', ...(await compression.deflateCmd()), '>', compressed];
+      const command: string[] = [getFixturePath('qux.tar'), '|', ...(await compression.deflateCmd(compressed))];
       await execa('cat', command, { shell: 'bash' });
 
       expect(fs.existsSync(compressed)).toBe(true);

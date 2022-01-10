@@ -1,0 +1,18 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="monofo deflate node-modules.tar node-modules.caidx" type="js.build_tools.npm" folderName="monofo">
+    <package-json value="$PROJECT_DIR$/package.json" />
+    <command value="run" />
+    <scripts>
+      <script value="monofo" />
+    </scripts>
+    <arguments value="deflate node-modules.tar node-modules.caidx" />
+    <node-interpreter value="project" />
+    <node-options value="--unhandled-rejections=strict" />
+    <envs>
+      <env name="DEBUG" value="*" />
+      <env name="BUILDKITE_BUILD_ID" value="123" />
+      <env name="MONOFO_DESYNC_STORE" value="s3+https://s3-us-west-2.amazonaws.com/vital-buildkite-cache-us-west-2/desync/store" />
+    </envs>
+    <method v="2" />
+  </configuration>
+</component>

@@ -10,7 +10,9 @@ export interface Compression {
   inflate(input: stream.Readable, outputPath?: string): Promise<ExecaReturnValue>;
 
   /**
-   * Returns a command (argv) that deflates from stdin to stdout
+   * Returns a command (argv) that deflates from stdin to the given outputPath
+   *
+   * The return value is an argv that can be sent to a `sh -c`-style shell interpreter
    */
-  deflateCmd(): Promise<string[]>;
+  deflateCmd(outputPath: string): Promise<string[]>;
 }
