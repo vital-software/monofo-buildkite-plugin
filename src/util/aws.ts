@@ -1,12 +1,18 @@
+import debug from 'debug';
 import got from 'got';
+
+const log = debug('monofo:util:aws');
 
 export async function hasInstanceMetadata(): Promise<boolean> {
   try {
-    await got.get('http://169.254.169.254/latest/', {
+    log('Checking for instance metadata server');
+    await got.head('http://169.254.169.254/latest/', {
       timeout: 500,
     });
+    log('Server is present');
     return true;
-  } catch (err) {
+  } catch (err: unknown) {
+    log('Server is NOT present', err);
     return false;
   }
 }
@@ -27,6 +33,8 @@ export async function getInstanceProfileSecurityCredentials(): Promise<InstanceP
       timeout: 2000,
     })
   ).body.trim();
+
+  log(`Using instance profile role: ${defaultRole}`);
 
   const credentialsBody = (
     await got.get(`http://169.254.169.254/latest/meta-data/iam/security-credentials/${defaultRole}/`, {
