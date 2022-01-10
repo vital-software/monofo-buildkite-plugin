@@ -1,3 +1,10 @@
+# [3.6.0](https://github.com/vital-software/monofo/compare/v3.5.3...v3.6.0) (2022-01-10)
+
+
+### Features
+
+* allow `matches: true` to opt out of PIPELINE_RUN_ONLY ([aaa18dd](https://github.com/vital-software/monofo/commit/aaa18dd44f150356103be3d5ce8f85b119a2a2d9))
+
 ## [3.5.3](https://github.com/vital-software/monofo/compare/v3.5.2...v3.5.3) (2022-01-10)
 
 
