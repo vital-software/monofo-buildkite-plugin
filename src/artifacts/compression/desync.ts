@@ -13,6 +13,10 @@ const log = debug('monofo:artifact:compression:desync');
 
 let enabled: boolean | undefined;
 
+const configDir = tempy.directory();
+const credentialsPath = path.join(configDir, 'credentials');
+const configPath = path.join(configDir, 'config');
+
 class MissingConfigError extends Error {}
 
 function store(): string {
@@ -38,11 +42,32 @@ function cacheFlags(as = 'cache'): string[] {
 }
 
 function tarFlags() {
-  return ['tar', '--verbose', '--tar-add-root', '--input-format', 'tar', '--index', '--store', store()];
+  return [
+    'tar',
+    '--config',
+    configPath,
+    '--verbose',
+    '--tar-add-root',
+    '--input-format',
+    'tar',
+    '--index',
+    '--store',
+    store(),
+  ];
 }
 
 function untarFlags() {
-  return ['untar', '--verbose', '--no-same-owner', '--index', '--store', store(), ...cacheFlags()];
+  return [
+    'untar',
+    '--config',
+    configPath,
+    '--verbose',
+    '--no-same-owner',
+    '--index',
+    '--store',
+    store(),
+    ...cacheFlags(),
+  ];
 }
 
 /**
@@ -69,15 +94,34 @@ async function ensureExists(maybeDir: () => string) {
   }
 }
 
-async function writeConfigFile(credentials: Credentials, configFile: string): Promise<void> {
+async function writeCredentialsFile(credentials: Credentials): Promise<void> {
   await fs.writeFile(
-    configFile,
+    credentialsPath,
     `[profile_desync]
 aws_access_key_id = ${credentials.accessKeyId}
 aws_secret_access_key = ${credentials.secretAccessKey}
-region = ${region()}
 ${credentials.sessionToken ? `aws_session_token = ${credentials.sessionToken}\n` : ''}`,
     { mode: 0o600 }
+  );
+}
+
+async function writeConfigFile(): Promise<void> {
+  await fs.writeFile(
+    configPath,
+    JSON.stringify(
+      {
+        's3-credentials': {
+          'https://s3.us-west-2.amazonaws.com': {
+            'aws-credentials-file': credentialsPath,
+            'aws-region': region(),
+            'aws-profile': 'profile_desync',
+          },
+        },
+      },
+      null,
+      4
+    ),
+    { mode: 0o640 }
   );
 }
 
@@ -99,9 +143,8 @@ ${credentials.sessionToken ? `aws_session_token = ${credentials.sessionToken}\n`
 async function ensureConfigExists(): Promise<void> {
   log('Checking whether to create config file');
 
-  const configDir = tempy.directory();
-  const configFile = path.join(configDir, 'credentials');
-
+  // This doesn't get used in the absence of static security credentials :(
+  // See https://github.com/folbricht/desync/blob/5dd803ef214b97059acffeddd156594fcc63edd8/cmd/desync/config.go#L61
   if (!process.env.S3_REGION) {
     log(`Setting S3_REGION=${region()}`);
     process.env.S3_REGION = region();
@@ -120,27 +163,30 @@ async function ensureConfigExists(): Promise<void> {
 
   if (process.env.AWS_SESSION_TOKEN && process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY) {
     try {
-      log('Loading env var security credentials into config file', configFile);
-      await writeConfigFile(await fromEnv()(), configFile);
+      log('Loading env var security credentials into file', credentialsPath);
+      await writeCredentialsFile(await fromEnv()());
 
       log('Successfully loaded');
       process.env.AWS_PROFILE = 'desync';
-      process.env.AWS_SHARED_CREDENTIALS_FILE = configFile;
+      process.env.AWS_SHARED_CREDENTIALS_FILE = credentialsPath;
     } catch (err: unknown) {
       log('Failed to use env var credentials directly', err);
     }
   }
-
   try {
-    log('Loading instance profile security credentials into config file', configFile);
-    await writeConfigFile(await fromInstanceMetadata()(), configFile);
+    log('Loading instance profile security credentials into file', credentialsPath);
+    await writeCredentialsFile(await fromInstanceMetadata()());
 
     log('Successfully loaded');
     process.env.AWS_PROFILE = 'desync';
-    process.env.AWS_SHARED_CREDENTIALS_FILE = configFile;
+    process.env.AWS_SHARED_CREDENTIALS_FILE = credentialsPath;
   } catch (err: unknown) {
     log('Failed to use instance profile from metadata service', err);
   }
+
+  // Furthermore, we need to use an actual config file: https://github.com/folbricht/desync/blob/5dd803ef214b97059acffeddd156594fcc63edd8/cmd/desync/config.go#L61
+  // Because otherwise there's no way to supply the region here
+  await writeConfigFile();
 }
 
 async function checkEnabled(): Promise<void> {
