@@ -34,11 +34,11 @@ function cacheFlags(as = 'cache'): string[] {
 }
 
 function tarFlags() {
-  return ['tar', '--tar-add-root', '--input-format', 'tar', '--index', '--store', store()];
+  return ['tar', '--verbose', '--tar-add-root', '--input-format', 'tar', '--index', '--store', store()];
 }
 
 function untarFlags() {
-  return ['untar', '--no-same-owner', '--index', '--store', store(), ...cacheFlags()];
+  return ['untar', '--verbose', '--no-same-owner', '--index', '--store', store(), ...cacheFlags()];
 }
 
 /**
