@@ -180,14 +180,16 @@ DynamoDB setup is only required if you're intending to use [pure mode](docs/pure
 
 * [`monofo autocomplete`](docs/commands/autocomplete.md) - display autocomplete installation instructions
 * [`monofo base-commit`](docs/commands/base-commit.md) - output a base commit hash, against which the current build would be compared
+* [`monofo deflate`](docs/commands/deflate.md) - deflate a tar resource into a given artifact name
 * [`monofo download`](docs/commands/download.md) - Downloads the given list of artifacts, inflating them if they are suitable archives
 * [`monofo hash`](docs/commands/hash.md) - hash the specified component and output the value
+* [`monofo inflate`](docs/commands/inflate.md) - install a DynamoDB table to store cache pointers for pure builds
 * [`monofo install`](docs/commands/install.md) - install a DynamoDB table to store cache pointers for pure builds
 * [`monofo list`](docs/commands/list.md) - list matching files for different parts of the pipeline
 * [`monofo pipeline`](docs/commands/pipeline.md) - generate a dynamic pipeline.yml and output it
 * [`monofo record-success`](docs/commands/record-success.md) - Record success of a component of the build, so that we can skip it next time if possible
 * [`monofo uninstall`](docs/commands/uninstall.md) - Uninstalls the Monofo DynamoDB tables
 * [`monofo upload`](docs/commands/upload.md) - Produces a compressed tarball artifact from a given list of globs, and uploads it to Buildkite Artifacts
-* [`monofo which`](docs/commands/which.md) - show which plugin a command is in
+* [`monofo which`](docs/commands/which.md) - Show which plugin a command is in.
 
 <!-- commandsstop -->

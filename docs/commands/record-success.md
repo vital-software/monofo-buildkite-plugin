@@ -24,4 +24,4 @@ OPTIONS
   -v, --verbose      Run with verbose logging
 ```
 
-_See code: [dist/src/commands/record-success.ts](https://github.com/vital-software/monofo/blob/v3.3.4/dist/src/commands/record-success.ts)_
+_See code: [dist/src/commands/record-success.ts](https://github.com/vital-software/monofo/blob/v3.5.3/dist/src/commands/record-success.ts)_

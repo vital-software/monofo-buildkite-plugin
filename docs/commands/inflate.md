@@ -1,17 +1,17 @@
-`monofo install`
+`monofo inflate`
 ================
 
 install a DynamoDB table to store cache pointers for pure builds
 
-* [`monofo install`](#monofo-install)
+* [`monofo inflate`](#monofo-inflate)
 
-## `monofo install`
+## `monofo inflate`
 
 install a DynamoDB table to store cache pointers for pure builds
 
 ```
 USAGE
-  $ monofo install
+  $ monofo inflate
 
 OPTIONS
   -C, --chdir=chdir  Directory to change to before executing command
@@ -20,4 +20,4 @@ OPTIONS
   -v, --verbose      Run with verbose logging
 ```
 
-_See code: [dist/src/commands/install.ts](https://github.com/vital-software/monofo/blob/v3.5.3/dist/src/commands/install.ts)_
+_See code: [dist/src/commands/inflate.ts](https://github.com/vital-software/monofo/blob/v3.5.3/dist/src/commands/inflate.ts)_

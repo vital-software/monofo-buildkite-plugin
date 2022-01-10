@@ -23,4 +23,4 @@ ALIASES
   $ monofo
 ```
 
-_See code: [dist/src/commands/pipeline.ts](https://github.com/vital-software/monofo/blob/v3.3.4/dist/src/commands/pipeline.ts)_
+_See code: [dist/src/commands/pipeline.ts](https://github.com/vital-software/monofo/blob/v3.5.3/dist/src/commands/pipeline.ts)_
