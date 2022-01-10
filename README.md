@@ -8,7 +8,6 @@ Monofo keeps your pipeline running the same way it always has (e.g. you don't
 have to split your pipeline and use triggers), while potentially saving heaps of
 time by only building what you need.
 
-
 ## Basic usage
 
 Instead of calling `buildkite-agent pipeline upload` in the first step of a
@@ -41,15 +40,16 @@ and give them with a short name, like: `pipeline.<component>.yml`. Each of these
 pipeline files can contain their own set of steps and environment variables.
 
 Next, add a `monorepo` configuration section to the top of each of these
-component pipelines. An example configuration is:
+component pipelines. Declare any input (`produces`) and output (`expects`)
+artifacts that your pipeline either builds or needs. An example configuration is:
 
 ```yaml
 monorepo:
-  expects:  blah.cfg
-  produces: output/foo.zip
+  expects:  node-modules.tar.gz
+  produces: app.tar.gz
   matches:
-    - foo.cfg
-    - foo/**/*.js
+    - serverless.yml
+    - app/**.ts
 ```
 
 The `matches` configuration defines a set of (minimatch) glob-style paths to
@@ -87,13 +87,39 @@ These are used:
 - to know what artifacts should be pulled from a previous build when needed
   (i.e. when a component pipeline can be skipped)
 
-#### Phony artifacts in `expects`/`produces`
+### Deflate/inflate artifacts to convenient archive formats
 
-As a special case, any artifact prefixed with `.phony/` is considered to not be
-a real file. These artifacts are still evaluated when _ordering_ pipeline steps,
-but they won't be actually downloaded.
+See [artifacts](docs/artifacts.md) for more information
+
+You can use the plugin to `upload` and `download` artifacts to compressed tarballs
+using good compression algorithms such as `lz4`, or even content-addressing-based
+caching systems such as [`desync`](https://github.com/folbricht/desync) (a casync
+implementation)
+
+The following breaks your `node_modules/` artifact up into chunks, and caches
+the chunks locally and on S3:
+
+```yaml
+env:
+  MONOFO_DESYNC_STORE: "s3+https://s3.amazonaws.com/some-bucket/desync/store"
+  MONOFO_DESYNC_CACHE: "/tmp/desync/monofo"
+
+steps:
+  - command: yarn install
+    plugins:
+      - vital-software/monofo#v3.5.3:
+          upload:
+            node-modules.caidx:
+              - "node_modules/"
+```
+
+The resulting `node-modules.caidx` only contains pointers to the full content
+chunks, and as a result, is only 200KiB for a 500MB node_modules/ artifact. This
+means it can upload/download in seconds.
 
 ### Content-based build skipping (`pure`)
+
+See [content-based build skipping](docs/pure.md) for more information
 
 You can mark a pipeline as pure by setting the `monorepo.pure` flag to `true` -
 this indicates that it doesn't have side-effects other than producing its
@@ -113,12 +139,11 @@ monorepo:
 In any future build, if `package.json` and `yarn.lock` have the same content,
 this pipeline will be skipped.
 
-For more information, see [content-based build skipping](docs/pure.md)
-
 ### Branch inclusion/exclusion filters
+
 If you require more specificity for what branches do or do not run your pipelines,
-there is a branch filter that matches the buildkite step-level branch filtering rules.
-See [Buildkite Branch Configuration](https://buildkite.com/docs/pipelines/branch-configuration#branch-pattern-examples)
+there is a branch filter that matches the [Buildkite step-level branch filtering
+rules](https://buildkite.com/docs/pipelines/branch-configuration#branch-pattern-examples).
 
 ```yaml
 monorepo:

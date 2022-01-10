@@ -11,8 +11,8 @@ you might find it easier to use the standard
 
 ## Uploads
 
-The `upload` subcommand takes a target artifact output file name, like 
-`node-modules.tar.lz4`. The artifact filename will determine what sort of 
+The `upload` subcommand takes a target artifact output file name, like
+`node-modules.tar.lz4`. The artifact filename will determine what sort of
 compressed archive is produced.
 
 The `upload` subcommand also needs a list of files to include in the archive.
@@ -41,8 +41,8 @@ steps:
 ```
 
 
-Passing a "filesFrom" list can be much faster than using globs, because it 
-allows the use of `-prune` (to early-exit from a `find` traversal, skipping a 
+Passing a "filesFrom" list can be much faster than using globs, because it
+allows the use of `-prune` (to early-exit from a `find` traversal, skipping a
 lot of file I/O). This is particularly useful for finding large numbers of small
 files by pointing at their parent directories e.g. `node_modules/`)
 
@@ -62,7 +62,7 @@ steps:
       - vital-software/monofo#v3.5.3:
           download:
             - node-modules.tar.lz4
-            - build.tar.cbidx
+            - build.caidx
 ```
 
 ## Compression
@@ -80,7 +80,8 @@ The supported compression types are:
 ### Desync
 
 Monofo uses [desync](https://github.com/folbricht/desync) to provide content-addressed
-caching and storage, speeding up the upload and download of artifacts and cached files.
+caching and storage, speeding up the upload and download of artifacts and cached
+files.
 
 #### Installing desync
 
@@ -93,12 +94,19 @@ GOOS=linux GOARCH=amd64 go install github.com/folbricht/desync/cmd/desync@latest
 
 #### Configuring desync
 
-desync must also be configured using the `MONOFO_DESYNC_FLAGS` environment variable
-before it'll be available for use. This environment variable is substituted into
-the eventual desync command, and a suitable value will usually declare `--store`
-and `--cache` options (without at least one, desync will not work).
+There are two main configuration environment variables:
 
-```shell
-export MONOFO_DESYNC_FLAGS="-c /tmp/desync-cache -s s3+https://s3-us-west-2.amazonaws.com/some-build-cache-bucket/prefix"
+- `MONOFO_DESYNC_STORE`: Usually, an S3 bucket, used to store content-addressed
+   chunks
+- `MONOFO_DESYNC_CACHE`: Usually, a local directory, used as a look-through
+   cache when they'd otherwise be downloaded from S3
+
+These environment variables are substituted into the eventual desync command as
+the `--store` and `--cache` options. For example, Monofo itself uses:
+
+```typescript
+MONOFO_DESYNC_STORE: "s3+https://s3-us-west-2.amazonaws.com/some-s3-bucket-name/desync/store"
+MONOFO_DESYNC_CACHE: "/tmp/desync/monofo"
 ```
 
+The `s3+https://` scheme is explained at [folbricht/desync](https://github.com/folbricht/desync#s3-chunk-stores)
