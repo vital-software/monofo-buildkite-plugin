@@ -22,9 +22,9 @@ steps:
     plugins:
       - improbable-eng/metahook#v0.4.1:
           pre-command: git fetch --tags -f # To allow mutating build tags for now
-      - vital-software/monofo#v3.4.3:
+      - vital-software/monofo#v3.5.1:
           download:
-            - node-modules.tar.lz4
+            - node-modules.caidx
             - typescript.tar.lz4
       - docker-compose#v3.9.0:
           run: node

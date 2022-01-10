@@ -6,7 +6,7 @@ env:
 monorepo:
   pure: true
   expects:
-    - node-modules.tar.lz4
+    - node-modules.caidx
     - typescript.tar.lz4
   matches:
     - "**/*.ts"
@@ -39,9 +39,9 @@ steps:
     command: yarn test
     <<: *step
     plugins:
-      - vital-software/monofo#v3.4.3:
+      - vital-software/monofo#v3.5.1:
           download:
-            - node-modules.tar.lz4
+            - node-modules.caidx
             - typescript.tar.lz4
       - *dc
 
@@ -50,8 +50,8 @@ steps:
     command: yarn lint
     <<: *step
     plugins:
-      - vital-software/monofo#v3.4.3:
+      - vital-software/monofo#v3.5.1:
           download:
-            - node-modules.tar.lz4
+            - node-modules.caidx
             - typescript.tar.lz4
       - *dc

@@ -4,7 +4,7 @@ env:
 
 monorepo:
   pure: true
-  expects: node-modules.tar.lz4
+  expects: node-modules.caidx
   matches:
     - "**/*.ts"
     - tsconfig.json
@@ -24,9 +24,9 @@ steps:
     plugins:
       - docker-compose#v3.9.0:
           run: node
-      - vital-software/monofo#v3.4.3:
+      - vital-software/monofo#v3.5.1:
           download:
-            - node-modules.tar.lz4
+            - node-modules.caidx
           upload:
             typescript.tar.lz4:
               - ./dist/
