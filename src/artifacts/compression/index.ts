@@ -16,30 +16,10 @@ export const compressors: Record<string, Compression> = {
   lz4,
 };
 
-export async function checkEnabled(artifact: Artifact): Promise<void> {
-  switch (artifact.ext) {
-    case compressors.gzip.extension:
-      await compressors.gzip.checkEnabled();
-      break;
-    case compressors.lz4.extension:
-      await compressors.lz4.checkEnabled();
-      break;
-    case compressors.desync.extension:
-      await compressors.desync.checkEnabled();
-      break;
-    case 'tar':
-      log(`No compression handled for tar archive: ${artifact.filename}`);
-      break;
-    default:
-      log(`No compression handled for artifact: ${artifact.filename}`);
-      break;
-  }
-}
-
-export function deflateCmd(artifact: Artifact): string[] {
+export function deflateCmd(artifact: Artifact): Promise<string[]> {
   switch (artifact.ext) {
     case 'tar':
-      return ['cat'];
+      return Promise.resolve(['cat']);
     case compressors.gzip.extension:
       return compressors.gzip.deflateCmd();
     case compressors.lz4.extension:

@@ -77,7 +77,7 @@ async function ensureExists(maybeDir: () => string) {
  *
  * So, we write out a temporary credentials file and mutate process.env to refer to it
  */
-function ensureConfig() {
+function ensureConfigExists() {
   const configDir = tempy.directory();
   const configFile = path.join(configDir, 'credentials');
 
@@ -100,32 +100,34 @@ function ensureConfig() {
   }
 }
 
+async function checkEnabled(): Promise<void> {
+  if (!store()) {
+    throw new Error('Desync compression disabled due to no MONOFO_DESYNC_STORE given');
+  }
+
+  if (enabled === undefined) {
+    ensureConfigExists();
+
+    await ensureExists(() => store());
+    await ensureExists(() => cache());
+
+    enabled = await hasBin('desync');
+  }
+
+  if (!enabled) {
+    throw new Error('Desync compression disabled due to missing desync bin on PATH');
+  }
+}
+
 export const desync: Compression = {
   extension: 'caidx',
-
-  async checkEnabled() {
-    if (!store()) {
-      throw new Error('Desync compression disabled due to no MONOFO_DESYNC_STORE given');
-    }
-
-    if (enabled === undefined) {
-      ensureConfig();
-
-      await ensureExists(() => store());
-      await ensureExists(() => cache());
-
-      enabled = await hasBin('desync');
-    }
-
-    if (!enabled) {
-      throw new Error('Desync compression disabled due to missing desync bin on PATH');
-    }
-  },
 
   /**
    * Deflate a tar file, creating a content-addressed index file
    */
-  deflateCmd(): string[] {
+  async deflateCmd(): Promise<string[]> {
+    await checkEnabled();
+
     return ['desync', ...tarFlags(), '-', '-'];
   },
 
@@ -139,6 +141,8 @@ export const desync: Compression = {
    * @return ExecaChildProcess The result of running desync untar
    */
   async inflate(input: stream.Readable, outputPath = '.'): Promise<ExecaReturnValue> {
+    await checkEnabled();
+
     log(`Inflating .caidx archive: desync ${untarFlags().join(' ')} - ${outputPath}`);
 
     const result = await execa('desync', [...untarFlags(), '-', outputPath], {

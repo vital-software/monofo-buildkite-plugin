@@ -3,7 +3,7 @@ import { flags as f } from '@oclif/command';
 import debug from 'debug';
 import execa from 'execa';
 import { upload } from '../artifacts/api';
-import { checkEnabled, deflateCmd } from '../artifacts/compression';
+import { deflateCmd } from '../artifacts/compression';
 import { filesToUpload } from '../artifacts/matcher';
 import { Artifact } from '../artifacts/model';
 import { BaseCommand, BaseFlags } from '../command';
@@ -99,8 +99,6 @@ locally cached
       log('Files to upload', files);
     }
 
-    await checkEnabled(artifact);
-
     log(`Uploading ${count(files, 'path')} as ${args.output}`);
 
     const tarBin = await tar();
@@ -113,7 +111,7 @@ locally cached
       tarBin,
       ...tarArgs,
       '|',
-      ...deflateCmd(artifact),
+      ...(await deflateCmd(artifact)),
       '>',
       artifact.filename,
     ];

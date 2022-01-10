@@ -1,7 +1,7 @@
 import debug from 'debug';
 import _ from 'lodash';
 import { download } from '../artifacts/api';
-import { checkEnabled, inflator } from '../artifacts/compression';
+import { inflator } from '../artifacts/compression';
 import { Artifact } from '../artifacts/model';
 import { BaseCommand } from '../command';
 import { count } from '../util/helper';
@@ -56,7 +56,6 @@ expected to be inflated in the working directory. For each artifact, we support 
 
     return Promise.all(
       artifacts.map(async (artifact) => {
-        await checkEnabled(artifact);
         await inflator(await download(artifact), artifact);
       })
     ).then(() => 'All done');

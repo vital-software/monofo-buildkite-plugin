@@ -9,21 +9,22 @@ const log = debug('monofo:artifact:compression:lz4');
 
 let enabled: boolean | undefined;
 
+async function checkEnabled() {
+  if (enabled === undefined) {
+    enabled = await hasBin('lz4');
+  }
+
+  if (!enabled) {
+    throw new Error('LZ4 compression is disabled due to no lz4 binary found on PATH');
+  }
+}
+
 export const lz4: Compression = {
   extension: 'tar.lz4',
 
-  deflateCmd(): string[] {
+  async deflateCmd(): Promise<string[]> {
+    await checkEnabled();
     return ['lz4', '-2'];
-  },
-
-  async checkEnabled() {
-    if (enabled === undefined) {
-      enabled = await hasBin('lz4');
-    }
-
-    if (!enabled) {
-      throw new Error('LZ4 compression is disabled due to no lz4 binary found on PATH');
-    }
   },
 
   async inflate(input: stream.Readable, outputPath = '.'): Promise<ExecaReturnValue> {
