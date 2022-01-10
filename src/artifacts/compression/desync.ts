@@ -57,6 +57,7 @@ async function ensureExists(maybeDir: () => string) {
     }
 
     if (dir) {
+      log(`Ensuring ${dir} exists via mkdir`);
       await mkdir(dir, { recursive: true });
     }
   } catch (err: unknown) {
@@ -78,6 +79,8 @@ async function ensureExists(maybeDir: () => string) {
  * So, we write out a temporary credentials file and mutate process.env to refer to it
  */
 function ensureConfigExists() {
+  log('Checking whether to create config file');
+
   const configDir = tempy.directory();
   const configFile = path.join(configDir, 'credentials');
 
@@ -97,6 +100,8 @@ function ensureConfigExists() {
     delete process.env.AWS_SESSION_TOKEN;
     delete process.env.AWS_ACCESS_KEY_ID;
     delete process.env.AWS_SECRET_ACCESS_KEY;
+  } else {
+    log('Not using STS credentials!');
   }
 }
 
