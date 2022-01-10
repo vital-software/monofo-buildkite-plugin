@@ -1,0 +1,17 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="monofo deflate node-modules.tar node-modules.tar.lz4" type="js.build_tools.npm" folderName="monofo">
+    <package-json value="$PROJECT_DIR$/package.json" />
+    <command value="run" />
+    <scripts>
+      <script value="monofo" />
+    </scripts>
+    <arguments value="deflate node-modules.tar node-modules.tar.lz4" />
+    <node-interpreter value="project" />
+    <node-options value="--unhandled-rejections=strict" />
+    <envs>
+      <env name="DEBUG" value="*" />
+      <env name="BUILDKITE_BUILD_ID" value="123" />
+    </envs>
+    <method v="2" />
+  </configuration>
+</component>

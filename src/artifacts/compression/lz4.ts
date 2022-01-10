@@ -22,9 +22,9 @@ async function checkEnabled() {
 export const lz4: Compression = {
   extension: 'tar.lz4',
 
-  async deflateCmd(): Promise<string[]> {
+  async deflateCmd(outputPath: string): Promise<string[]> {
     await checkEnabled();
-    return ['lz4', '-2'];
+    return ['lz4', '-2', '>', outputPath];
   },
 
   async inflate(input: stream.Readable, outputPath = '.'): Promise<ExecaReturnValue> {
