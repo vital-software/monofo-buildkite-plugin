@@ -1,4 +1,4 @@
-import { AWSError } from 'aws-sdk';
+import { SdkError } from '@aws-sdk/types';
 import debug from 'debug';
 import { CACHE_METADATA_TABLE_NAME } from '../cache-metadata';
 import { BaseCommand } from '../command';
@@ -13,9 +13,9 @@ export default class Uninstall extends BaseCommand {
 
   async run() {
     try {
-      await service.deleteTable({ TableName: CACHE_METADATA_TABLE_NAME }).promise();
+      await service.deleteTable({ TableName: CACHE_METADATA_TABLE_NAME });
     } catch (e) {
-      if ((e as AWSError).code === 'ResourceNotFoundException') {
+      if ((e as SdkError).name === 'ResourceNotFoundException') {
         log('Could not find table to remove: probably already uninstalled');
         return;
       }

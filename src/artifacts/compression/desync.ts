@@ -2,13 +2,12 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import stream from 'stream';
 import { fromEnv, fromInstanceMetadata } from '@aws-sdk/credential-providers';
-import { Credentials } from '@aws-sdk/types/dist-types/credentials';
+import { Credentials } from '@aws-sdk/types';
 import debug from 'debug';
 import execa, { ExecaReturnValue } from 'execa';
 import tempy from 'tempy';
-import { hasInstanceMetadata, getInstanceProfileSecurityCredentials } from '../../util/aws.js';
-import { hasBin } from '../../util/exec.js';
-import { Compression } from './compression.js';
+import { hasBin } from '../../util/exec';
+import { Compression } from './compression';
 
 const log = debug('monofo:artifact:compression:desync');
 

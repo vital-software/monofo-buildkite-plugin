@@ -1,4 +1,4 @@
-import AWS from 'aws-sdk';
+import { DynamoDB } from '@aws-sdk/client-dynamodb';
 import { getBuildkiteInfo } from '../buildkite/config';
 import { CacheMetadataRepository } from '../cache-metadata';
 import { BaseCommand } from '../command';
@@ -29,7 +29,7 @@ export default class RecordSuccess extends BaseCommand {
     } = this.parse<unknown, RecordSuccessArgs>(RecordSuccess);
     const { buildId, pipeline, commit } = getBuildkiteInfo();
 
-    const ddb = new AWS.DynamoDB();
+    const ddb = new DynamoDB({});
     const metadata = new CacheMetadataRepository(ddb);
 
     process.stdout.write(`Recording success of ${componentName}\n`);

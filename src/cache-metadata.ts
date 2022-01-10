@@ -1,5 +1,5 @@
-import AWS from 'aws-sdk';
-import { DocumentClient } from 'aws-sdk/clients/dynamodb';
+import { DynamoDB } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocument } from '@aws-sdk/lib-dynamodb';
 import debug from 'debug';
 
 const log = debug('monofo:cache-metadata');
@@ -45,10 +45,10 @@ export const CACHE_METADATA_TABLE_DEFINITION = {
 };
 
 export class CacheMetadataRepository {
-  private readonly client: DocumentClient;
+  private readonly client: DynamoDBDocument;
 
-  public constructor(private readonly service: AWS.DynamoDB) {
-    this.client = new DocumentClient({ service });
+  public constructor(private readonly service: DynamoDB) {
+    this.client = DynamoDBDocument.from(service);
   }
 
   public async getAll(keys: CacheMetadataKey[]): Promise<CacheMetadata[]> {
@@ -57,15 +57,13 @@ export class CacheMetadataRepository {
     }
 
     log('Getting cache metadata for keys', keys);
-    const res = await this.client
-      .batchGet({
-        RequestItems: {
-          [TableName]: {
-            Keys: keys,
-          },
+    const res = await this.client.batchGet({
+      RequestItems: {
+        [TableName]: {
+          Keys: keys,
         },
-      })
-      .promise();
+      },
+    });
 
     log('Got result', res?.Responses?.[TableName] || []);
     return (res?.Responses?.[TableName] as CacheMetadata[]) || [];
@@ -73,11 +71,9 @@ export class CacheMetadataRepository {
 
   public async put(item: CacheMetadata): Promise<void> {
     log('Putting cache metadata', item);
-    await this.client
-      .put({
-        TableName,
-        Item: { ...item, expiresAt: Date.now() / 1000 + SEVEN_DAYS_SECS },
-      })
-      .promise();
+    await this.client.put({
+      TableName,
+      Item: { ...item, expiresAt: Date.now() / 1000 + SEVEN_DAYS_SECS },
+    });
   }
 }

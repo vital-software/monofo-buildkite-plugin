@@ -1,5 +1,5 @@
-import { AWSError } from 'aws-sdk';
-import { DescribeTableOutput } from 'aws-sdk/clients/dynamodb';
+import { DescribeTableOutput } from '@aws-sdk/client-dynamodb';
+import { SdkError } from '@aws-sdk/types';
 import debug from 'debug';
 import { CACHE_METADATA_TABLE_DEFINITION, CACHE_METADATA_TABLE_NAME } from '../cache-metadata';
 import { BaseCommand } from '../command';
@@ -34,9 +34,9 @@ export default class Install extends BaseCommand {
   private static async createTable(): Promise<void> {
     log('Creating table');
     try {
-      await service.createTable(CACHE_METADATA_TABLE_DEFINITION).promise();
+      await service.createTable(CACHE_METADATA_TABLE_DEFINITION);
     } catch (e) {
-      if ((e as AWSError).code === 'ResourceInUseException') {
+      if ((e as SdkError).name === 'ResourceInUseException') {
         log('Received ResourceInUseException because table likely already exists, continuing');
         return;
       }
@@ -47,15 +47,13 @@ export default class Install extends BaseCommand {
     await Install.tableReady();
 
     log('Configuring TTL');
-    await service
-      .updateTimeToLive({
-        TableName: CACHE_METADATA_TABLE_NAME,
-        TimeToLiveSpecification: {
-          Enabled: true,
-          AttributeName: 'expiresAt',
-        },
-      })
-      .promise();
+    await service.updateTimeToLive({
+      TableName: CACHE_METADATA_TABLE_NAME,
+      TimeToLiveSpecification: {
+        Enabled: true,
+        AttributeName: 'expiresAt',
+      },
+    });
   }
 
   private static async tableReady(): Promise<void> {
@@ -83,9 +81,9 @@ export default class Install extends BaseCommand {
     let result;
 
     try {
-      result = await service.describeTable({ TableName: CACHE_METADATA_TABLE_NAME }).promise();
+      result = await service.describeTable({ TableName: CACHE_METADATA_TABLE_NAME });
     } catch (e) {
-      if ((e as AWSError).code === 'ResourceNotFoundException') {
+      if ((e as SdkError).name === 'ResourceNotFoundException') {
         return undefined;
       }
 
