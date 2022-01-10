@@ -1,3 +1,10 @@
+## [3.4.4](https://github.com/vital-software/monofo/compare/v3.4.3...v3.4.4) (2022-01-10)
+
+
+### Bug Fixes
+
+* better logging around checking directories and config files ([981f75f](https://github.com/vital-software/monofo/commit/981f75faeab91207bddeea871cc2a8ec6eb6e857))
+
 ## [3.4.3](https://github.com/vital-software/monofo/compare/v3.4.2...v3.4.3) (2022-01-09)
 
 
