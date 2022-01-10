@@ -1,15 +1,14 @@
-import fs from 'fs';
+import { promises as fs } from 'fs';
 import path from 'path';
 import stream from 'stream';
-import util from 'util';
+import { fromEnv, fromInstanceMetadata } from '@aws-sdk/credential-providers';
+import { Credentials } from '@aws-sdk/types/dist-types/credentials';
 import debug from 'debug';
 import execa, { ExecaReturnValue } from 'execa';
 import tempy from 'tempy';
 import { hasInstanceMetadata, getInstanceProfileSecurityCredentials } from '../../util/aws.js';
 import { hasBin } from '../../util/exec.js';
 import { Compression } from './compression.js';
-
-const mkdir = util.promisify(fs.mkdir);
 
 const log = debug('monofo:artifact:compression:desync');
 
@@ -59,12 +58,23 @@ async function ensureExists(maybeDir: () => string) {
 
     if (dir) {
       log(`Ensuring ${dir} exists via mkdir`);
-      await mkdir(dir, { recursive: true });
+      await fs.mkdir(dir, { recursive: true });
     }
   } catch (err: unknown) {
     if (err instanceof MissingConfigError) return;
     throw err;
   }
+}
+
+async function writeConfigFile(credentials: Credentials, configFile: string): Promise<void> {
+  await fs.writeFile(
+    configFile,
+    `[profile_desync]
+aws_access_key_id = ${credentials.accessKeyId}
+aws_secret_access_key = ${credentials.secretAccessKey}
+${credentials.sessionToken ? `aws_session_token = ${credentials.sessionToken}\n` : ''}`,
+    { mode: 0o600 }
+  );
 }
 
 /**
@@ -105,36 +115,28 @@ async function ensureConfigExists(): Promise<void> {
     return;
   }
 
-  if (
-    (!process.env.AWS_SESSION_TOKEN || !process.env.AWS_ACCESS_KEY_ID || !process.env.AWS_SECRET_ACCESS_KEY) &&
-    (await hasInstanceMetadata())
-  ) {
-    log('Loading instance profile security credentials');
-    const credentials = await getInstanceProfileSecurityCredentials();
+  if (process.env.AWS_SESSION_TOKEN && process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY) {
+    try {
+      log('Loading env var security credentials into config file', configFile);
+      await writeConfigFile(await fromEnv()(), configFile);
 
-    process.env.AWS_ACCESS_KEY_ID = credentials.AccessKeyId;
-    process.env.AWS_SECRET_ACCESS_KEY = credentials.SecretAccessKey;
-    process.env.AWS_SESSION_TOKEN = credentials.Token;
+      log('Successfully loaded');
+      process.env.AWS_PROFILE = 'desync';
+      process.env.AWS_SHARED_CREDENTIALS_FILE = configFile;
+    } catch (err: unknown) {
+      log('Failed to use env var credentials directly', err);
+    }
   }
 
-  if (process.env.AWS_SESSION_TOKEN && process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY) {
-    log('Creating desync config file to allow for use of STS credentials');
+  try {
+    log('Loading instance profile security credentials into config file', configFile);
+    await writeConfigFile(await fromInstanceMetadata()(), configFile);
 
-    const credentials = fs.createWriteStream(configFile, { mode: 0o600 });
-    credentials.write(`[profile_desync]\n`);
-    credentials.write(`aws_access_key_id = ${process.env.AWS_ACCESS_KEY_ID}\n`);
-    credentials.write(`aws_secret_access_key = ${process.env.AWS_SECRET_ACCESS_KEY}\n`);
-    credentials.write(`aws_session_token = ${process.env.AWS_SESSION_TOKEN}\n`);
-    credentials.end();
-
+    log('Successfully loaded');
     process.env.AWS_PROFILE = 'desync';
     process.env.AWS_SHARED_CREDENTIALS_FILE = configFile;
-
-    delete process.env.AWS_SESSION_TOKEN;
-    delete process.env.AWS_ACCESS_KEY_ID;
-    delete process.env.AWS_SECRET_ACCESS_KEY;
-  } else {
-    log('Not using STS credentials!');
+  } catch (err: unknown) {
+    log('Failed to use instance profile from metadata service', err);
   }
 }
 

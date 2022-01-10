@@ -50,6 +50,7 @@
     "/oclif.manifest.json"
   ],
   "dependencies": {
+    "@aws-sdk/credential-providers": "3.46.0",
     "@oclif/command": "1.8.16",
     "@oclif/config": "1.18.2",
     "@oclif/plugin-autocomplete": "1.1.1",
@@ -75,6 +76,7 @@
     "toposort": "2.0.2"
   },
   "devDependencies": {
+    "@aws-sdk/types": "3.46.0",
     "@commitlint/cli": "16.0.2",
     "@commitlint/config-conventional": "16.0.0",
     "@google/semantic-release-replace-plugin": "1.1.0",
