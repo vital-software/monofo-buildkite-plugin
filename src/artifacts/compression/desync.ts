@@ -1,21 +1,33 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import stream from 'stream';
+import { promisify } from 'util';
 import { fromEnv, fromInstanceMetadata } from '@aws-sdk/credential-providers';
 import { Credentials } from '@aws-sdk/types';
 import debug from 'debug';
 import execa, { ExecaReturnValue } from 'execa';
+import rimrafCb from 'rimraf';
 import tempy from 'tempy';
 import { hasBin } from '../../util/exec';
 import { Compression } from './compression';
 
 const log = debug('monofo:artifact:compression:desync');
 
+const rimraf = promisify(rimrafCb);
+
 let enabled: boolean | undefined;
 
 const configDir = tempy.directory();
 const credentialsPath = path.join(configDir, 'credentials');
 const configPath = path.join(configDir, 'config');
+
+process.on('exit', () => {
+  (async () => {
+    await rimraf(configDir);
+  })().catch((err) => {
+    throw err;
+  });
+});
 
 class MissingConfigError extends Error {}
 
