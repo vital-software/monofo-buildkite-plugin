@@ -1,3 +1,11 @@
+## [3.5.1-alpha.1](https://github.com/vital-software/monofo/compare/v3.5.0...v3.5.1-alpha.1) (2022-01-10)
+
+
+### Bug Fixes
+
+* use verbose flag ([162a142](https://github.com/vital-software/monofo/commit/162a142f6c3af1bcadb61e79f8d50636b180cee2))
+* write a config file as well as a credentials file ([19af1f9](https://github.com/vital-software/monofo/commit/19af1f94daaf2de39fcaaa627489dee892d9bafa))
+
 # [3.5.0](https://github.com/vital-software/monofo/compare/v3.4.4...v3.5.0) (2022-01-10)
 
 
