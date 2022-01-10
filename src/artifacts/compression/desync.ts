@@ -5,8 +5,9 @@ import util from 'util';
 import debug from 'debug';
 import execa, { ExecaReturnValue } from 'execa';
 import tempy from 'tempy';
-import { hasBin } from '../../util/exec';
-import { Compression } from './compression';
+import { hasInstanceMetadata, getInstanceProfileSecurityCredentials } from '../../util/aws.js';
+import { hasBin } from '../../util/exec.js';
+import { Compression } from './compression.js';
 
 const mkdir = util.promisify(fs.mkdir);
 
@@ -67,22 +68,54 @@ async function ensureExists(maybeDir: () => string) {
 }
 
 /**
- * When using STS credentials, these are set:
+ * If S3_ACCESS_KEY, S3_SECRET_KEY (static credentials) are given, those are used. Otherwise, these are the standard way
+ * to set STS credentials:
  *
  * AWS_ACCESS_KEY_ID=ASIAABCDEFABCDEF
  * AWS_SECRET_ACCESS_KEY=(40 chars)
  * AWS_SESSION_TOKEN=(392 chars)
  *
+ * But first we must read them from instance metadata, because they're not in environment variables to start with.
+ *
  * But we can only get Desync to use the session token via the credentials file:
  *  https://github.com/folbricht/desync/blob/651a6cea14a080326bb64b28b82c14495c2028ff/cmd/desync/config.go#L67
  *
- * So, we write out a temporary credentials file and mutate process.env to refer to it
+ * So, we write out a temporary credentials file and mutate process.env to refer to it.
  */
-function ensureConfigExists() {
+async function ensureConfigExists(): Promise<void> {
   log('Checking whether to create config file');
 
   const configDir = tempy.directory();
   const configFile = path.join(configDir, 'credentials');
+  const region = process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION;
+
+  if (region && !process.env.S3_REGION) {
+    log(`Setting S3_REGION=${region}`);
+    process.env.S3_REGION = region;
+  }
+
+  /*
+   * Desync only understands S3_ACCESS_KEY, S3_SECRET_KEY - not the standard AWS_*
+   *
+   * We will translated those, via the configuration file. But first, if they're not already set, perhaps we can
+   * load them from the instance metadata (i.e. if you're in EC2)
+   */
+  if (process.env.S3_ACCESS_KEY && process.env.S3_SECRET_KEY) {
+    log('Using static S3 credentials');
+    return;
+  }
+
+  if (
+    (!process.env.AWS_SESSION_TOKEN || !process.env.AWS_ACCESS_KEY_ID || !process.env.AWS_SECRET_ACCESS_KEY) &&
+    (await hasInstanceMetadata())
+  ) {
+    log('Loading instance profile security credentials');
+    const credentials = await getInstanceProfileSecurityCredentials();
+
+    process.env.AWS_ACCESS_KEY_ID = credentials.AccessKeyId;
+    process.env.AWS_SECRET_ACCESS_KEY = credentials.SecretAccessKey;
+    process.env.AWS_SESSION_TOKEN = credentials.Token;
+  }
 
   if (process.env.AWS_SESSION_TOKEN && process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY) {
     log('Creating desync config file to allow for use of STS credentials');
@@ -111,7 +144,7 @@ async function checkEnabled(): Promise<void> {
   }
 
   if (enabled === undefined) {
-    ensureConfigExists();
+    await ensureConfigExists();
 
     await ensureExists(() => store());
     await ensureExists(() => cache());
