@@ -1,3 +1,10 @@
+## [3.5.3](https://github.com/vital-software/monofo/compare/v3.5.2...v3.5.3) (2022-01-10)
+
+
+### Bug Fixes
+
+* show the correct inflate arguments ([10a5596](https://github.com/vital-software/monofo/commit/10a559653cf05773e2accc7582b991edcb5f9142))
+
 ## [3.5.2](https://github.com/vital-software/monofo/compare/v3.5.1...v3.5.2) (2022-01-10)
 
 
