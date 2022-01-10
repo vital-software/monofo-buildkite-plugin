@@ -1,3 +1,12 @@
+## [3.5.1](https://github.com/vital-software/monofo/compare/v3.5.0...v3.5.1) (2022-01-10)
+
+
+### Bug Fixes
+
+* allow deflate to control how output is written ([c3dd399](https://github.com/vital-software/monofo/commit/c3dd399058cd7f98473172f93e749b80bf624214))
+* use verbose flag ([5fab7fd](https://github.com/vital-software/monofo/commit/5fab7fdb431aa15a461f6b0305f237e867894aa5))
+* write a config file as well as a credentials file ([a78d5b1](https://github.com/vital-software/monofo/commit/a78d5b17399c17beccf2157a253489734a4bebd0))
+
 # [3.5.0](https://github.com/vital-software/monofo/compare/v3.4.4...v3.5.0) (2022-01-10)
 
 
