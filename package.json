@@ -50,14 +50,16 @@
     "/oclif.manifest.json"
   ],
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "3.46.0",
     "@aws-sdk/credential-providers": "3.46.0",
+    "@aws-sdk/lib-dynamodb": "3.46.0",
+    "@aws-sdk/types": "3.46.0",
     "@oclif/command": "1.8.16",
     "@oclif/config": "1.18.2",
     "@oclif/plugin-autocomplete": "1.1.1",
     "@oclif/plugin-help": "5.1.10",
     "@oclif/plugin-not-found": "2.2.4",
     "@oclif/plugin-which": "2.0.5",
-    "aws-sdk": "2.1051.0",
     "bluebird": "3.7.2",
     "chalk": "4.1.2",
     "command-exists": "1.2.9",
@@ -76,7 +78,6 @@
     "toposort": "2.0.2"
   },
   "devDependencies": {
-    "@aws-sdk/types": "3.46.0",
     "@commitlint/cli": "16.0.2",
     "@commitlint/config-conventional": "16.0.0",
     "@google/semantic-release-replace-plugin": "1.1.0",
