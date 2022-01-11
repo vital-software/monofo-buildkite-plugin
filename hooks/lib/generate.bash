@@ -31,7 +31,7 @@ BUILDKITE_AGENT_ACCESS_TOKEN=${BUILDKITE_AGENT_ACCESS_TOKEN:-}
 echo "--- Fetching other branches" >&2
 git fetch -v origin +refs/heads/*:refs/remotes/origin/*
 
-echo "+++ :pipeline: Generating..." >&2
+echo "+++ :pipeline: Generating... going to run ${MONOFO}" >&2
 $MONOFO > "$PIPELINE_FILE"
 
 echo "--- :pipeline: Result" >&2
