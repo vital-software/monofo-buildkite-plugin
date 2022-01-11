@@ -1,3 +1,11 @@
+## [3.6.2](https://github.com/vital-software/monofo/compare/v3.6.1...v3.6.2) (2022-01-11)
+
+
+### Bug Fixes
+
+* log the generated monofo command ([0be0593](https://github.com/vital-software/monofo/commit/0be0593d5db0f3ea95eda8f3632781047aa59481))
+* provide specific messaging about boolean matches ([c014963](https://github.com/vital-software/monofo/commit/c014963cd763162f31bfb9f0b5b058e844778972))
+
 ## [3.6.1](https://github.com/vital-software/monofo/compare/v3.6.0...v3.6.1) (2022-01-11)
 
 
