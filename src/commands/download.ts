@@ -56,7 +56,16 @@ expected to be inflated in the working directory. For each artifact, we support 
 
     return Promise.all(
       artifacts.map(async (artifact) => {
-        await inflator(await download(artifact), artifact);
+        try {
+          await inflator(await download(artifact), artifact);
+        } catch (err: unknown) {
+          if (artifact.softFail) {
+            log(`Soft fail enabled for ${artifact.name}, so ignoring error`, err);
+            return;
+          }
+
+          throw err;
+        }
       })
     ).then(() => 'All done');
   }
