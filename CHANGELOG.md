@@ -1,3 +1,10 @@
+## [3.6.5](https://github.com/vital-software/monofo/compare/v3.6.4...v3.6.5) (2022-01-11)
+
+
+### Bug Fixes
+
+* set globs from variadic args ([3d51105](https://github.com/vital-software/monofo/commit/3d511059aab2171e32a6712b7feedd2be0744530))
+
 ## [3.6.4](https://github.com/vital-software/monofo/compare/v3.6.3...v3.6.4) (2022-01-11)
 
 
