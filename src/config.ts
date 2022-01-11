@@ -74,6 +74,11 @@ export default class Config {
   public changes: string[] = [];
 
   /**
+   * Total set of all changes, even non-matching ones
+   */
+  public allChanges: string[] = [];
+
+  /**
    * Whether this config is currently considered for inclusion in the final pipeline output
    */
   public included?: boolean = false;
@@ -185,10 +190,12 @@ export default class Config {
     const patterns = this.matchPatterns();
 
     if (!changedFiles || changedFiles.length < 1) {
+      this.allChanges = [];
       this.changes = [];
       return;
     }
 
+    this.allChanges = changedFiles;
     this.changes = [
       ...new Set(
         patterns.flatMap((pattern) =>

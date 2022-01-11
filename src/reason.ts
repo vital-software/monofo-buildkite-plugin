@@ -7,6 +7,7 @@ export enum IncludeReasonType {
   NO_FILE_MATCH = 'no files match',
   NO_PREVIOUS_SUCCESSFUL = 'no previous successful build, fallback to being included',
   PIPELINE_ONLY_OPT_OUT = 'been opted-out of PIPELINE_RUN_ONLY via monorepo.matches === true',
+  ALWAYS_INCLUDED = 'been always included by monorepo.matches === true',
 }
 
 export enum ExcludeReasonType {
@@ -16,6 +17,7 @@ export enum ExcludeReasonType {
   FORCED = 'been forced NOT to by',
   NO_PREVIOUS_SUCCESSFUL = 'no previous successful build, fallback to being excluded',
   PIPELINE_RUN_OPT_OUT = 'been opted-out of PIPELINE_RUN_ALL via monorepo.matches === false',
+  NEVER_INCLUDED = 'been always excluded by monorepo.matches === false',
 }
 
 export default class Reason {
