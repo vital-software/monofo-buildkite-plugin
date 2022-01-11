@@ -13,6 +13,8 @@ const log = debug('monofo:artifact:api');
  *                 a build ID, the search will be filtered to that build
  */
 export async function search(artifact: Artifact): Promise<string> {
+  log('Searching for artifact');
+
   const args = [
     'artifact',
     'search',
