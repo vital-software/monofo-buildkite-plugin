@@ -1,3 +1,10 @@
+## [3.6.1](https://github.com/vital-software/monofo/compare/v3.6.0...v3.6.1) (2022-01-11)
+
+
+### Bug Fixes
+
+* support single-string version of download property ([88524bc](https://github.com/vital-software/monofo/commit/88524bca51ac5202f04ec6d01a6fd18b0ef7e692))
+
 # [3.6.0](https://github.com/vital-software/monofo/compare/v3.5.3...v3.6.0) (2022-01-10)
 
 
