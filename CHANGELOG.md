@@ -1,3 +1,10 @@
+## [3.6.3](https://github.com/vital-software/monofo/compare/v3.6.2...v3.6.3) (2022-01-11)
+
+
+### Bug Fixes
+
+* set DEBUG when hook debug is set ([fe81318](https://github.com/vital-software/monofo/commit/fe8131818d58039230c3bf4f83a334bf68ecc517))
+
 ## [3.6.2](https://github.com/vital-software/monofo/compare/v3.6.1...v3.6.2) (2022-01-11)
 
 
