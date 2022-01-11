@@ -75,17 +75,24 @@ locally cached
       required: false,
       description: 'A list of glob patterns; matching files are included in the artifact upload',
       default: [],
+      multiple: true,
     },
   ];
 
   async run() {
-    const { args, flags } = this.parse<UploadFlags, UploadArgs>(Upload);
+    const { args, flags, raw } = this.parse<UploadFlags, UploadArgs>(Upload);
 
     if (!args.output) {
       throw new Error(
         'Must be given an output (tarball) filename, to upload the collected files to, as the first positional argument'
       );
     }
+
+    // see https://github.com/oclif/oclif/issues/293 and https://github.com/oclif/parser/pull/63
+    args.globs = raw
+      .filter((arg) => arg.type === 'arg')
+      .map((arg) => arg.input)
+      .slice(1);
 
     const artifact = new Artifact(args.output);
     const files = await filesToUpload({ globs: args.globs, filesFrom: flags['files-from'], useNull: flags.null });
