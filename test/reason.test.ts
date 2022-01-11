@@ -48,13 +48,40 @@ describe('config.reason', () => {
       { name: 'included', included: true, reason: 'been forced to by PIPELINE_RUN_INCLUDED' },
       { name: 'match-all', included: true, reason: '4 matching changes: all files match' },
       { name: 'match-all-env', included: true, reason: '4 matching changes: all files match' },
-      { name: 'match-all-false', included: false, reason: 'no matching changes' },
+      { name: 'match-all-false', included: false, reason: 'been always excluded by monorepo.matches === false' },
       { name: 'match-all-mixed', included: true, reason: '4 matching changes: all files match' },
-      { name: 'match-all-true', included: true, reason: '4 matching changes: all files match' },
+      { name: 'match-all-true', included: true, reason: 'been always included by monorepo.matches === true' },
       { name: 'qux', included: false, reason: 'no matching changes' },
       { name: 'baz', included: true, reason: '1 matching change: baz/abc.ts' },
       { name: 'some-long-name', included: false, reason: 'no matching changes' },
       { name: 'unreferenced', included: true, reason: '4 matching changes: all files match' },
+    ]);
+  });
+
+  it('matches expected reasons when no changes', async () => {
+    const reasons = await getInclusionReasons([]);
+
+    expect(reasons).toStrictEqual([
+      {
+        name: 'branch-excluded',
+        included: false,
+        reason: 'a branches configuration which excludes the current branch',
+      },
+      { name: 'changed', included: false, reason: 'no matching changes' },
+      { name: 'dependedon', included: false, reason: 'no matching changes' },
+      { name: 'excluded', included: false, reason: 'been forced NOT to by PIPELINE_NO_RUN_EXCLUDED' },
+      { name: 'foo', included: false, reason: 'no matching changes' },
+      { name: 'bar', included: false, reason: 'no matching changes' },
+      { name: 'included', included: true, reason: 'been forced to by PIPELINE_RUN_INCLUDED' },
+      { name: 'match-all', included: false, reason: 'no matching changes' },
+      { name: 'match-all-env', included: false, reason: 'no matching changes' },
+      { name: 'match-all-false', included: false, reason: 'been always excluded by monorepo.matches === false' },
+      { name: 'match-all-mixed', included: false, reason: 'no matching changes' },
+      { name: 'match-all-true', included: true, reason: 'been always included by monorepo.matches === true' },
+      { name: 'qux', included: false, reason: 'no matching changes' },
+      { name: 'baz', included: false, reason: 'no matching changes' },
+      { name: 'some-long-name', included: false, reason: 'no matching changes' },
+      { name: 'unreferenced', included: false, reason: 'no matching changes' },
     ]);
   });
 

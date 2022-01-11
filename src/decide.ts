@@ -13,12 +13,23 @@ import Reason, { ExcludeReasonType, IncludeReasonType } from './reason';
  */
 function updateDecisionsForChanges(configs: Config[]): void {
   configs.forEach((config) => {
+    if (typeof config.monorepo.matches === 'boolean') {
+      config.decide(
+        config.monorepo.matches,
+        new Reason(config.monorepo.matches ? IncludeReasonType.ALWAYS_INCLUDED : ExcludeReasonType.NEVER_INCLUDED)
+      );
+
+      return; // read: continue the loop
+    }
+
     if (config.changes.length > 0) {
       let reasonType = IncludeReasonType.FILE_MATCH;
 
-      if (typeof config.monorepo.matches === 'boolean') {
-        reasonType = config.monorepo.matches ? IncludeReasonType.ALL_FILE_MATCH : IncludeReasonType.NO_FILE_MATCH;
-      } else if (config.monorepo.matches.indexOf('**') !== -1 || config.monorepo.matches.indexOf('**/*') !== -1) {
+      if (
+        config.changes.length >= config.allChanges.length ||
+        config.monorepo.matches.indexOf('**') !== -1 ||
+        config.monorepo.matches.indexOf('**/*') !== -1
+      ) {
         reasonType = IncludeReasonType.ALL_FILE_MATCH;
       }
 
