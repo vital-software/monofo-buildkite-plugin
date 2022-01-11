@@ -1,3 +1,10 @@
+## [3.6.4](https://github.com/vital-software/monofo/compare/v3.6.3...v3.6.4) (2022-01-11)
+
+
+### Bug Fixes
+
+* soft-fail errors in download as well as inflate ([298abe9](https://github.com/vital-software/monofo/commit/298abe95760032b7f9f9976c59089e71b957f485))
+
 ## [3.6.3](https://github.com/vital-software/monofo/compare/v3.6.2...v3.6.3) (2022-01-11)
 
 
