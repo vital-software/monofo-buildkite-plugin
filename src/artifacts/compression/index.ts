@@ -41,30 +41,19 @@ export async function inflator(
     return Promise.resolve(execa('true'));
   }
 
-  try {
-    switch (artifact.ext) {
-      case 'tar':
-        // eslint-disable-next-line @typescript-eslint/return-await
-        return Promise.resolve(execa('tar', ['-C', outputPath, '-xf', '-'], { input, stderr: 'inherit' }));
-      case compressors.gzip.extension:
-        return await compressors.gzip.inflate(input, outputPath);
-      case compressors.lz4.extension:
-        return await compressors.lz4.inflate(input, outputPath);
-      case compressors.desync.extension:
-        return await compressors.desync.inflate(input, outputPath);
-      default:
-        // eslint-disable-next-line @typescript-eslint/return-await
-        return Promise.resolve(execa('tee', [artifact.filename], { input, stderr: 'inherit' }));
-    }
-  } catch (error) {
-    log(`Failed to inflate ${artifact.name}`, error);
-
-    if (artifact.softFail) {
-      log(`Skipping failure for ${artifact.name} because soft fail is enabled`);
-      return Promise.resolve(execa('true'));
-    }
-
-    throw error;
+  switch (artifact.ext) {
+    case 'tar':
+      // eslint-disable-next-line @typescript-eslint/return-await
+      return Promise.resolve(execa('tar', ['-C', outputPath, '-xf', '-'], { input, stderr: 'inherit' }));
+    case compressors.gzip.extension:
+      return compressors.gzip.inflate(input, outputPath);
+    case compressors.lz4.extension:
+      return compressors.lz4.inflate(input, outputPath);
+    case compressors.desync.extension:
+      return compressors.desync.inflate(input, outputPath);
+    default:
+      // eslint-disable-next-line @typescript-eslint/return-await
+      return Promise.resolve(execa('tee', [artifact.filename], { input, stderr: 'inherit' }));
   }
 }
 
