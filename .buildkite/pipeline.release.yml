@@ -19,7 +19,7 @@ steps:
     plugins:
       - improbable-eng/metahook#v0.4.1:
           pre-command: git fetch --tags -f # To allow mutating build tags for now
-      - vital-software/monofo#v3.6.2:
+      - vital-software/monofo#v3.6.3:
           download:
             - node-modules.caidx
             - typescript.caidx
