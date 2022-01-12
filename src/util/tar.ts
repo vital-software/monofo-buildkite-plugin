@@ -1,8 +1,8 @@
 import path from 'path';
+import { compare } from 'compare-versions';
 import debug from 'debug';
 import execa from 'execa';
 import _ from 'lodash';
-import semver from 'semver/preload';
 import { exec, hasBin } from './exec';
 
 const log = debug('monofo:util:tar');
@@ -45,7 +45,7 @@ export async function tar(): Promise<{ bin: string; createArgs: string[] }> {
 
       const matches = output.match(/^tar \(GNU tar\) ([0-9.-]+)\n/);
 
-      if (matches && semver.gte(matches[1], '1.28')) {
+      if (matches && compare(matches[1], '1.28', '>=')) {
         createArgs = [...createArgs, '--sort=name']; // --sort was added in 1.28
       }
     }
