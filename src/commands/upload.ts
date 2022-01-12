@@ -104,7 +104,7 @@ locally cached
     log(`Uploading ${count(files, 'path')} as ${args.output}`, files);
 
     const tarBin = await tar();
-    const tarArgs = ['-c', '--null', '--files-from', '-'];
+    const tarArgs = ['-c', '--sort=name', '--hard-dereference', '--null', '--files-from', '-'];
     const allArgs: string[] = ['-o', 'pipefail', ';', tarBin, ...tarArgs, '|', ...(await deflateCmd(artifact))];
     const input = `${files.join('\x00')}\x00`;
 
