@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import { promisify } from 'util';
+import mkdirp from 'mkdirp';
 import tempy from 'tempy';
 import { upload } from '../../src/artifacts/api';
 import Upload from '../../src/commands/upload';
@@ -31,7 +32,7 @@ describe('cmd upload', () => {
 
       await writeFile(`${dir}/foo.txt`, 'bar');
       await writeFile(`${dir}/bar.txt`, 'baz');
-      await writeFile(`${dir}/file-list.null.txt`, 'foo.txt\x00bar.txt');
+      await writeFile(`${dir}/file-list.null.txt`, 'foo.txt\x00bar.txt\x00');
 
       const { stderr } = await testRun(Upload, [
         '--null',
@@ -40,6 +41,34 @@ describe('cmd upload', () => {
         'some-upload.tar.gz',
       ]);
 
+      expect(stderr).toContain('Successfully uploaded some-upload');
+    });
+  });
+
+  it('can upload a list of directories in the right order, null separated', async () => {
+    await tempy.directory.task(async (dir) => {
+      process.chdir(dir);
+
+      await mkdirp(`${dir}/foo/bar`);
+      await mkdirp(`${dir}/foo/baz`);
+      +(await writeFile(`${dir}/foo/bar/a.txt`, 'a'));
+      await writeFile(`${dir}/foo/bar/b.txt`, 'b');
+      await writeFile(`${dir}/foo/baz/a.txt`, 'a');
+      await writeFile(`${dir}/foo/baz/b.txt`, 'b');
+      await writeFile(`${dir}/foo/a.txt`, 'a');
+      await writeFile(`${dir}/foo/b.txt`, 'b');
+
+      // This file list is in the wrong order! https://github.com/folbricht/desync/issues/210
+      await writeFile(`${dir}/file-list.null.txt`, './foo/bar\x00./foo/\x00./foo/baz/\x00');
+
+      const { stderr } = await testRun(Upload, [
+        '--null',
+        '--files-from',
+        `${dir}/file-list.null.txt`,
+        'some-upload.tar.gz',
+      ]);
+
+      expect(stderr).toContain("Uploading 3 paths as some-upload.tar.gz [ './foo/', './foo/bar', './foo/baz/' ]");
       expect(stderr).toContain('Successfully uploaded some-upload');
     });
   });

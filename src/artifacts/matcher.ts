@@ -66,5 +66,5 @@ export async function filesToUpload({
   }
 
   await Promise.all(matching);
-  return matched.matched;
+  return matched.matched.sort();
 }
