@@ -13,10 +13,20 @@ export function hasBin(bin: string): Promise<boolean> {
     .catch(() => false);
 }
 
+export class EmptyArgsError extends Error {
+  constructor() {
+    super('Expected argv to contain at least one argument');
+  }
+}
+
 /**
  * Announces what it's about to execute, then runs it, returning the output
  */
-export async function exec(command: string, args: string[], options: execa.Options): Promise<execa.ExecaChildProcess> {
+export async function exec(
+  command: string,
+  args: string[],
+  options: execa.Options = {}
+): Promise<execa.ExecaChildProcess> {
   const opts: execa.Options = {
     shell: 'bash',
     stderr: 'inherit',

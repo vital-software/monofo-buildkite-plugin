@@ -1,6 +1,5 @@
 import fs from 'fs';
 import { promisify } from 'util';
-import execa from 'execa';
 import rimrafCb from 'rimraf';
 import tempy from 'tempy';
 import { Compression, compressors, inflator } from '../../src/artifacts/compression';
@@ -36,12 +35,11 @@ describe('compression', () => {
   });
 
   describe('round-trip', () => {
-    it.each([['gzip'], ['lz4'], ['desync']])('compression algorithm: %s', async (algo) => {
-      const compression: Compression = compressors[algo];
-      const compressed = `${dir}/test.${compression.extension}`;
+    it.each([['tar.gz'], ['tar.lz4'], ['caidx']])('compression algorithm: %s', async (extension) => {
+      const compression: Compression = compressors[extension];
+      const compressed = `${dir}/test.${extension}`;
 
-      const command: string[] = [getFixturePath('qux.tar'), '|', ...(await compression.deflateCmd(compressed))];
-      await execa('cat', command, { shell: 'bash' });
+      await compression.deflate(new Artifact(compressed), { file: getFixturePath('qux.tar') });
 
       expect(fs.existsSync(compressed)).toBe(true);
 

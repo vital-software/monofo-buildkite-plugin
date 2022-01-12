@@ -1,18 +1,19 @@
 import stream from 'stream';
-import { ExecaReturnValue } from 'execa';
+import execa from 'execa';
+import { Artifact } from '../model';
+
+export type TarInputArgs = { argv: string[]; input: string } | { file: string };
 
 export interface Compression {
-  extension: string;
+  /**
+   * inflate decompresses an input stream (usually an in-progress artifact download), writing decompressed files to disk
+   * at the given outputPath (usually the working dir)
+   */
+  inflate(input: stream.Readable, outputPath?: string): Promise<execa.ExecaReturnValue>;
 
   /**
-   * inflate just does the inflation, in place
+   * deflate either takes a tar, or creates on on the fly, and passes this to a compression algorithm, outputting the
+   * desired artifact
    */
-  inflate(input: stream.Readable, outputPath?: string): Promise<ExecaReturnValue>;
-
-  /**
-   * Returns a command (argv) that deflates from stdin to the given outputPath
-   *
-   * The return value is an argv that can be sent to a `sh -c`-style shell interpreter
-   */
-  deflateCmd(outputPath: string): Promise<string[]>;
+  deflate(output: Artifact, tarInputArgs: TarInputArgs): Promise<execa.ExecaChildProcess>;
 }

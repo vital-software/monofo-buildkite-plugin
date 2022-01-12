@@ -1,11 +1,10 @@
 import { flags as f } from '@oclif/command';
 import debug from 'debug';
 import { upload } from '../artifacts/api';
-import { deflateCmd } from '../artifacts/compression';
+import { deflator } from '../artifacts/compression';
 import { filesToUpload } from '../artifacts/matcher';
 import { Artifact } from '../artifacts/model';
 import { BaseCommand, BaseFlags } from '../command';
-import { exec } from '../util/exec';
 import { count } from '../util/helper';
 import { tar } from '../util/tar';
 
@@ -104,13 +103,22 @@ locally cached
     log(`Uploading ${count(files, 'path')} as ${args.output}`, files);
 
     const tarBin = await tar();
-    const tarArgs = ['-c', '--sort=name', '--hard-dereference', '--null', '--files-from', '-'];
-    const allArgs: string[] = ['-o', 'pipefail', ';', tarBin, ...tarArgs, '|', ...(await deflateCmd(artifact))];
-    const input = `${files.join('\x00')}\x00`;
+    const tarArgs = [
+      'set',
+      '-o',
+      'pipefail',
+      ';',
+      tarBin,
+      '-c',
+      '--sort=name',
+      '--hard-dereference',
+      '--null',
+      '--files-from',
+      '-',
+    ];
 
-    await exec('set', allArgs, {
-      input,
-    });
+    const input = `${files.join('\x00')}\x00`;
+    await deflator(artifact, { argv: tarArgs, input });
 
     log(`Archive deflated at ${args.output}`);
 

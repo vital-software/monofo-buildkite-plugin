@@ -51,7 +51,7 @@ describe('cmd upload', () => {
 
       await mkdirp(`${dir}/foo/bar`);
       await mkdirp(`${dir}/foo/baz`);
-      +(await writeFile(`${dir}/foo/bar/a.txt`, 'a'));
+      await writeFile(`${dir}/foo/bar/a.txt`, 'a');
       await writeFile(`${dir}/foo/bar/b.txt`, 'b');
       await writeFile(`${dir}/foo/baz/a.txt`, 'a');
       await writeFile(`${dir}/foo/baz/b.txt`, 'b');
