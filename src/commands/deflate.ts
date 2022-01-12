@@ -1,7 +1,6 @@
 import { promises as fs } from 'fs';
 import debug from 'debug';
-import execa from 'execa';
-import { deflateCmd } from '../artifacts/compression';
+import { deflator } from '../artifacts/compression';
 import { Artifact } from '../artifacts/model';
 import { BaseCommand } from '../command';
 
@@ -41,13 +40,8 @@ export default class Deflate extends BaseCommand {
     }
 
     const artifact = new Artifact(args.output);
-    const allArgs: string[] = ['-o', 'pipefail', ';', 'cat', args.tarFile, '|', ...(await deflateCmd(artifact))];
-    log(`Going to deflate ${args.tarFile}: set ${allArgs.join(' ')}`);
 
-    return (
-      await execa('set', allArgs, {
-        shell: 'bash',
-      })
-    ).stdout;
+    const result = await deflator(artifact, { file: args.tarFile });
+    return result.stdout;
   }
 }

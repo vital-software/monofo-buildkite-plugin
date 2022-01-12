@@ -9,7 +9,9 @@ import execa, { ExecaReturnValue } from 'execa';
 import rimrafCb from 'rimraf';
 import tempy from 'tempy';
 import { hasBin } from '../../util/exec';
-import { Compression } from './compression';
+import { Artifact } from '../model';
+import { Compression, TarInputArgs } from './compression';
+import { execFromTar } from './tar';
 
 const log = debug('monofo:artifact:compression:desync');
 
@@ -192,15 +194,14 @@ async function checkEnabled(): Promise<void> {
 }
 
 export const desync: Compression = {
-  extension: 'caidx',
-
   /**
    * Deflate a tar file, creating a content-addressed index file
    */
-  async deflateCmd(outputPath: string): Promise<string[]> {
+  async deflate(output: Artifact, tarInputArgs: TarInputArgs): Promise<execa.ExecaChildProcess> {
     await checkEnabled();
 
-    return [
+    return execFromTar(tarInputArgs, [
+      '|',
       'desync',
       'tar',
       '--config',
@@ -212,9 +213,9 @@ export const desync: Compression = {
       '--index',
       '--store',
       store(),
-      outputPath,
+      output.filename,
       '-',
-    ];
+    ]);
   },
 
   /**
