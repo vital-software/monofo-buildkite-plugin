@@ -1,3 +1,11 @@
+## [3.7.1](https://github.com/vital-software/monofo/compare/v3.7.0...v3.7.1) (2022-01-12)
+
+
+### Bug Fixes
+
+* don't use --sort flag unless GNU tar >= 1.28 ([757ddfa](https://github.com/vital-software/monofo/commit/757ddfab3656e109be5a34a38da4924833da0e90))
+* need to use a version comparison that supports two part versions ([b91f1a7](https://github.com/vital-software/monofo/commit/b91f1a72af5e9276029817e3aeb5b4641f275521))
+
 # [3.7.0](https://github.com/vital-software/monofo/compare/v3.6.6...v3.7.0) (2022-01-12)
 
 
