@@ -1,5 +1,7 @@
+import path from 'path';
 import debug from 'debug';
 import execa from 'execa';
+import _ from 'lodash';
 import { exec, hasBin } from './exec';
 
 const log = debug('monofo:util:tar');
@@ -42,4 +44,10 @@ export async function tar(): Promise<string> {
   }
 
   return cachedTar;
+}
+
+export function depthSort(paths: string[]): string[] {
+  return _.uniq(paths)
+    .sort()
+    .sort((p1, p2) => p1.split(path.sep).length - p2.split(path.sep).length);
 }
