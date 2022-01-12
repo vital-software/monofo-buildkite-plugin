@@ -1,6 +1,5 @@
 import { flags as f } from '@oclif/command';
 import debug from 'debug';
-import execa from 'execa';
 import { upload } from '../artifacts/api';
 import { deflateCmd } from '../artifacts/compression';
 import { filesToUpload } from '../artifacts/matcher';
@@ -102,22 +101,15 @@ locally cached
       return;
     }
 
-    if (flags.verbose) {
-      log('Files to upload', files);
-    }
-
-    log(`Uploading ${count(files, 'path')} as ${args.output}`);
+    log(`Uploading ${count(files, 'path')} as ${args.output}`, files);
 
     const tarBin = await tar();
     const tarArgs = ['-c', '--null', '--files-from', '-'];
-
     const allArgs: string[] = ['-o', 'pipefail', ';', tarBin, ...tarArgs, '|', ...(await deflateCmd(artifact))];
+    const input = `${files.join('\x00')}\x00`;
 
-    log(`Going to deflate, using set ${allArgs.join(' ')} < files-to-upload`);
-
-    await execa('set', allArgs, {
-      input: stream.Readable.from(files.join('\x00')),
-      shell: 'bash',
+    await exec('set', allArgs, {
+      input,
     });
 
     log(`Archive deflated at ${args.output}`);
