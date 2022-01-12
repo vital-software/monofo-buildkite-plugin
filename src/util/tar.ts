@@ -1,5 +1,8 @@
+import debug from 'debug';
 import execa from 'execa';
-import { hasBin } from './exec';
+import { exec, hasBin } from './exec';
+
+const log = debug('monofo:util:tar');
 
 async function tarBin(): Promise<string> {
   if (process.platform === 'darwin') {
@@ -33,6 +36,9 @@ export async function tar(): Promise<string> {
         }\n`
       );
     }
+
+    const version = await exec(cachedTar, ['--version']);
+    log(`Using ${cachedTar}: ${version.stdout}`);
   }
 
   return cachedTar;
