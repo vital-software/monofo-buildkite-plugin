@@ -1,3 +1,13 @@
+## [3.6.6](https://github.com/vital-software/monofo/compare/v3.6.5...v3.6.6) (2022-01-12)
+
+
+### Bug Fixes
+
+* add --hard-dereference and --sort flags to tar ([21e5793](https://github.com/vital-software/monofo/commit/21e579396b0289490fde40a66b8dbb009c6892db))
+* add an exec helper for better output ([1c2ab07](https://github.com/vital-software/monofo/commit/1c2ab07e2c47a62f0f26158c07d06939cdbc4cfb))
+* enable for process.env.DEBUG if it exists ([aee7492](https://github.com/vital-software/monofo/commit/aee7492502cdb06e69826d074bbf20259fe83e42))
+* sort file arguments to tar file-list ([bb90301](https://github.com/vital-software/monofo/commit/bb903014f3745a0b3e0c8ca7c3b1d4ba8f999033))
+
 ## [3.6.5](https://github.com/vital-software/monofo/compare/v3.6.4...v3.6.5) (2022-01-11)
 
 
