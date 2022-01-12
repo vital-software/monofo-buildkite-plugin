@@ -61,7 +61,7 @@ export const tar: Compression = {
 
     log(`Inflating .tar archive: tar -C ${outputPath} -x -f -`);
 
-    const result = await exec(await tarBin(), ['-C', outputPath, '-x', '-f', '-'], {
+    const result = await exec((await tarBin()).bin, ['-C', outputPath, '-x', '-f', '-'], {
       input,
     });
 

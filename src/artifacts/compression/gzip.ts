@@ -30,9 +30,11 @@ export const gzip: Compression = {
   async inflate(input: stream.Readable, outputPath = '.'): Promise<ExecaReturnValue> {
     await checkEnabled();
 
-    log(`Inflating .tar.gz archive: ${await tar()} -C ${outputPath} -xzf -`);
+    const tarBin = await tar();
 
-    const result = await execa(await tar(), ['-C', outputPath, '-xzf', '-'], {
+    log(`Inflating .tar.gz archive: ${tarBin.bin} -C ${outputPath} -xzf -`);
+
+    const result = await execa(tarBin.bin, ['-C', outputPath, '-xzf', '-'], {
       input,
     });
 
