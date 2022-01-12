@@ -2,6 +2,7 @@ import path from 'path';
 import debug from 'debug';
 import execa from 'execa';
 import _ from 'lodash';
+import semver from 'semver/preload';
 import { exec, hasBin } from './exec';
 
 const log = debug('monofo:util:tar');
@@ -25,25 +26,37 @@ async function isGnuTar(bin: string): Promise<boolean> {
   return stdout.slice(stdout.indexOf('\n') + 1).startsWith('GNU');
 }
 
-let cachedTar: string | undefined;
+let cachedTarResult: { bin: string; createArgs: string[] } | undefined;
 
-export async function tar(): Promise<string> {
-  if (!cachedTar) {
-    cachedTar = await tarBin();
+export async function tar(): Promise<{ bin: string; createArgs: string[] }> {
+  if (!cachedTarResult) {
+    const bin = await tarBin();
+    let createArgs: string[] = [];
 
-    if (!(await isGnuTar(cachedTar))) {
+    if (!(await isGnuTar(bin))) {
       process.stderr.write(
         `WARNING: tar on PATH does not seem to be GNU tar: it may fail to extract artifacts correctly${
           process.platform === 'darwin' ? ' (named gtar, try "brew install gtar")' : ''
         }\n`
       );
+    } else {
+      const output = (await exec(bin, ['--version'])).stdout;
+      log(`Using ${bin}: ${output}`);
+
+      const matches = output.match(/^tar \(GNU tar\) ([0-9.-]+)\n/);
+
+      if (matches && semver.gte(matches[1], '1.28')) {
+        createArgs = [...createArgs, '--sort=name']; // --sort was added in 1.28
+      }
     }
 
-    const version = await exec(cachedTar, ['--version']);
-    log(`Using ${cachedTar}: ${version.stdout}`);
+    cachedTarResult = {
+      bin,
+      createArgs,
+    };
   }
 
-  return cachedTar;
+  return cachedTarResult;
 }
 
 export function depthSort(paths: string[]): string[] {
