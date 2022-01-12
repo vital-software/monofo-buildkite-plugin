@@ -5,6 +5,7 @@ import debug from 'debug';
 import _ from 'lodash';
 import split from 'split2';
 import { globSet } from '../util/glob';
+import { depthSort } from '../util/tar';
 
 const pipeline = promisify(pipelineSync);
 
@@ -66,5 +67,5 @@ export async function filesToUpload({
   }
 
   await Promise.all(matching);
-  return matched.matched.sort();
+  return depthSort(matched.matched);
 }
