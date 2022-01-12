@@ -1,4 +1,7 @@
 import { Command, flags as f } from '@oclif/command';
+import debug from 'debug';
+
+const log = debug('monofo:cmd');
 
 export interface BaseFlags {
   chdir?: string;
@@ -24,6 +27,10 @@ export abstract class BaseCommand extends Command {
 
   protected override init(): Promise<void> {
     const { flags } = this.parse(BaseCommand);
+
+    if (flags?.verbose) {
+      debug.enable('monofo:*');
+    }
 
     if (flags?.chdir) {
       this.log(`Changing dir to ${flags.chdir}`);
