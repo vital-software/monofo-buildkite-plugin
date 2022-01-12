@@ -1,8 +1,6 @@
 import { Command, flags as f } from '@oclif/command';
 import debug from 'debug';
 
-const log = debug('monofo:cmd');
-
 export interface BaseFlags {
   chdir?: string;
   verbose: boolean;
@@ -29,7 +27,7 @@ export abstract class BaseCommand extends Command {
     const { flags } = this.parse(BaseCommand);
 
     if (flags?.verbose) {
-      debug.enable('monofo:*');
+      debug.enable(process.env?.DEBUG || 'monofo:*');
     }
 
     if (flags?.chdir) {
