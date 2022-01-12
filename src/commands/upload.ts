@@ -1,4 +1,3 @@
-import stream from 'stream';
 import { flags as f } from '@oclif/command';
 import debug from 'debug';
 import execa from 'execa';
@@ -7,6 +6,7 @@ import { deflateCmd } from '../artifacts/compression';
 import { filesToUpload } from '../artifacts/matcher';
 import { Artifact } from '../artifacts/model';
 import { BaseCommand, BaseFlags } from '../command';
+import { exec } from '../util/exec';
 import { count } from '../util/helper';
 import { tar } from '../util/tar';
 
