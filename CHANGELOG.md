@@ -1,3 +1,11 @@
+# [3.7.0](https://github.com/vital-software/monofo/compare/v3.6.6...v3.7.0) (2022-01-12)
+
+
+### Features
+
+* depth sort rather than alphabetical ([8563ca5](https://github.com/vital-software/monofo/commit/8563ca5b1b6fd743a276f8559912fe8cbcd1862b))
+* show tar version in use ([45cd9af](https://github.com/vital-software/monofo/commit/45cd9af32faf2123962e89b3fa4ce1f3656125b8))
+
 ## [3.6.6](https://github.com/vital-software/monofo/compare/v3.6.5...v3.6.6) (2022-01-12)
 
 
