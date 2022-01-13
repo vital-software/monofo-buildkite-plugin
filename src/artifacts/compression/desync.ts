@@ -1,6 +1,5 @@
 import { promises as fs } from 'fs';
 import path from 'path';
-import stream from 'stream';
 import { promisify } from 'util';
 import { fromEnv, fromInstanceMetadata } from '@aws-sdk/credential-providers';
 import { Credentials } from '@aws-sdk/types';
@@ -8,9 +7,8 @@ import debug from 'debug';
 import execa, { ExecaReturnValue } from 'execa';
 import rimrafCb from 'rimraf';
 import tempy from 'tempy';
-import { hasBin } from '../../util/exec';
-import { Artifact } from '../model';
-import { Compression, TarInputArgs } from './compression';
+import { exec, hasBin } from '../../util/exec';
+import { Compression } from './compression';
 import { execFromTar } from './tar';
 
 const log = debug('monofo:artifact:compression:desync');
@@ -197,7 +195,7 @@ export const desync: Compression = {
   /**
    * Deflate a tar file, creating a content-addressed index file
    */
-  async deflate(output: Artifact, tarInputArgs: TarInputArgs): Promise<execa.ExecaChildProcess> {
+  async deflate({ output, tarInputArgs }): Promise<execa.ExecaChildProcess> {
     await checkEnabled();
 
     return execFromTar(tarInputArgs, [
@@ -227,7 +225,7 @@ export const desync: Compression = {
    *
    * @return ExecaChildProcess The result of running desync untar
    */
-  async inflate(input: stream.Readable, outputPath = '.'): Promise<ExecaReturnValue> {
+  async inflate({ input, outputPath = '.', verbose = false }): Promise<ExecaReturnValue> {
     await checkEnabled();
 
     const allArgs = [
@@ -246,9 +244,14 @@ export const desync: Compression = {
 
     log(`Inflating .caidx archive: desync ${allArgs.join(' ')}`);
 
-    const result = await execa('desync', allArgs, {
-      input,
-    });
+    const result = await exec(
+      'desync',
+      allArgs,
+      {
+        input,
+      },
+      verbose
+    );
 
     log('Finished inflating desync .caidx');
 

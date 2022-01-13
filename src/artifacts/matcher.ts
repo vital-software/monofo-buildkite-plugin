@@ -64,6 +64,7 @@ export async function filesToUpload({
       filesFrom === '-' ? process.stdin : fs.createReadStream(filesFrom, { encoding: 'utf8', autoClose: true });
 
     matching.push(pipeline(source, split(useNull ? '\x00' : '\n'), matched));
+    // TODO: pipeline is sync here anyway, so this can be simplified
   }
 
   await Promise.all(matching);

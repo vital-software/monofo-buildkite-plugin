@@ -9,11 +9,11 @@ export interface Compression {
    * inflate decompresses an input stream (usually an in-progress artifact download), writing decompressed files to disk
    * at the given outputPath (usually the working dir)
    */
-  inflate(input: stream.Readable, outputPath?: string): Promise<execa.ExecaReturnValue>;
+  inflate(options: { input: stream.Readable; outputPath?: string; verbose?: boolean }): Promise<execa.ExecaReturnValue>;
 
   /**
-   * deflate either takes a tar, or creates on on the fly, and passes this to a compression algorithm, outputting the
+   * deflate either takes a tar, or creates one on the fly, and passes this to a compression algorithm, outputting the
    * desired artifact
    */
-  deflate(output: Artifact, tarInputArgs: TarInputArgs): Promise<execa.ExecaChildProcess>;
+  deflate(options: { output: Artifact; tarInputArgs: TarInputArgs }): Promise<execa.ExecaChildProcess>;
 }

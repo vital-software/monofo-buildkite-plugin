@@ -50,13 +50,13 @@ export function execFromTar(
 }
 
 export const tar: Compression = {
-  async deflate(artifact, tarInputArgs): Promise<execa.ExecaChildProcess> {
+  async deflate({ output, tarInputArgs }): Promise<execa.ExecaChildProcess> {
     await checkEnabled();
 
-    return execFromTar(tarInputArgs, ['>', artifact.filename]);
+    return execFromTar(tarInputArgs, ['>', output.filename]);
   },
 
-  async inflate(input: stream.Readable, outputPath = '.'): Promise<ExecaReturnValue> {
+  async inflate({ input, outputPath = '.' }): Promise<ExecaReturnValue> {
     await checkEnabled();
 
     log(`Inflating .tar archive: tar -C ${outputPath} -x -f -`);
