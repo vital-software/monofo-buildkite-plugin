@@ -100,6 +100,13 @@ locally cached
       return;
     }
 
+    /*
+     * The files will be passed to tar in the order shown, and then tar will
+     * recurse into each entry if it's a directory (because --recursive is the
+     * default) - it should use the --sort argument (if your tar is new enough)
+     * to sort the eventual input file list, but they'll still be ordered according
+     * to the order of this files argument
+     */
     log(`Uploading ${count(files, 'path')} as ${args.output}`, files);
 
     const tarBin = await tar();

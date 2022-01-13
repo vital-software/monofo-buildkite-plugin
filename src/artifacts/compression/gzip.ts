@@ -1,10 +1,8 @@
-import stream from 'stream';
 import debug from 'debug';
 import execa, { ExecaReturnValue } from 'execa';
 import { hasBin } from '../../util/exec';
 import { tar } from '../../util/tar';
-import { Artifact } from '../model';
-import { Compression, TarInputArgs } from './compression';
+import { Compression } from './compression';
 import { execFromTar } from './tar';
 
 const log = debug('monofo:artifact:compression:gzip');
@@ -22,12 +20,12 @@ async function checkEnabled() {
 }
 
 export const gzip: Compression = {
-  async deflate(output: Artifact, tarInputArgs: TarInputArgs): Promise<execa.ExecaChildProcess> {
+  async deflate({ output, tarInputArgs }): Promise<execa.ExecaChildProcess> {
     await checkEnabled();
     return execFromTar(tarInputArgs, ['|', 'gzip', '>', output.filename]);
   },
 
-  async inflate(input: stream.Readable, outputPath = '.'): Promise<ExecaReturnValue> {
+  async inflate({ input, outputPath = '.' }): Promise<ExecaReturnValue> {
     await checkEnabled();
 
     const tarBin = await tar();

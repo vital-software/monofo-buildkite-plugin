@@ -25,11 +25,12 @@ export class EmptyArgsError extends Error {
 export async function exec(
   command: string,
   args: string[],
-  options: execa.Options = {}
+  options: execa.Options = {},
+  verbose = false
 ): Promise<execa.ExecaChildProcess> {
   const opts: execa.Options = {
     shell: 'bash',
-    stderr: 'inherit',
+    stderr: verbose ? 'inherit' : undefined,
 
     ...options,
   };

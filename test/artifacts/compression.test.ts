@@ -39,11 +39,14 @@ describe('compression', () => {
       const compression: Compression = compressors[extension];
       const compressed = `${dir}/test.${extension}`;
 
-      await compression.deflate(new Artifact(compressed), { file: getFixturePath('qux.tar') });
+      await compression.deflate({
+        output: new Artifact(compressed),
+        tarInputArgs: { file: getFixturePath('qux.tar') },
+      });
 
       expect(fs.existsSync(compressed)).toBe(true);
 
-      await compression.inflate(fs.createReadStream(compressed), dir);
+      await compression.inflate({ input: fs.createReadStream(compressed), outputPath: dir });
 
       expect(fs.existsSync(`${dir}/qux/quux`)).toBe(true);
     });
