@@ -1,4 +1,4 @@
-import { promises as fs } from 'fs';
+import { promises as fs, createReadStream } from 'fs';
 import debug from 'debug';
 import { deflator } from '../artifacts/compression';
 import { Artifact } from '../artifacts/model';
@@ -25,7 +25,7 @@ export default class Deflate extends BaseCommand {
     },
   ];
 
-  async run(): Promise<string> {
+  async run(): Promise<void> {
     const { args } = this.parse<unknown, DeflateArguments>(Deflate);
 
     try {
@@ -39,9 +39,6 @@ export default class Deflate extends BaseCommand {
       throw err;
     }
 
-    const artifact = new Artifact(args.output);
-
-    const result = await deflator(artifact, { file: args.tarFile });
-    return result.stdout;
+    await deflator(new Artifact(args.output), createReadStream(args.tarFile));
   }
 }

@@ -1,5 +1,8 @@
+import stream from 'stream';
+import { promisify } from 'util';
 import { flags as f } from '@oclif/command';
 import debug from 'debug';
+import execa from 'execa';
 import { upload } from '../artifacts/api';
 import { deflator } from '../artifacts/compression';
 import { filesToUpload } from '../artifacts/matcher';
@@ -7,6 +10,8 @@ import { Artifact } from '../artifacts/model';
 import { BaseCommand, BaseFlags } from '../command';
 import { count } from '../util/helper';
 import { tar } from '../util/tar';
+
+const pipeline = promisify(stream.pipeline);
 
 const log = debug('monofo:cmd:upload');
 
@@ -110,22 +115,21 @@ locally cached
     log(`Uploading ${count(files, 'path')} as ${args.output}`, files);
 
     const tarBin = await tar();
-    const tarArgs = [
-      'set',
-      '-o',
-      'pipefail',
-      ';',
-      tarBin.bin,
-      '-c',
-      ...tarBin.createArgs,
-      '--hard-dereference',
-      '--null',
-      '--files-from',
-      '-',
-    ];
+    const tarArgs = ['-c', ...tarBin.createArgs, '--hard-dereference', '--null', '--files-from', '-'];
 
-    const input = `${files.join('\x00')}\x00`;
-    await deflator(artifact, { argv: tarArgs, input });
+    log(`About to run: ${tarBin.bin} ${tarArgs.join(' ')} <<< '${files.join(',')}'`);
+
+    const subprocess = execa(tarBin.bin, tarArgs, {
+      stdout: 'pipe',
+      buffer: false,
+      input: `${files.join('\x00')}\x00`,
+    });
+
+    if (!subprocess.stdout || !subprocess.stdin) {
+      throw new Error('Expected to be piped stdout/stdin from tar process');
+    }
+
+    await deflator(artifact, subprocess.stdout);
 
     log(`Archive deflated at ${args.output}`);
 

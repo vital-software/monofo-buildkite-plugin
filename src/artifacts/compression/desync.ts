@@ -9,7 +9,6 @@ import rimrafCb from 'rimraf';
 import tempy from 'tempy';
 import { exec, hasBin } from '../../util/exec';
 import { Compression } from './compression';
-import { execFromTar } from './tar';
 
 const log = debug('monofo:artifact:compression:desync');
 
@@ -195,25 +194,29 @@ export const desync: Compression = {
   /**
    * Deflate a tar file, creating a content-addressed index file
    */
-  async deflate({ output, tarInputArgs }): Promise<execa.ExecaChildProcess> {
+  async deflate({ output, tarStream }): Promise<execa.ExecaChildProcess> {
     await checkEnabled();
 
-    return execFromTar(tarInputArgs, [
-      '|',
+    return exec(
       'desync',
-      'tar',
-      '--config',
-      configPath,
-      '--verbose',
-      '--tar-add-root',
-      '--input-format',
-      'tar',
-      '--index',
-      '--store',
-      store(),
-      output.filename,
-      '-',
-    ]);
+      [
+        'tar',
+        '--config',
+        configPath,
+        '--verbose',
+        '--tar-add-root',
+        '--input-format',
+        'tar',
+        '--index',
+        '--store',
+        store(),
+        output.filename,
+        '-',
+      ],
+      {
+        input: tarStream,
+      }
+    );
   },
 
   /**

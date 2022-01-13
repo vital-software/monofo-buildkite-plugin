@@ -26,8 +26,7 @@ describe('compression', () => {
     it('can download and inflate .tar.lz4 files correctly', async () => {
       const artifact = new Artifact('foo.tar.lz4');
 
-      const res = await inflator(fs.createReadStream(getFixturePath('foo.tar.lz4')), artifact);
-      expect(res.exitCode).toBe(0);
+      await inflator(fs.createReadStream(getFixturePath('foo.tar.lz4')), artifact);
 
       expect(fs.existsSync(`${dir}`)).toBe(true);
       expect(fs.existsSync(`${dir}/foo/bar`)).toBe(true);
@@ -41,7 +40,7 @@ describe('compression', () => {
 
       await compression.deflate({
         output: new Artifact(compressed),
-        tarInputArgs: { file: getFixturePath('qux.tar') },
+        tarStream: fs.createReadStream(getFixturePath('qux.tar')),
       });
 
       expect(fs.existsSync(compressed)).toBe(true);

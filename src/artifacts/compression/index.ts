@@ -3,7 +3,7 @@ import debug from 'debug';
 import execa from 'execa';
 import { exec } from '../../util/exec';
 import { Artifact } from '../model';
-import { Compression, TarInputArgs } from './compression';
+import { Compression } from './compression';
 import { desync } from './desync';
 import { gzip } from './gzip';
 import { lz4 } from './lz4';
@@ -20,21 +20,17 @@ export const compressors: Record<string, Compression> = {
   tar,
 };
 
-export function deflator(output: Artifact, tarInputArgs: TarInputArgs): Promise<execa.ExecaChildProcess> {
+export function deflator(output: Artifact, tarStream: stream.Readable): Promise<unknown> {
   const compressor = compressors?.[output.ext];
 
   if (!compressor) {
     throw new Error(`Unsupported output artifact format: ${output.ext}`);
   }
 
-  return compressor.deflate({ output, tarInputArgs });
+  return compressor.deflate({ output, tarStream });
 }
 
-export async function inflator(
-  input: stream.Readable,
-  artifact: Artifact,
-  outputPath = '.'
-): Promise<execa.ExecaChildProcess> {
+export async function inflator(input: stream.Readable, artifact: Artifact, outputPath = '.'): Promise<unknown> {
   if (artifact.skip) {
     log(`Skipping download and inflate for ${artifact.name} because skip is enabled`);
     return Promise.resolve(execa('true'));

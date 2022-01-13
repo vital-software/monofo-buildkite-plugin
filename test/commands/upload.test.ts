@@ -1,12 +1,9 @@
-import * as fs from 'fs';
-import { promisify } from 'util';
+import { promises as fs } from 'fs';
 import mkdirp from 'mkdirp';
 import tempy from 'tempy';
 import { upload } from '../../src/artifacts/api';
 import Upload from '../../src/commands/upload';
 import { fakeProcess, testRun } from '../fixtures';
-
-const writeFile = promisify(fs.writeFile);
 
 jest.mock('../../src/artifacts/api');
 
@@ -30,9 +27,31 @@ describe('cmd upload', () => {
     await tempy.directory.task(async (dir) => {
       process.chdir(dir);
 
-      await writeFile(`${dir}/foo.txt`, 'bar');
-      await writeFile(`${dir}/bar.txt`, 'baz');
-      await writeFile(`${dir}/file-list.null.txt`, 'foo.txt\x00bar.txt\x00');
+      await fs.writeFile(`${dir}/foo.txt`, 'bar');
+      await fs.writeFile(`${dir}/bar.txt`, 'baz');
+      await fs.writeFile(`${dir}/file-list.null.txt`, 'foo.txt\x00bar.txt\x00');
+
+      const { stderr } = await testRun(Upload, [
+        '--null',
+        '--files-from',
+        `${dir}/file-list.null.txt`,
+        'some-upload.tar.gz',
+      ]);
+
+      expect(stderr).toContain('Successfully uploaded some-upload');
+    });
+  });
+
+  it('can expect to be given a list of disparate directories, null separated, must produce catar-like tree', async () => {
+    await tempy.directory.task(async (dir) => {
+      process.chdir(dir);
+
+      await mkdirp(`${dir}/a/b/c/d`);
+      await mkdirp(`${dir}/e/f/g/h`);
+
+      await fs.writeFile(`${dir}/a/b/c/d/foo.txt`, 'bar');
+      await fs.writeFile(`${dir}/e/f/g/h/bar.txt`, 'baz');
+      await fs.writeFile(`${dir}/file-list.null.txt`, './a/b/c/d\x00./e/f/g/h\x00');
 
       const { stderr } = await testRun(Upload, [
         '--null',
@@ -51,15 +70,15 @@ describe('cmd upload', () => {
 
       await mkdirp(`${dir}/foo/bar`);
       await mkdirp(`${dir}/foo/baz`);
-      await writeFile(`${dir}/foo/bar/a.txt`, 'a');
-      await writeFile(`${dir}/foo/bar/b.txt`, 'b');
-      await writeFile(`${dir}/foo/baz/a.txt`, 'a');
-      await writeFile(`${dir}/foo/baz/b.txt`, 'b');
-      await writeFile(`${dir}/foo/a.txt`, 'a');
-      await writeFile(`${dir}/foo/b.txt`, 'b');
+      await fs.writeFile(`${dir}/foo/bar/a.txt`, 'a');
+      await fs.writeFile(`${dir}/foo/bar/b.txt`, 'b');
+      await fs.writeFile(`${dir}/foo/baz/a.txt`, 'a');
+      await fs.writeFile(`${dir}/foo/baz/b.txt`, 'b');
+      await fs.writeFile(`${dir}/foo/a.txt`, 'a');
+      await fs.writeFile(`${dir}/foo/b.txt`, 'b');
 
       // This file list is in the wrong order! https://github.com/folbricht/desync/issues/210
-      await writeFile(`${dir}/file-list.null.txt`, './foo/bar\x00./foo/\x00./foo/baz/\x00');
+      await fs.writeFile(`${dir}/file-list.null.txt`, './foo/bar\x00./foo/\x00./foo/baz/\x00');
 
       const { stderr } = await testRun(Upload, [
         '--null',
@@ -77,8 +96,8 @@ describe('cmd upload', () => {
     await tempy.directory.task(async (dir: string) => {
       process.chdir(dir);
 
-      await writeFile(`${dir}/foo.txt`, 'bar');
-      await writeFile(`${dir}/bar.txt`, 'baz');
+      await fs.writeFile(`${dir}/foo.txt`, 'bar');
+      await fs.writeFile(`${dir}/bar.txt`, 'baz');
 
       const { stderr } = await testRun(Upload, ['some-upload.tar.gz', '*.txt']);
 
