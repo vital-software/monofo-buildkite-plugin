@@ -31,7 +31,7 @@ export const lz4: Compression = {
     await checkEnabled();
     log(`Inflating .tar.lz4 archive: tar -C ${outputPath} -x --use-compress-program=lz4 -f -`);
 
-    const result = await execa((await tar()).bin, ['-C', outputPath, '-x', '--use-compress-program=lz4', '-f', '-'], {
+    const result = await exec((await tar()).bin, ['-C', outputPath, '-x', '--use-compress-program=lz4', '-f', '-'], {
       input,
     });
 

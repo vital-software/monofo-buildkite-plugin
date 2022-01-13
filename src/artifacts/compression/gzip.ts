@@ -34,7 +34,7 @@ export const gzip: Compression = {
 
     log(`Inflating .tar.gz archive: ${tarBin.bin} -C ${outputPath} -xzf -`);
 
-    const result = await execa(tarBin.bin, ['-C', outputPath, '-xzf', '-'], {
+    const result = await exec(tarBin.bin, ['-C', outputPath, '-xzf', '-'], {
       input,
     });
 

@@ -1,17 +1,13 @@
-import stream from 'stream';
-import { promisify } from 'util';
 import { flags as f } from '@oclif/command';
 import debug from 'debug';
-import execa from 'execa';
 import { upload } from '../artifacts/api';
 import { deflator } from '../artifacts/compression';
 import { filesToUpload } from '../artifacts/matcher';
 import { Artifact } from '../artifacts/model';
 import { BaseCommand, BaseFlags } from '../command';
+import { exec } from '../util/exec';
 import { count } from '../util/helper';
 import { tar } from '../util/tar';
-
-const pipeline = promisify(stream.pipeline);
 
 const log = debug('monofo:cmd:upload');
 
@@ -119,7 +115,7 @@ locally cached
 
     log(`About to run: ${tarBin.bin} ${tarArgs.join(' ')} <<< '${files.join(',')}'`);
 
-    const subprocess = execa(tarBin.bin, tarArgs, {
+    const subprocess = exec(tarBin.bin, tarArgs, {
       stdout: 'pipe',
       buffer: false,
       input: `${files.join('\x00')}\x00`,
