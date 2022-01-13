@@ -27,7 +27,7 @@ export function deflator(output: Artifact, tarInputArgs: TarInputArgs): Promise<
     throw new Error(`Unsupported output artifact format: ${output.ext}`);
   }
 
-  return compressor.deflate(output, tarInputArgs);
+  return compressor.deflate({ output, tarInputArgs });
 }
 
 export async function inflator(
@@ -47,5 +47,5 @@ export async function inflator(
     return exec('cat', ['>', artifact.filename], { input });
   }
 
-  return compressor.inflate(input, outputPath);
+  return compressor.inflate({ input, outputPath });
 }

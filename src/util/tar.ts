@@ -48,6 +48,8 @@ export async function tar(): Promise<{ bin: string; createArgs: string[] }> {
       if (matches && compare(matches[1], '1.28', '>=')) {
         createArgs = [...createArgs, '--sort=name']; // --sort was added in 1.28
       }
+
+      createArgs = ['--verbose', ...createArgs];
     }
 
     cachedTarResult = {

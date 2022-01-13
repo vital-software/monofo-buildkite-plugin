@@ -28,9 +28,9 @@ describe('artifact matcher', () => {
     await directory.task(async (dir) => {
       process.chdir(dir);
 
-      await writeFile(`${dir}/foo.txt`, 'bar');
-      await writeFile(`${dir}/bar.txt`, 'baz');
-      await writeFile(`${dir}/file-list.null.txt`, 'foo.txt\x00bar.txt');
+      await writeFile(`${dir}/foo.txt`, `bar\n`);
+      await writeFile(`${dir}/bar.txt`, `baz\n`);
+      await writeFile(`${dir}/file-list.null.txt`, 'foo.txt\x00bar.txt\x00');
 
       const result = filesToUpload({
         filesFrom: `${dir}/file-list.null.txt`,
@@ -43,12 +43,31 @@ describe('artifact matcher', () => {
     });
   });
 
+  it('can match a list of files, newline separated', async () => {
+    await directory.task(async (dir) => {
+      process.chdir(dir);
+
+      await writeFile(`${dir}/foo.txt`, 'bar\n');
+      await writeFile(`${dir}/bar.txt`, 'baz\n');
+      await writeFile(`${dir}/file-list.newline.txt`, 'foo.txt\nbar.txt\n');
+
+      const result = filesToUpload({
+        filesFrom: `${dir}/file-list.newline.txt`,
+        useNull: false,
+      });
+
+      await expect(result).resolves.toHaveLength(2);
+      expect(await result).toContain('foo.txt');
+      expect(await result).toContain('bar.txt');
+    });
+  });
+
   it('can match a set of globs', async () => {
     await directory.task(async (dir) => {
       process.chdir(dir);
 
-      await writeFile(`${dir}/foo.txt`, 'bar');
-      await writeFile(`${dir}/bar.txt`, 'baz');
+      await writeFile(`${dir}/foo.txt`, 'bar\n');
+      await writeFile(`${dir}/bar.txt`, 'baz\n');
 
       const result = filesToUpload({
         globs: ['*.txt'],
