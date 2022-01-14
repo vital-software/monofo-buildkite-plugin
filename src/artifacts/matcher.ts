@@ -3,7 +3,7 @@ import path from 'path';
 import debug from 'debug';
 import _ from 'lodash';
 import { globSet } from '../util/glob';
-import { count } from '../util/helper';
+import { count, depthSort } from '../util/helper';
 
 const exists = async (file: string) => {
   try {
@@ -22,6 +22,35 @@ export interface PathsToPack {
 
 function isRoot(p: string): boolean {
   return p === '' || p === '/' || p === '.';
+}
+
+export function flattenPaths(toPack: PathsToPack): string[] {
+  return depthSort(
+    Object.entries(toPack).map(([p, { recurse }]) => {
+      if (recurse) {
+        throw new Error('Expected recursive paths to be resolved before flattening');
+      }
+
+      return p;
+    })
+  );
+}
+
+export async function resolveRecursive(toPack: PathsToPack): Promise<PathsToPack> {
+  const repacked: PathsToPack = {};
+  const toGlob = [];
+
+  for (const [p, { recurse }] of Object.entries(toPack)) {
+    if (recurse) {
+      toGlob.push(`${p}/**`);
+    } else {
+      repacked[p] = { recurse: false };
+    }
+  }
+
+  const globResults = await globSet(toGlob, { matchBase: false });
+
+  return { ...repacked, ...Object.fromEntries(globResults.map((r) => [r, { recurse: false }])) };
 }
 
 export function addIntermediateDirectories(toPack: PathsToPack): PathsToPack {
@@ -61,7 +90,7 @@ export function addIntermediateDirectories(toPack: PathsToPack): PathsToPack {
  * To fix this, and make the eventual tar compatible with catar, we do the
  * recursion into files ourselves.
  */
-export async function pathsToUpload({
+export async function pathsToPack({
   filesFrom,
   globs,
   useNull = false,
@@ -69,7 +98,7 @@ export async function pathsToUpload({
   filesFrom?: string;
   globs?: string[];
   useNull?: boolean;
-}): Promise<Record<string, { recurse: boolean }>> {
+}): Promise<PathsToPack> {
   if (!filesFrom && !globs) {
     return {};
   }

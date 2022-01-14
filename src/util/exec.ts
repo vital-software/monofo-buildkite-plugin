@@ -1,3 +1,4 @@
+import stream from 'stream';
 import chalk from 'chalk';
 import commandExists from 'command-exists';
 import debug from 'debug';
@@ -13,10 +14,12 @@ export function hasBin(bin: string): Promise<boolean> {
     .catch(() => false);
 }
 
-export class EmptyArgsError extends Error {
-  constructor() {
-    super('Expected argv to contain at least one argument');
+export function getReadableFromProcessStdout(process: execa.ExecaChildProcess): stream.Readable {
+  if (!process.stdout) {
+    throw new Error();
   }
+
+  return process.stdout;
 }
 
 /**

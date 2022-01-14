@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import { promisify } from 'util';
 import { directory } from 'tempy';
-import { addIntermediateDirectories, PathsToPack, pathsToUpload } from '../../src/artifacts/matcher';
+import { addIntermediateDirectories, PathsToPack, pathsToPack } from '../../src/artifacts/matcher';
 import { mergeBase, diff, revList } from '../../src/git';
 import { fakeProcess, COMMIT } from '../fixtures';
 
@@ -32,7 +32,7 @@ describe('artifact matcher', () => {
       await writeFile(`${dir}/bar.txt`, `baz\n`);
       await writeFile(`${dir}/file-list.null.txt`, './foo.txt\x00./bar.txt\x00');
 
-      const result = await pathsToUpload({
+      const result = await pathsToPack({
         filesFrom: `${dir}/file-list.null.txt`,
         useNull: true,
       });
@@ -51,7 +51,7 @@ describe('artifact matcher', () => {
       await writeFile(`${dir}/bar.txt`, 'baz\n');
       await writeFile(`${dir}/file-list.newline.txt`, './foo.txt\n./bar.txt\n');
 
-      const result = await pathsToUpload({
+      const result = await pathsToPack({
         filesFrom: `${dir}/file-list.newline.txt`,
         useNull: false,
       });
@@ -69,7 +69,7 @@ describe('artifact matcher', () => {
       await writeFile(`${dir}/foo.txt`, 'bar\n');
       await writeFile(`${dir}/bar.txt`, 'baz\n');
 
-      const result = await pathsToUpload({
+      const result = await pathsToPack({
         globs: ['*.txt'],
       });
 

@@ -1,22 +1,28 @@
 import path from 'path';
+import stream from 'stream';
 import { compare } from 'compare-versions';
 import debug from 'debug';
 import execa from 'execa';
 import _ from 'lodash';
 import { pack } from 'tar-fs';
-import { PathsToPack } from '../artifacts/matcher';
-import { exec, hasBin } from './exec';
+import { flattenPaths, PathsToPack, resolveRecursive } from '../artifacts/matcher';
+import { exec, getReadableFromProcessStdout, hasBin } from './exec';
+import { count, charCount } from './helper';
 
 const log = debug('monofo:util:tar');
 
 async function tarBin(): Promise<string> {
+  if (process.env?.MONOFO_TAR_BIN) {
+    return process.env.MONOFO_TAR_BIN;
+  }
+
   if (process.platform === 'darwin') {
     if (await hasBin('gtar')) {
       return 'gtar';
     }
 
     process.stderr.write(
-      'WARNING: may fail to extract correctly: if so, need a GNU compatible tar, named gtar, on PATH\n'
+      'WARNING: may fail to extract correctly: if so, need a GNU compatible tar on PATH, and set MONOFO_TAR_BIN\n'
     );
   }
 
@@ -63,19 +69,37 @@ export async function tar(): Promise<{ bin: string; createArgs: string[] }> {
   return cachedTarResult;
 }
 
-export function depthSort(paths: string[]): string[] {
-  return _.uniq(paths)
-    .sort()
-    .sort((p1, p2) => p1.split(path.sep).length - p2.split(path.sep).length);
+async function produceTarStreamGnuExec(toPack: PathsToPack): Promise<stream.Readable> {
+  const paths = flattenPaths(await resolveRecursive(toPack));
+
+  log(`Passing ${count(paths, 'path').length}`);
+
+  const { bin, createArgs } = await tar();
+  const tarArgs = [
+    'set',
+    '-o',
+    'pipefail',
+    ';',
+    bin,
+    '-c',
+    ...createArgs,
+    '--hard-dereference',
+    '--null',
+    '--no-recursion',
+    '--files-from',
+    '-',
+  ];
+
+  const process = exec(bin, tarArgs, {
+    input: `${paths.join('\x00')}\x00`,
+    buffer: false,
+  });
+
+  return getReadableFromProcessStdout(process);
 }
 
-/**
- * number of ch occurances in str without .split() (less allocations)
- */
-const charCount = (haystack: string, needleChar: string) =>
-  _.sumBy(haystack, (x: string) => (x === needleChar ? 1 : 0));
-
-export function produceTarStream(paths: PathsToPack) {
+// noinspection JSUnusedLocalSymbols
+function produceTarStreamNode(paths: PathsToPack): stream.Readable {
   const prefixMatch: string[] = Object.entries(paths)
     .filter(([, { recurse }]) => recurse)
     .map(([pathKey]) => {
@@ -101,4 +125,10 @@ export function produceTarStream(paths: PathsToPack) {
       return !(name in exactMatch || prefixMatch.find((prefix) => name.startsWith(prefix)));
     },
   });
+}
+
+export function produceTarStream(paths: PathsToPack): Promise<stream.Readable> {
+  return (process.env?.MONOFO_USE_TAR_CLI ?? 'true') === 'true'
+    ? produceTarStreamGnuExec(paths)
+    : Promise.resolve(produceTarStreamNode(paths));
 }

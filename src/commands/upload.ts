@@ -5,7 +5,7 @@ import { flags as f } from '@oclif/command';
 import debug from 'debug';
 import { upload } from '../artifacts/api';
 import { deflator } from '../artifacts/compression';
-import { PathsToPack, pathsToUpload } from '../artifacts/matcher';
+import { PathsToPack, pathsToPack } from '../artifacts/matcher';
 import { Artifact } from '../artifacts/model';
 import { BaseCommand, BaseFlags } from '../command';
 import { produceTarStream } from '../util/tar';
@@ -103,7 +103,7 @@ locally cached
 
     const artifact = new Artifact(args.output);
 
-    const paths: PathsToPack = await pathsToUpload({
+    const paths: PathsToPack = await pathsToPack({
       globs: args.globs,
       filesFrom: flags['files-from'],
       useNull: flags.null,
@@ -114,7 +114,7 @@ locally cached
       return;
     }
 
-    const tarStream = produceTarStream(paths);
+    const tarStream = await produceTarStream(paths);
 
     if (flags['debug-tar']) {
       log(`Writing debug tar to ${flags['debug-tar']}`);
