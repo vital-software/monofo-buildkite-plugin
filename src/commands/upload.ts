@@ -1,3 +1,6 @@
+import { createWriteStream } from 'fs';
+import { pipeline as pipelineCb } from 'stream';
+import util from 'util';
 import { flags as f } from '@oclif/command';
 import debug from 'debug';
 import { upload } from '../artifacts/api';
@@ -7,11 +10,14 @@ import { Artifact } from '../artifacts/model';
 import { BaseCommand, BaseFlags } from '../command';
 import { produceTarStream } from '../util/tar';
 
+const pipeline = util.promisify(pipelineCb);
+
 const log = debug('monofo:cmd:upload');
 
 interface UploadFlags extends BaseFlags {
   'files-from'?: string;
   null: boolean;
+  'debug-tar'?: string;
 }
 
 interface UploadArgs {
@@ -59,6 +65,10 @@ locally cached
       dependsOn: ['files-from'],
       description: "If given, the list of files is expected to be null-separated (a la find's -print0)",
     }),
+    'debug-tar': f.string({
+      char: 'T',
+      description: 'A path to write the uncompressed resulting tar file to (as a debug measure)',
+    }),
   };
 
   static override args = [
@@ -105,6 +115,12 @@ locally cached
     }
 
     const tarStream = produceTarStream(paths);
+
+    if (flags['debug-tar']) {
+      log(`Writing debug tar to ${flags['debug-tar']}`);
+      await pipeline(tarStream, createWriteStream(flags['debug-tar']));
+      log('Finished writing debug tar');
+    }
 
     log(`Deflating archive`);
     await deflator(artifact, tarStream);
