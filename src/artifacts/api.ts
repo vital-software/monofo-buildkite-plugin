@@ -1,7 +1,7 @@
 import stream from 'stream';
 import debug from 'debug';
-import execa from 'execa';
 import got from 'got';
+import { exec } from '../util/exec';
 import { Artifact } from './model';
 
 const log = debug('monofo:artifact:api');
@@ -27,7 +27,7 @@ export async function search(artifact: Artifact): Promise<string> {
 
   log(`Calling buildkite-agent ${args.join(' ')}`);
 
-  return (await execa('buildkite-agent', args, { stderr: 'inherit' })).stdout.split('\n')[0];
+  return (await exec('buildkite-agent', args, { stderr: 'inherit' })).stdout.split('\n')[0];
 }
 
 /**
@@ -39,7 +39,7 @@ export async function search(artifact: Artifact): Promise<string> {
  * @param artifact The artifact to upload
  */
 export async function upload(artifact: Artifact): Promise<void> {
-  await execa('buildkite-agent', ['artifact', 'upload', artifact.filename], {
+  await exec('buildkite-agent', ['artifact', 'upload', artifact.filename], {
     stdio: ['inherit', 'inherit', 'inherit'],
   });
 }
