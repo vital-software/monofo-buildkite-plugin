@@ -1,3 +1,15 @@
+# [3.8.0-alpha.1](https://github.com/vital-software/monofo/compare/v3.7.1...v3.8.0-alpha.1) (2022-01-14)
+
+
+### Bug Fixes
+
+* use exec instead of underlying in more places ([21f5222](https://github.com/vital-software/monofo/commit/21f5222f00a8d7c1e25eee93f9b716489179e9c3))
+
+
+### Features
+
+* use tar-fs to produce a tar stream ([c4c9085](https://github.com/vital-software/monofo/commit/c4c9085b069225fe3d156dabe52bf160a56fbb4e))
+
 ## [3.7.1](https://github.com/vital-software/monofo/compare/v3.7.0...v3.7.1) (2022-01-12)
 
 
