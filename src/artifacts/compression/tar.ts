@@ -2,10 +2,10 @@ import fs from 'fs';
 import { pipeline as pipelineCb } from 'stream';
 import util from 'util';
 import debug from 'debug';
-import execa, { ExecaReturnValue } from 'execa';
-import { EmptyArgsError, exec, hasBin } from '../../util/exec';
+import { ExecaReturnValue } from 'execa';
+import { exec, hasBin } from '../../util/exec';
 import { tar as tarBin } from '../../util/tar';
-import { Compression, TarInputArgs } from './compression';
+import { Compression } from './compression';
 
 const pipeline = util.promisify(pipelineCb);
 

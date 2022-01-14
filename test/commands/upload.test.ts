@@ -1,8 +1,10 @@
 import { promises as fs } from 'fs';
+import execa from 'execa';
 import mkdirp from 'mkdirp';
 import tempy from 'tempy';
 import { upload } from '../../src/artifacts/api';
 import Upload from '../../src/commands/upload';
+import { tar } from '../../src/util/tar';
 import { fakeProcess, testRun } from '../fixtures';
 
 jest.mock('../../src/artifacts/api');
@@ -29,7 +31,7 @@ describe('cmd upload', () => {
 
       await fs.writeFile(`${dir}/foo.txt`, 'bar');
       await fs.writeFile(`${dir}/bar.txt`, 'baz');
-      await fs.writeFile(`${dir}/file-list.null.txt`, 'foo.txt\x00bar.txt\x00');
+      await fs.writeFile(`${dir}/file-list.null.txt`, './foo.txt\x00./bar.txt\x00');
 
       const { stderr } = await testRun(Upload, [
         '--null',
@@ -65,30 +67,42 @@ describe('cmd upload', () => {
   });
 
   it('can upload a list of directories in the right order, null separated', async () => {
+    jest.setTimeout(100000000);
+
     await tempy.directory.task(async (dir) => {
       process.chdir(dir);
 
       await mkdirp(`${dir}/foo/bar`);
       await mkdirp(`${dir}/foo/baz`);
+      await mkdirp(`${dir}/foo/qux/quux`);
+
       await fs.writeFile(`${dir}/foo/bar/a.txt`, 'a');
       await fs.writeFile(`${dir}/foo/bar/b.txt`, 'b');
       await fs.writeFile(`${dir}/foo/baz/a.txt`, 'a');
       await fs.writeFile(`${dir}/foo/baz/b.txt`, 'b');
+      await fs.writeFile(`${dir}/foo/qux/quux/a.txt`, 'a');
+      await fs.writeFile(`${dir}/foo/qux/quux/b.txt`, 'b');
       await fs.writeFile(`${dir}/foo/a.txt`, 'a');
       await fs.writeFile(`${dir}/foo/b.txt`, 'b');
 
-      // This file list is in the wrong order! https://github.com/folbricht/desync/issues/210
-      await fs.writeFile(`${dir}/file-list.null.txt`, './foo/bar\x00./foo/\x00./foo/baz/\x00');
+      // This file list is missing the foo parent! https://github.com/folbricht/desync/issues/210
+      await fs.writeFile(`${dir}/file-list.null.txt`, './foo/bar\x00./foo/baz/\x00');
 
       const { stderr } = await testRun(Upload, [
         '--null',
         '--files-from',
         `${dir}/file-list.null.txt`,
         'some-upload.tar.gz',
+        'foo/qux/**/*.txt',
       ]);
 
-      expect(stderr).toContain("Uploading 3 paths as some-upload.tar.gz [ './foo/', './foo/bar', './foo/baz/' ]");
+      expect(stderr).toContain('Adding intermediate directory to included paths to upload: ./foo');
+      expect(stderr).toContain('Adding intermediate directory to included paths to upload: ./foo/qux/quux');
+      expect(stderr).toContain('Globs and file input matched 4 paths');
       expect(stderr).toContain('Successfully uploaded some-upload');
+
+      const res = await execa((await tar()).bin, ['-tzf', `${dir}/some-upload.tar.gz`]);
+      expect(res.stdout).toContain('foo');
     });
   });
 

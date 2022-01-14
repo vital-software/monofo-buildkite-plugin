@@ -3,6 +3,8 @@ import { compare } from 'compare-versions';
 import debug from 'debug';
 import execa from 'execa';
 import _ from 'lodash';
+import { pack } from 'tar-fs';
+import { PathsToPack } from '../artifacts/matcher';
 import { exec, hasBin } from './exec';
 
 const log = debug('monofo:util:tar');
@@ -65,4 +67,22 @@ export function depthSort(paths: string[]): string[] {
   return _.uniq(paths)
     .sort()
     .sort((p1, p2) => p1.split(path.sep).length - p2.split(path.sep).length);
+}
+
+export function produceTarStream(paths: PathsToPack) {
+  const prefixMatch: string[] = Object.entries(paths)
+    .filter(([, { recurse }]) => recurse)
+    .map(([k]) => (k.startsWith('./') ? k.slice(2) : k));
+
+  const exactMatch: Record<string, boolean> = Object.fromEntries(
+    Object.entries(paths)
+      .filter(([, { recurse }]) => !recurse)
+      .map(([k]) => [k.startsWith('./') ? k.slice(2) : k, true])
+  );
+
+  return pack('.', {
+    ignore: (name: string): boolean => {
+      return !(name in exactMatch) && prefixMatch.find((prefix) => name.startsWith(prefix)) === undefined;
+    },
+  });
 }

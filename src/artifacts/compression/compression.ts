@@ -1,8 +1,5 @@
 import stream from 'stream';
-import execa from 'execa';
 import { Artifact } from '../model';
-
-export type TarInputArgs = { argv: string[]; input: string } | { file: string };
 
 export interface Compression {
   /**

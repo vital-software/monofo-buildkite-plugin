@@ -2,12 +2,10 @@ import { flags as f } from '@oclif/command';
 import debug from 'debug';
 import { upload } from '../artifacts/api';
 import { deflator } from '../artifacts/compression';
-import { filesToUpload } from '../artifacts/matcher';
+import { PathsToPack, pathsToUpload } from '../artifacts/matcher';
 import { Artifact } from '../artifacts/model';
 import { BaseCommand, BaseFlags } from '../command';
-import { exec } from '../util/exec';
-import { count } from '../util/helper';
-import { tar } from '../util/tar';
+import { produceTarStream } from '../util/tar';
 
 const log = debug('monofo:cmd:upload');
 
@@ -94,39 +92,22 @@ locally cached
       .slice(1);
 
     const artifact = new Artifact(args.output);
-    const files = await filesToUpload({ globs: args.globs, filesFrom: flags['files-from'], useNull: flags.null });
 
-    if (files.length === 0) {
+    const paths: PathsToPack = await pathsToUpload({
+      globs: args.globs,
+      filesFrom: flags['files-from'],
+      useNull: flags.null,
+    });
+
+    if (Object.keys(paths).length === 0) {
       log('No files to upload: nothing to do');
       return;
     }
 
-    /*
-     * The files will be passed to tar in the order shown, and then tar will
-     * recurse into each entry if it's a directory (because --recursive is the
-     * default) - it should use the --sort argument (if your tar is new enough)
-     * to sort the eventual input file list, but they'll still be ordered according
-     * to the order of this files argument
-     */
-    log(`Uploading ${count(files, 'path')} as ${args.output}`, files);
+    const tarStream = produceTarStream(paths);
 
-    const tarBin = await tar();
-    const tarArgs = ['-c', ...tarBin.createArgs, '--hard-dereference', '--null', '--files-from', '-'];
-
-    log(`About to run: ${tarBin.bin} ${tarArgs.join(' ')} <<< '${files.join(',')}'`);
-
-    const subprocess = exec(tarBin.bin, tarArgs, {
-      stdout: 'pipe',
-      buffer: false,
-      input: `${files.join('\x00')}\x00`,
-    });
-
-    if (!subprocess.stdout || !subprocess.stdin) {
-      throw new Error('Expected to be piped stdout/stdin from tar process');
-    }
-
-    await deflator(artifact, subprocess.stdout);
-
+    log(`Deflating archive`);
+    await deflator(artifact, tarStream);
     log(`Archive deflated at ${args.output}`);
 
     log('Uploading to Buildkite');
