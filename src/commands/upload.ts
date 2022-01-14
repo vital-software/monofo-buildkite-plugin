@@ -1,14 +1,16 @@
 import { createWriteStream } from 'fs';
-import { pipeline as pipelineCb } from 'stream';
+import stream, { pipeline as pipelineCb } from 'stream';
 import util from 'util';
 import { flags as f } from '@oclif/command';
 import debug from 'debug';
+import execa, { ExecaChildProcess } from 'execa';
 import { upload } from '../artifacts/api';
 import { deflator } from '../artifacts/compression';
 import { PathsToPack, pathsToPack } from '../artifacts/matcher';
 import { Artifact } from '../artifacts/model';
 import { BaseCommand, BaseFlags } from '../command';
-import { produceTarStream } from '../util/tar';
+import { getReadableFromProcess, streamToFile } from '../util/exec';
+import { produceTarStreamGnuExec } from '../util/tar';
 
 const pipeline = util.promisify(pipelineCb);
 
@@ -114,21 +116,26 @@ locally cached
       return;
     }
 
-    const tarStream = await produceTarStream(paths);
+    const result = produceTarStreamGnuExec(paths).then(async (spawned) => {
+      const readable: stream.Readable = getReadableFromProcess(spawned);
 
-    if (flags['debug-tar']) {
-      log(`Writing debug tar to ${flags['debug-tar']}`);
-      await pipeline(tarStream, createWriteStream(flags['debug-tar']));
-      log('Finished writing debug tar');
-    }
+      let toFile = Promise.resolve();
 
-    log(`Deflating archive`);
-    await deflator(artifact, tarStream);
-    log(`Archive deflated at ${args.output}`);
+      if (flags['debug-tar']) {
+        log(`Writing debug tar to ${flags['debug-tar']}`);
+        toFile = streamToFile(readable, flags['debug-tar']);
+      }
 
-    log('Uploading to Buildkite');
-    await upload(artifact);
+      log(`Deflating archive`);
+      await deflator(artifact, readable);
+      log(`Archive deflated at ${args.output}`);
 
-    log(`Successfully uploaded ${artifact.name}`);
+      await toFile;
+
+      log('Uploading to Buildkite');
+      await upload(artifact);
+
+      log(`Successfully uploaded ${artifact.name}`);
+    });
   }
 }

@@ -1,3 +1,5 @@
+import { ChildProcess } from 'child_process';
+import { createWriteStream } from 'fs';
 import stream from 'stream';
 import chalk from 'chalk';
 import commandExists from 'command-exists';
@@ -14,9 +16,9 @@ export function hasBin(bin: string): Promise<boolean> {
     .catch(() => false);
 }
 
-export function getReadableFromProcessStdout(process: execa.ExecaChildProcess): stream.Readable {
+export function getReadableFromProcess(process: ChildProcess): stream.Readable {
   if (!process.stdout) {
-    throw new Error();
+    throw new Error('Expected stdout from process');
   }
 
   return process.stdout;
@@ -57,4 +59,10 @@ export function exec(
     });
 
   return subprocess;
+}
+
+export function streamToFile(inputStream: stream.Readable, filePath: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    inputStream.pipe(createWriteStream(filePath)).on('finish', resolve).on('error', reject);
+  });
 }

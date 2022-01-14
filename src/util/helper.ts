@@ -1,3 +1,4 @@
+import { promises as fs } from 'fs';
 import path from 'path';
 import _ from 'lodash';
 
@@ -30,4 +31,13 @@ export function depthSort(paths: string[]): string[] {
   return _.uniq(paths)
     .sort()
     .sort((p1, p2) => p1.split(path.sep).length - p2.split(path.sep).length);
+}
+
+export async function exists(file: string): Promise<boolean> {
+  try {
+    await fs.stat(file);
+    return true;
+  } catch (err) {
+    return false;
+  }
 }

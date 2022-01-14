@@ -1,20 +1,35 @@
 import { promises as fs, PathLike } from 'fs';
 import path from 'path';
+import stream from 'stream';
 import debug from 'debug';
 import _ from 'lodash';
 import { globSet } from '../util/glob';
-import { count, depthSort } from '../util/helper';
-
-const exists = async (file: string) => {
-  try {
-    await fs.stat(file);
-    return true;
-  } catch (err) {
-    return false;
-  }
-};
+import { count, depthSort, exists } from '../util/helper';
 
 const log = debug('monofo:artifact:matcher');
+
+/**
+ * Utility class that can act as a writable stream of file name chunks, or receive globs
+ */
+class MatchedFiles extends stream.Writable {
+  constructor(private _matched: string[] = []) {
+    super({
+      objectMode: true,
+      write: (chunk: string, _encoding, next) => {
+        this._matched.push(chunk);
+        next();
+      },
+    });
+  }
+
+  async addGlobs(globs: string[]): Promise<void> {
+    this._matched = [...this._matched, ...(await globSet(_.castArray(globs), { matchBase: false }))];
+  }
+
+  get matched() {
+    return this._matched;
+  }
+}
 
 export interface PathsToPack {
   [path: string]: { recurse: boolean };
@@ -24,33 +39,20 @@ function isRoot(p: string): boolean {
   return p === '' || p === '/' || p === '.';
 }
 
-export function flattenPaths(toPack: PathsToPack): string[] {
-  return depthSort(
-    Object.entries(toPack).map(([p, { recurse }]) => {
-      if (recurse) {
-        throw new Error('Expected recursive paths to be resolved before flattening');
-      }
-
-      return p;
-    })
+export function flattenPaths(toPack: PathsToPack): { recursive: string[]; nonRecursive: string[] } {
+  const recursive = depthSort(
+    Object.entries(toPack)
+      .filter(([, { recurse }]) => recurse)
+      .map(([p]) => p)
   );
-}
 
-export async function resolveRecursive(toPack: PathsToPack): Promise<PathsToPack> {
-  const repacked: PathsToPack = {};
-  const toGlob = [];
+  const nonRecursive = depthSort(
+    Object.entries(toPack)
+      .filter(([, { recurse }]) => recurse)
+      .map(([p]) => p)
+  );
 
-  for (const [p, { recurse }] of Object.entries(toPack)) {
-    if (recurse) {
-      toGlob.push(`${p}/**`);
-    } else {
-      repacked[p] = { recurse: false };
-    }
-  }
-
-  const globResults = await globSet(toGlob, { matchBase: false });
-
-  return { ...repacked, ...Object.fromEntries(globResults.map((r) => [r, { recurse: false }])) };
+  return { recursive, nonRecursive };
 }
 
 export function addIntermediateDirectories(toPack: PathsToPack): PathsToPack {

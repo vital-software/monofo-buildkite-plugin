@@ -1,12 +1,14 @@
+import { ChildProcess } from 'child_process';
+import { promises as fs } from 'fs';
 import path from 'path';
 import stream from 'stream';
 import { compare } from 'compare-versions';
 import debug from 'debug';
-import execa from 'execa';
-import _ from 'lodash';
+import execa, { ExecaChildProcess, ExecaReturnValue } from 'execa';
 import { pack } from 'tar-fs';
-import { flattenPaths, PathsToPack, resolveRecursive } from '../artifacts/matcher';
-import { exec, getReadableFromProcessStdout, hasBin } from './exec';
+import tempy from 'tempy';
+import { flattenPaths, PathsToPack } from '../artifacts/matcher';
+import { exec, getReadableFromProcess, hasBin } from './exec';
 import { count, charCount } from './helper';
 
 const log = debug('monofo:util:tar');
@@ -69,37 +71,41 @@ export async function tar(): Promise<{ bin: string; createArgs: string[] }> {
   return cachedTarResult;
 }
 
-async function produceTarStreamGnuExec(toPack: PathsToPack): Promise<stream.Readable> {
-  const paths = flattenPaths(await resolveRecursive(toPack));
+export async function produceTarStreamGnuExec(toPack: PathsToPack, verbose = true): Promise<execa.ExecaChildProcess> {
+  const { recursive, nonRecursive } = flattenPaths(toPack);
 
-  log(`Passing ${count(paths, 'path').length}`);
+  log(`Passing ${count(recursive, 'recursive path')} and ${count(nonRecursive, 'non-recursive path')} to tar process`);
+
+  if (verbose) {
+    log('Paths were:', { recursive, nonRecursive });
+  }
+
+  const dir = tempy.directory();
+  await fs.writeFile(`${dir}/recursive`, `${recursive.join('\x00')}\x00`);
+  await fs.writeFile(`${dir}/nonRecursive`, `${nonRecursive.join('\x00')}\x00`);
 
   const { bin, createArgs } = await tar();
   const tarArgs = [
-    'set',
-    '-o',
-    'pipefail',
-    ';',
-    bin,
     '-c',
     ...createArgs,
+    '--verbose',
     '--hard-dereference',
     '--null',
     '--no-recursion',
     '--files-from',
-    '-',
+    `${dir}/nonRecursive`,
+    '--recursion',
+    '--files-from',
+    `${dir}/recursive`,
   ];
 
-  const process = exec(bin, tarArgs, {
-    input: `${paths.join('\x00')}\x00`,
+  return execa(bin, tarArgs, {
     buffer: false,
   });
-
-  return getReadableFromProcessStdout(process);
 }
 
 // noinspection JSUnusedLocalSymbols
-function produceTarStreamNode(paths: PathsToPack): stream.Readable {
+function produceTarStreamNode(paths: PathsToPack): Promise<ExecaReturnValue> {
   const prefixMatch: string[] = Object.entries(paths)
     .filter(([, { recurse }]) => recurse)
     .map(([pathKey]) => {
@@ -120,15 +126,18 @@ function produceTarStreamNode(paths: PathsToPack): stream.Readable {
       .map(([k]) => [k.startsWith('./') ? k.slice(2) : k, true])
   );
 
-  return pack('.', {
-    ignore: (name: string): boolean => {
-      return !(name in exactMatch || prefixMatch.find((prefix) => name.startsWith(prefix)));
-    },
+  return exec('cat', [], {
+    buffer: false,
+    input: pack('.', {
+      ignore: (name: string): boolean => {
+        return !(name in exactMatch || prefixMatch.find((prefix) => name.startsWith(prefix)));
+      },
+    }),
   });
 }
 
-export function produceTarStream(paths: PathsToPack): Promise<stream.Readable> {
-  return (process.env?.MONOFO_USE_TAR_CLI ?? 'true') === 'true'
-    ? produceTarStreamGnuExec(paths)
-    : Promise.resolve(produceTarStreamNode(paths));
-}
+// export async function produceTarStream(paths: PathsToPack): Promise<execa.ExecaReturnValue> {
+//   return (process.env?.MONOFO_USE_TAR_CLI ?? 'true') === 'true'
+//     ? ((await produceTarStreamGnuExec(paths)) as unknown as ExecaChildProcess)
+//     : produceTarStreamNode(paths);
+// }
