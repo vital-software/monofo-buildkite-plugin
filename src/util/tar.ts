@@ -69,10 +69,26 @@ export function depthSort(paths: string[]): string[] {
     .sort((p1, p2) => p1.split(path.sep).length - p2.split(path.sep).length);
 }
 
+/**
+ * number of ch occurances in str without .split() (less allocations)
+ */
+const charCount = (haystack: string, needleChar: string) =>
+  _.sumBy(haystack, (x: string) => (x === needleChar ? 1 : 0));
+
 export function produceTarStream(paths: PathsToPack) {
   const prefixMatch: string[] = Object.entries(paths)
     .filter(([, { recurse }]) => recurse)
-    .map(([k]) => (k.startsWith('./') ? k.slice(2) : k));
+    .map(([pathKey]) => {
+      const toPackPath = pathKey.startsWith('./') ? pathKey.slice(2) : pathKey; // without initial ./ prefix for matching purposes
+      const depth = charCount(pathKey, path.sep);
+      return { toPackPath, depth };
+    })
+    .sort()
+    .sort((a, b): number => a.depth - b.depth)
+    .map(({ toPackPath }) => toPackPath);
+
+  // These are sorted so that lower depths occur first in the array
+  // This is convenient for monorepo setups, where more common dependencies are usually lower in the tree
 
   const exactMatch: Record<string, boolean> = Object.fromEntries(
     Object.entries(paths)
@@ -82,7 +98,7 @@ export function produceTarStream(paths: PathsToPack) {
 
   return pack('.', {
     ignore: (name: string): boolean => {
-      return !(name in exactMatch) && prefixMatch.find((prefix) => name.startsWith(prefix)) === undefined;
+      return !(name in exactMatch || prefixMatch.find((prefix) => name.startsWith(prefix)));
     },
   });
 }
