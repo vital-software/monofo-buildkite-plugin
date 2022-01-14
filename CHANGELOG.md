@@ -1,3 +1,10 @@
+# [3.8.0-alpha.2](https://github.com/vital-software/monofo/compare/v3.8.0-alpha.1...v3.8.0-alpha.2) (2022-01-14)
+
+
+### Features
+
+* added --debug-tar flag ([fdd7823](https://github.com/vital-software/monofo/commit/fdd782308565c35d4497384d79a602a101fa4776))
+
 # [3.8.0-alpha.1](https://github.com/vital-software/monofo/compare/v3.7.1...v3.8.0-alpha.1) (2022-01-14)
 
 
