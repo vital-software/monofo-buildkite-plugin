@@ -1,3 +1,10 @@
+## [3.7.2-beta.1](https://github.com/vital-software/monofo/compare/v3.7.1...v3.7.2-beta.1) (2022-01-14)
+
+
+### Bug Fixes
+
+* still use GNU but pass non-recursion list of paths too ([20c10c7](https://github.com/vital-software/monofo/commit/20c10c74a8d48a32fc8dffc0169f5b8cd8b667e5))
+
 ## [3.7.1](https://github.com/vital-software/monofo/compare/v3.7.0...v3.7.1) (2022-01-12)
 
 
