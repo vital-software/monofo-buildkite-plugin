@@ -1,4 +1,4 @@
-import { depthSort } from '../../src/util/tar';
+import { depthSort } from '../../src/util/helper';
 
 describe('depthSort', () => {
   it('sorts a nice scenario', () => {

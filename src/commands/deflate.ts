@@ -25,7 +25,7 @@ export default class Deflate extends BaseCommand {
     },
   ];
 
-  async run(): Promise<string> {
+  async run(): Promise<void> {
     const { args } = this.parse<unknown, DeflateArguments>(Deflate);
 
     try {
@@ -40,8 +40,6 @@ export default class Deflate extends BaseCommand {
     }
 
     const artifact = new Artifact(args.output);
-
-    const result = await deflator(artifact, { file: args.tarFile });
-    return result.stdout;
+    await deflator(artifact, { file: args.tarFile });
   }
 }
