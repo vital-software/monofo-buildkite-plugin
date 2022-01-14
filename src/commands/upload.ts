@@ -1,8 +1,10 @@
+import { promises as fs } from 'fs';
 import { flags as f } from '@oclif/command';
 import debug from 'debug';
+import tempy from 'tempy';
 import { upload } from '../artifacts/api';
 import { deflator } from '../artifacts/compression';
-import { filesToUpload } from '../artifacts/matcher';
+import { flattenPaths, pathsToPack } from '../artifacts/matcher';
 import { Artifact } from '../artifacts/model';
 import { BaseCommand, BaseFlags } from '../command';
 import { count } from '../util/helper';
@@ -93,21 +95,31 @@ locally cached
       .slice(1);
 
     const artifact = new Artifact(args.output);
-    const files = await filesToUpload({ globs: args.globs, filesFrom: flags['files-from'], useNull: flags.null });
+    const toPack = await pathsToPack({ globs: args.globs, filesFrom: flags['files-from'], useNull: flags.null });
 
-    if (files.length === 0) {
+    if (Object.keys(toPack).length === 0) {
       log('No files to upload: nothing to do');
       return;
     }
 
-    /*
-     * The files will be passed to tar in the order shown, and then tar will
-     * recurse into each entry if it's a directory (because --recursive is the
-     * default) - it should use the --sort argument (if your tar is new enough)
-     * to sort the eventual input file list, but they'll still be ordered according
-     * to the order of this files argument
-     */
-    log(`Uploading ${count(files, 'path')} as ${args.output}`, files);
+    const { recursive, nonRecursive } = flattenPaths(toPack);
+
+    const dir = tempy.directory();
+    const recursiveFile = `${dir}/recursive`;
+    const nonRecursiveFile = `${dir}/nonRecursive`;
+
+    log(
+      `Passing ${count(recursive, 'recursive path')} and ${count(nonRecursive, 'non-recursive path')} to tar process`
+    );
+
+    if (flags.verbose) {
+      log('Paths were:', { recursive, nonRecursive });
+    }
+
+    await fs.writeFile(recursiveFile, `${recursive.join('\x00')}\x00`);
+    await fs.writeFile(nonRecursiveFile, `${nonRecursive.join('\x00')}\x00`);
+
+    log(`Written to ${dir}/recursive`);
 
     const tarBin = await tar();
     const tarArgs = [
@@ -119,13 +131,16 @@ locally cached
       '-c',
       ...tarBin.createArgs,
       '--hard-dereference',
+      '--no-recursion',
       '--null',
       '--files-from',
-      '-',
+      nonRecursiveFile,
+      '--recursion',
+      '--files-from',
+      recursiveFile,
     ];
 
-    const input = `${files.join('\x00')}\x00`;
-    await deflator(artifact, { argv: tarArgs, input });
+    await deflator(artifact, { argv: tarArgs });
 
     log(`Archive deflated at ${args.output}`);
 

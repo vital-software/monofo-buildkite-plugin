@@ -20,6 +20,11 @@ This list can be passed using:
  - a list of glob expressions, or
  - a file containing a list of paths to include
 
+The glob expressions and paths must be relative, and point to locations below
+the working directory. Intermediate directories between the working directory
+and the target paths will be included in the archive as (otherwise empty) 
+placeholder structure.
+
 Passing `-` as the file to read from will cause `upload` to read the list of
 files from `stdin` - this allows e.g. using `find -print0` to produce a list
 of matching files to upload.

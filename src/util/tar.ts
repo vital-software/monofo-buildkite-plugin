@@ -1,8 +1,6 @@
-import path from 'path';
 import { compare } from 'compare-versions';
 import debug from 'debug';
 import execa from 'execa';
-import _ from 'lodash';
 import { exec, hasBin } from './exec';
 
 const log = debug('monofo:util:tar');
@@ -48,8 +46,6 @@ export async function tar(): Promise<{ bin: string; createArgs: string[] }> {
       if (matches && compare(matches[1], '1.28', '>=')) {
         createArgs = [...createArgs, '--sort=name']; // --sort was added in 1.28
       }
-
-      createArgs = ['--verbose', ...createArgs];
     }
 
     cachedTarResult = {
@@ -59,10 +55,4 @@ export async function tar(): Promise<{ bin: string; createArgs: string[] }> {
   }
 
   return cachedTarResult;
-}
-
-export function depthSort(paths: string[]): string[] {
-  return _.uniq(paths)
-    .sort()
-    .sort((p1, p2) => p1.split(path.sep).length - p2.split(path.sep).length);
 }

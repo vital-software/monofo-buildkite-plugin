@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import { promisify } from 'util';
 import { directory } from 'tempy';
-import { filesToUpload } from '../../src/artifacts/matcher';
+import { addIntermediateDirectories, PathsToPack, pathsToPack } from '../../src/artifacts/matcher';
 import { mergeBase, diff, revList } from '../../src/git';
 import { fakeProcess, COMMIT } from '../fixtures';
 
@@ -30,16 +30,16 @@ describe('artifact matcher', () => {
 
       await writeFile(`${dir}/foo.txt`, `bar\n`);
       await writeFile(`${dir}/bar.txt`, `baz\n`);
-      await writeFile(`${dir}/file-list.null.txt`, 'foo.txt\x00bar.txt\x00');
+      await writeFile(`${dir}/file-list.null.txt`, './foo.txt\x00./bar.txt\x00');
 
-      const result = filesToUpload({
+      const result = await pathsToPack({
         filesFrom: `${dir}/file-list.null.txt`,
         useNull: true,
       });
 
-      await expect(result).resolves.toHaveLength(2);
-      expect(await result).toContain('foo.txt');
-      expect(await result).toContain('bar.txt');
+      expect(result['./foo.txt']).toStrictEqual({ recurse: true });
+      expect(result['./bar.txt']).toStrictEqual({ recurse: true });
+      expect(Object.keys(result)).toHaveLength(2);
     });
   });
 
@@ -49,16 +49,16 @@ describe('artifact matcher', () => {
 
       await writeFile(`${dir}/foo.txt`, 'bar\n');
       await writeFile(`${dir}/bar.txt`, 'baz\n');
-      await writeFile(`${dir}/file-list.newline.txt`, 'foo.txt\nbar.txt\n');
+      await writeFile(`${dir}/file-list.newline.txt`, './foo.txt\n./bar.txt\n');
 
-      const result = filesToUpload({
+      const result = await pathsToPack({
         filesFrom: `${dir}/file-list.newline.txt`,
         useNull: false,
       });
 
-      await expect(result).resolves.toHaveLength(2);
-      expect(await result).toContain('foo.txt');
-      expect(await result).toContain('bar.txt');
+      expect(Object.keys(result)).toHaveLength(2);
+      expect(result['./foo.txt']).toStrictEqual({ recurse: true });
+      expect(result['./bar.txt']).toStrictEqual({ recurse: true });
     });
   });
 
@@ -69,11 +69,39 @@ describe('artifact matcher', () => {
       await writeFile(`${dir}/foo.txt`, 'bar\n');
       await writeFile(`${dir}/bar.txt`, 'baz\n');
 
-      const result = filesToUpload({
+      const result = await pathsToPack({
         globs: ['*.txt'],
       });
 
-      return expect(result).resolves.toHaveLength(2);
+      expect(Object.keys(result)).toHaveLength(2);
+      expect(result['./foo.txt']).toStrictEqual({ recurse: false });
+      expect(result['./bar.txt']).toStrictEqual({ recurse: false });
     });
+  });
+});
+
+describe('add intermediate directories', () => {
+  it('adds intermediate dirs', () => {
+    const paths: PathsToPack = {
+      'a/b/c/foo.txt': { recurse: false },
+      'd/e/f/blah.txt': { recurse: false },
+      'h/i/j': { recurse: true },
+    };
+
+    const result = addIntermediateDirectories(paths);
+
+    expect(Object.keys(result)).toStrictEqual([
+      'a',
+      'a/b',
+      'a/b/c',
+      'a/b/c/foo.txt',
+      'd',
+      'd/e',
+      'd/e/f',
+      'd/e/f/blah.txt',
+      'h',
+      'h/i',
+      'h/i/j',
+    ]);
   });
 });

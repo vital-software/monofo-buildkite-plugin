@@ -20,7 +20,7 @@ export const compressors: Record<string, Compression> = {
   tar,
 };
 
-export function deflator(output: Artifact, tarInputArgs: TarInputArgs): Promise<execa.ExecaChildProcess> {
+export function deflator(output: Artifact, tarInputArgs: TarInputArgs): Promise<unknown> {
   const compressor = compressors?.[output.ext];
 
   if (!compressor) {
@@ -30,11 +30,7 @@ export function deflator(output: Artifact, tarInputArgs: TarInputArgs): Promise<
   return compressor.deflate({ output, tarInputArgs });
 }
 
-export async function inflator(
-  input: stream.Readable,
-  artifact: Artifact,
-  outputPath = '.'
-): Promise<execa.ExecaChildProcess> {
+export async function inflator(input: stream.Readable, artifact: Artifact, outputPath = '.'): Promise<unknown> {
   if (artifact.skip) {
     log(`Skipping download and inflate for ${artifact.name} because skip is enabled`);
     return Promise.resolve(execa('true'));
