@@ -38,6 +38,8 @@ function sequentialGroupsByRecursion(manifest: Manifest): { recurse: boolean; pa
     group.paths.push(pathToPack);
   }
 
+  groups.push({ ...group });
+
   return groups;
 }
 
