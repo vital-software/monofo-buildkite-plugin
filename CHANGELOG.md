@@ -1,3 +1,12 @@
+## [3.7.2-beta.2](https://github.com/vital-software/monofo/compare/v3.7.2-beta.1...v3.7.2-beta.2) (2022-01-15)
+
+
+### Bug Fixes
+
+* change between recursive and non-recursive each time ([559fe98](https://github.com/vital-software/monofo/commit/559fe98f12b48fb6e24d74113396f32274818654))
+* change between recursive and non-recursive each time ([983ef7f](https://github.com/vital-software/monofo/commit/983ef7ff231cf059965df2e8ff4d7360d1121c67))
+* still use GNU but pass non-recursion list of paths too ([4c123fd](https://github.com/vital-software/monofo/commit/4c123fdcb4e500de663fef6a603e417aa2cd47ac))
+
 ## [3.7.2-beta.1](https://github.com/vital-software/monofo/compare/v3.7.1...v3.7.2-beta.1) (2022-01-14)
 
 
