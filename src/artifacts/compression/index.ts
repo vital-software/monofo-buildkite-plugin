@@ -3,7 +3,7 @@ import debug from 'debug';
 import execa from 'execa';
 import { exec } from '../../util/exec';
 import { Artifact } from '../model';
-import { Compression, TarInputArgs } from './compression';
+import { Compression } from './compression';
 import { desync } from './desync';
 import { gzip } from './gzip';
 import { lz4 } from './lz4';

@@ -9,7 +9,6 @@ import rimrafCb from 'rimraf';
 import tempy from 'tempy';
 import { exec, hasBin } from '../../util/exec';
 import { Compression } from './compression';
-import { execFromTar } from './tar';
 
 const log = debug('monofo:artifact:compression:desync');
 
@@ -211,18 +210,6 @@ export const desync: Compression = {
 
         output.filename, // caidx file
         '-',             // tar will be received on input
-
-      // Check for crashes
-      // Samples the 200 bytes of the output, requires it to be larger than 141 bytes, which is an empty .caidx (a truncated .catar is slightly smaller)
-      '&&',
-      '(',
-        'test', `"$(head -c 200 ${output.filename} | wc -c | tr -d ' ')"`, '-gt', '141',
-      '||',
-        '(',
-          'echo', '"detected failure"', '>&2', ';',
-          'exit', '2', ';',
-        ')',
-      ')',
     ];
   },
 
