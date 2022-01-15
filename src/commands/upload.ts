@@ -1,10 +1,8 @@
-import { promises as fs } from 'fs';
 import { flags as f } from '@oclif/command';
 import debug from 'debug';
-import tempy from 'tempy';
 import { upload } from '../artifacts/api';
 import { deflator } from '../artifacts/compression';
-import { flattenPaths, pathsToPack } from '../artifacts/matcher';
+import { flattenPathsToFileList, getManifest } from '../artifacts/matcher';
 import { Artifact } from '../artifacts/model';
 import { BaseCommand, BaseFlags } from '../command';
 import { count } from '../util/helper';
@@ -95,31 +93,16 @@ locally cached
       .slice(1);
 
     const artifact = new Artifact(args.output);
-    const toPack = await pathsToPack({ globs: args.globs, filesFrom: flags['files-from'], useNull: flags.null });
+    const manifest = await getManifest({ globs: args.globs, filesFrom: flags['files-from'], useNull: flags.null });
 
-    if (Object.keys(toPack).length === 0) {
+    if (Object.keys(manifest).length === 0) {
       log('No files to upload: nothing to do');
       return;
     }
 
-    const { recursive, nonRecursive } = flattenPaths(toPack);
-
-    const dir = tempy.directory();
-    const recursiveFile = `${dir}/recursive`;
-    const nonRecursiveFile = `${dir}/nonRecursive`;
-
-    log(
-      `Passing ${count(recursive, 'recursive path')} and ${count(nonRecursive, 'non-recursive path')} to tar process`
-    );
-
-    if (flags.verbose) {
-      log('Paths were:', { recursive, nonRecursive });
-    }
-
-    await fs.writeFile(recursiveFile, `${recursive.join('\x00')}\x00`);
-    await fs.writeFile(nonRecursiveFile, `${nonRecursive.join('\x00')}\x00`);
-
-    log(`Written to ${dir}/recursive`);
+    const fileList = await flattenPathsToFileList(manifest);
+    log(`Giving ${count(fileList, 'arguments')} to tar as input filelist`);
+    const input = `${fileList.join('\n')}\n`;
 
     const tarBin = await tar();
     const tarArgs = [
@@ -131,16 +114,11 @@ locally cached
       '-c',
       ...tarBin.createArgs,
       '--hard-dereference',
-      '--no-recursion',
-      '--null',
       '--files-from',
-      nonRecursiveFile,
-      '--recursion',
-      '--files-from',
-      recursiveFile,
+      '-',
     ];
 
-    await deflator(artifact, { argv: tarArgs });
+    await deflator(artifact, { argv: tarArgs, input });
 
     log(`Archive deflated at ${args.output}`);
 
