@@ -3,11 +3,14 @@ import path from 'path';
 import debug from 'debug';
 import _ from 'lodash';
 import tempy from 'tempy';
-import { globSet } from '../util/glob';
-import { count, exists } from '../util/helper';
+import { globSet } from './util/glob';
+import { count, exists } from './util/helper';
 
-const log = debug('monofo:artifact:matcher');
+const log = debug('monofo:manifest');
 
+/**
+ * A manifest is a simple struct for holding tar input items by path
+ */
 export interface Manifest {
   [pathToPack: string]: { recurse: boolean };
 }
@@ -47,7 +50,7 @@ function sequentialGroupsByRecursion(manifest: Manifest): { recurse: boolean; pa
  *
  * @return string A set of tar options, that can be put into a file list or passed as an argv for further processing
  */
-export async function flattenPathsToFileList(manifest: Manifest): Promise<string[]> {
+export async function tarArgListForManifest(manifest: Manifest): Promise<string[]> {
   const groups: { recurse: boolean; paths: string[] }[] = sequentialGroupsByRecursion(manifest).filter(
     ({ paths }) => paths.length > 0
   );

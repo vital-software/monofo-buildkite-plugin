@@ -2,9 +2,9 @@ import { flags as f } from '@oclif/command';
 import debug from 'debug';
 import { upload } from '../artifacts/api';
 import { deflator } from '../artifacts/compression';
-import { flattenPathsToFileList, getManifest } from '../artifacts/matcher';
 import { Artifact } from '../artifacts/model';
 import { BaseCommand, BaseFlags } from '../command';
+import { tarArgListForManifest, getManifest } from '../manifest';
 import { count } from '../util/helper';
 import { tar } from '../util/tar';
 
@@ -100,14 +100,14 @@ locally cached
       return;
     }
 
-    const fileList = await flattenPathsToFileList(manifest);
-    log(`Giving ${count(fileList, 'arguments')} to tar as input filelist`);
+    const fileList = await tarArgListForManifest(manifest);
+    log(`Giving ${count(fileList, 'argument')} to tar as input filelist`);
     const input = `${fileList.join('\n')}\n`;
 
     const tarBin = await tar();
     const tarArgs = [
       'set',
-      '-o',
+      '-euo',
       'pipefail',
       ';',
       tarBin.bin,
@@ -118,8 +118,8 @@ locally cached
       '-',
     ];
 
+    log(`Deflating to ${args.output}`);
     await deflator(artifact, { argv: tarArgs, input });
-
     log(`Archive deflated at ${args.output}`);
 
     log('Uploading to Buildkite');
