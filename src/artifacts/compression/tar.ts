@@ -49,10 +49,9 @@ export function execFromTar(
 }
 
 export const tar: Compression = {
-  async deflate({ output, tarInputArgs }): Promise<execa.ExecaChildProcess> {
+  async deflate(output): Promise<string[]> {
     await checkEnabled();
-
-    return execFromTar(tarInputArgs, ['>', output.filename]);
+    return ['>', output.filename];
   },
 
   async inflate({ input, outputPath = '.' }): Promise<ExecaReturnValue> {

@@ -40,6 +40,6 @@ export default class Deflate extends BaseCommand {
     }
 
     const artifact = new Artifact(args.output);
-    await deflator(artifact, { file: args.tarFile });
+    await deflator(artifact);
   }
 }

@@ -5,18 +5,31 @@ import { exec, hasBin } from './exec';
 
 const log = debug('monofo:util:tar');
 
-async function tarBin(): Promise<string> {
-  if (process.platform === 'darwin') {
-    if (await hasBin('gtar')) {
-      return 'gtar';
-    }
+export interface TarConfiguration {
+  bin: string;
 
-    process.stderr.write(
-      'WARNING: may fail to extract correctly: if so, need a GNU compatible tar, named gtar, on PATH\n'
-    );
+  argsFor: {
+    create: string[];
+  };
+}
+
+let discoveredConfiguration: TarConfiguration | undefined;
+
+async function discoverBin(): Promise<string> {
+  if (process.env.MONOFO_TAR_BIN) {
+    return process.env.MONOFO_TAR_BIN;
   }
 
-  return 'tar';
+  const toCheck = process.platform === 'darwin' ? ['gtar', 'tar'] : ['tar'];
+
+  for (const possibleBin of toCheck) {
+    // eslint-disable-next-line no-await-in-loop
+    if (await hasBin(possibleBin)) {
+      return possibleBin;
+    }
+  }
+
+  throw new Error('No tar found on PATH');
 }
 
 async function isGnuTar(bin: string): Promise<boolean> {
@@ -24,35 +37,45 @@ async function isGnuTar(bin: string): Promise<boolean> {
   return stdout.slice(stdout.indexOf('\n') + 1).startsWith('GNU');
 }
 
-let cachedTarResult: { bin: string; createArgs: string[] } | undefined;
+function getGnuTarVersion(versionOutput: string): string {
+  const matches = versionOutput.match(/^tar \(GNU tar\) ([0-9.-]+)\n/);
 
-export async function tar(): Promise<{ bin: string; createArgs: string[] }> {
-  if (!cachedTarResult) {
-    const bin = await tarBin();
-    let createArgs: string[] = [];
+  if (matches && matches[1]) {
+    return matches[1];
+  }
+
+  throw new Error('Could not get GNU tar version');
+}
+
+export async function tar(verbose = false): Promise<TarConfiguration> {
+  if (!discoveredConfiguration) {
+    const bin = await discoverBin();
+    let create: string[] = [];
 
     if (!(await isGnuTar(bin))) {
-      process.stderr.write(
-        `WARNING: tar on PATH does not seem to be GNU tar: it may fail to extract artifacts correctly${
-          process.platform === 'darwin' ? ' (named gtar, try "brew install gtar")' : ''
-        }\n`
-      );
+      log(`Using ${bin}: this does not seem to be GNU tar: it may fail to extract artifacts correctly`);
     } else {
-      const output = (await exec(bin, ['--version'])).stdout;
-      log(`Using ${bin}: ${output}`);
+      const versionOutput = (await exec(bin, ['--version'])).stdout;
+      const version = getGnuTarVersion(versionOutput);
 
-      const matches = output.match(/^tar \(GNU tar\) ([0-9.-]+)\n/);
+      log(`Using ${bin} : ${version}`);
 
-      if (matches && compare(matches[1], '1.28', '>=')) {
-        createArgs = [...createArgs, '--sort=name']; // --sort was added in 1.28
+      if (verbose) {
+        log(versionOutput);
+      }
+
+      if (compare(version, '1.28', '>=')) {
+        create = [...create, '--sort=name']; // --sort was added in 1.28
       }
     }
 
-    cachedTarResult = {
+    discoveredConfiguration = {
       bin,
-      createArgs,
+      argsFor: {
+        create,
+      },
     };
   }
 
-  return cachedTarResult;
+  return discoveredConfiguration;
 }

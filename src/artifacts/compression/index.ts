@@ -20,14 +20,14 @@ export const compressors: Record<string, Compression> = {
   tar,
 };
 
-export function deflator(output: Artifact, tarInputArgs: TarInputArgs): Promise<unknown> {
+export function deflator(output: Artifact): Promise<string[]> {
   const compressor = compressors?.[output.ext];
 
   if (!compressor) {
     throw new Error(`Unsupported output artifact format: ${output.ext}`);
   }
 
-  return compressor.deflate({ output, tarInputArgs });
+  return compressor.deflate(output);
 }
 
 export async function inflator(input: stream.Readable, artifact: Artifact, outputPath = '.'): Promise<unknown> {
