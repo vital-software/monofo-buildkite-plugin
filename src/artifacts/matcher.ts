@@ -2,37 +2,73 @@ import { promises as fs, PathLike } from 'fs';
 import path from 'path';
 import debug from 'debug';
 import _ from 'lodash';
+import tempy from 'tempy';
 import { globSet } from '../util/glob';
-import { count, exists, depthSort } from '../util/helper';
+import { count, exists } from '../util/helper';
 
 const log = debug('monofo:artifact:matcher');
 
-export interface PathsToPack {
-  [path: string]: { recurse: boolean };
+export interface Manifest {
+  [pathToPack: string]: { recurse: boolean };
 }
 
-function isRoot(p: string): boolean {
-  return p === '' || p === '/' || p === '.';
+function isRoot(pth: string): boolean {
+  return pth === '' || pth === '/' || pth === '.';
 }
 
-export function flattenPaths(toPack: PathsToPack): { recursive: string[]; nonRecursive: string[] } {
-  const recursive = depthSort(
-    Object.entries(toPack)
-      .filter(([, { recurse }]) => recurse)
-      .map(([p]) => p)
+function recursionOpt(mode: boolean) {
+  return mode ? '--recursion' : '--no-recursion';
+}
+
+function sequentialGroupsByRecursion(manifest: Manifest): { recurse: boolean; paths: string[] }[] {
+  const sorted = Object.entries(manifest).sort(([p1], [p2]) => p1.localeCompare(p2));
+
+  const groups: { recurse: boolean; paths: string[] }[] = [];
+  let group: { recurse: boolean; paths: string[] } = { paths: [], recurse: sorted?.[0]?.[1]?.recurse || false };
+
+  for (const [pathToPack, { recurse }] of sorted) {
+    if (group.recurse !== recurse) {
+      groups.push({ ...group });
+      group = { paths: [], recurse };
+    }
+
+    group.paths.push(pathToPack);
+  }
+
+  return groups;
+}
+
+/**
+ * Flattens the given paths to a single file list that can be loaded by GNU tar
+ *
+ * The file list uses recursive file list loading (--files-from can be used inside the --files-from), and the
+ * --no-recursion option to provide support for intermediate directories while retaining support for complex file names
+ * (such as ones beginning with `-` or containing newlines)
+ *
+ * @return string A set of tar options, that can be put into a file list or passed as an argv for further processing
+ */
+export async function flattenPathsToFileList(manifest: Manifest): Promise<string[]> {
+  const output: string[] = ['--null'];
+
+  const groups: { recurse: boolean; paths: string[] }[] = sequentialGroupsByRecursion(manifest).filter(
+    ({ paths }) => paths.length > 0
   );
 
-  const nonRecursive = depthSort(
-    Object.entries(toPack)
-      .filter(([, { recurse }]) => !recurse)
-      .map(([p]) => p)
-  );
+  if (!groups.length) {
+    return [];
+  }
 
-  return { recursive, nonRecursive };
+  for (const { paths, recurse } of groups) {
+    const newFileList = tempy.file({ extension: '.null.list' });
+    await fs.writeFile(newFileList, `${paths.join('\x00')}\x00`);
+    output.push(recursionOpt(recurse), `--files-from=${newFileList}`);
+  }
+
+  return output;
 }
 
-export function addIntermediateDirectories(toPack: PathsToPack): PathsToPack {
-  const repacked: PathsToPack = {};
+export function addIntermediateDirectories(manifest: Manifest): Manifest {
+  const repacked: Manifest = {};
 
   const addWithParents = (p: string, recurse: boolean): void => {
     if (isRoot(p)) {
@@ -49,7 +85,7 @@ export function addIntermediateDirectories(toPack: PathsToPack): PathsToPack {
     repacked[p] = { recurse };
   };
 
-  for (const [p, { recurse }] of Object.entries(toPack)) {
+  for (const [p, { recurse }] of Object.entries(manifest)) {
     addWithParents(p, recurse);
   }
 
@@ -68,7 +104,7 @@ export function addIntermediateDirectories(toPack: PathsToPack): PathsToPack {
  * To fix this, and make the eventual tar compatible with catar, we do the
  * recursion into files ourselves.
  */
-export async function pathsToPack({
+export async function getManifest({
   filesFrom,
   globs,
   useNull = false,
@@ -76,7 +112,7 @@ export async function pathsToPack({
   filesFrom?: string;
   globs?: string[];
   useNull?: boolean;
-}): Promise<PathsToPack> {
+}): Promise<Manifest> {
   if (!filesFrom && !globs) {
     return {};
   }
