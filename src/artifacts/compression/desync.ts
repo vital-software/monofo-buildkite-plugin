@@ -198,21 +198,31 @@ export const desync: Compression = {
   async deflate({ output, tarInputArgs }): Promise<execa.ExecaChildProcess> {
     await checkEnabled();
 
+    // prettier-ignore
     return execFromTar(tarInputArgs, [
       '|',
-      'desync',
-      'tar',
-      '--config',
-      configPath,
-      '--verbose',
-      '--tar-add-root',
-      '--input-format',
-      'tar',
-      '--index',
-      '--store',
-      store(),
-      output.filename,
-      '-',
+      'desync', 'tar',
+        '--config', configPath,
+        '--verbose',
+        '--tar-add-root',
+        '--input-format', 'tar',
+        '--index',
+        '--store', store(),
+
+        output.filename, // caidx file
+        '-',             // tar will be received on input
+
+      // Check for crashes
+      // Samples the 200 bytes of the output, requires it to be larger than 141 bytes, which is an empty .caidx (a truncated .catar is slightly smaller)
+      '&&',
+      '(',
+        'test', `"$(head -c 200 ${output.filename} | wc -c | tr -d ' ')"`, '-gt', '141',
+      '||',
+        '(',
+          'echo', '"detected failure"', '>&2', ';',
+          'exit', '2', ';',
+        ')',
+      ')',
     ]);
   },
 

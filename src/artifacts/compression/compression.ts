@@ -1,7 +1,7 @@
 import stream from 'stream';
 import { Artifact } from '../model';
 
-export type TarInputArgs = { argv: string[] } | { file: string };
+export type TarInputArgs = { argv: string[]; input: string } | { file: string };
 
 export interface Compression {
   /**

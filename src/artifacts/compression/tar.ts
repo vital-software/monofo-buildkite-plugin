@@ -1,4 +1,3 @@
-import stream from 'stream';
 import debug from 'debug';
 import execa, { ExecaReturnValue } from 'execa';
 import { EmptyArgsError, exec, hasBin } from '../../util/exec';
@@ -27,6 +26,14 @@ export function tarExecArgs(tarInputArgs: TarInputArgs): string[] {
   return tarInputArgs.argv;
 }
 
+export function tarExecOptions(tarInputArgs: TarInputArgs): Partial<execa.Options> {
+  if ('input' in tarInputArgs) {
+    return { input: tarInputArgs.input };
+  }
+
+  return {};
+}
+
 export function execFromTar(
   tarInputArgs: TarInputArgs,
   argv: string[],
@@ -38,7 +45,7 @@ export function execFromTar(
     throw new EmptyArgsError();
   }
 
-  return exec(first, rest, options);
+  return exec(first, rest, { ...tarExecOptions(tarInputArgs), ...options });
 }
 
 export const tar: Compression = {
