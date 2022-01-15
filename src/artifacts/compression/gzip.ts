@@ -3,7 +3,6 @@ import execa, { ExecaReturnValue } from 'execa';
 import { hasBin } from '../../util/exec';
 import { tar } from '../../util/tar';
 import { Compression } from './compression';
-import { execFromTar } from './tar';
 
 const log = debug('monofo:artifact:compression:gzip');
 
