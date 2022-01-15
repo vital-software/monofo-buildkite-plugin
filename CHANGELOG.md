@@ -1,3 +1,12 @@
+## [3.7.2](https://github.com/vital-software/monofo/compare/v3.7.1...v3.7.2) (2022-01-15)
+
+
+### Bug Fixes
+
+* **deps:** update aws-sdk-js-v3 monorepo to v[secure] ([2a95eb3](https://github.com/vital-software/monofo/commit/2a95eb3603b3dd2a0d68bcd01a48c2ccef8b6e19))
+* change between recursive and non-recursive each time ([d148f00](https://github.com/vital-software/monofo/commit/d148f00797ff1a45ec9c40d0384f7e21df4e59ba))
+* still use GNU but pass non-recursion list of paths too ([75c716b](https://github.com/vital-software/monofo/commit/75c716bf55e9e7a902d45257db61b2a7b8a7d825))
+
 ## [3.7.1](https://github.com/vital-software/monofo/compare/v3.7.0...v3.7.1) (2022-01-12)
 
 
