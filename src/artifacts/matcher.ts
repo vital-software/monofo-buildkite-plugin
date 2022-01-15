@@ -48,8 +48,6 @@ function sequentialGroupsByRecursion(manifest: Manifest): { recurse: boolean; pa
  * @return string A set of tar options, that can be put into a file list or passed as an argv for further processing
  */
 export async function flattenPathsToFileList(manifest: Manifest): Promise<string[]> {
-  const output: string[] = ['--null'];
-
   const groups: { recurse: boolean; paths: string[] }[] = sequentialGroupsByRecursion(manifest).filter(
     ({ paths }) => paths.length > 0
   );
@@ -58,13 +56,18 @@ export async function flattenPathsToFileList(manifest: Manifest): Promise<string
     return [];
   }
 
-  for (const { paths, recurse } of groups) {
-    const newFileList = tempy.file({ extension: '.null.list' });
-    await fs.writeFile(newFileList, `${paths.join('\x00')}\x00`);
-    output.push(recursionOpt(recurse), `--files-from=${newFileList}`);
-  }
-
-  return output;
+  return [
+    '--null',
+    ...(
+      await Promise.all(
+        groups.map<Promise<string[]>>(async ({ paths, recurse }): Promise<string[]> => {
+          const newFileList = tempy.file({ extension: '.null.list' });
+          await fs.writeFile(newFileList, `${paths.join('\x00')}\x00`);
+          return [recursionOpt(recurse), `--files-from=${newFileList}`];
+        })
+      )
+    ).flat(),
+  ];
 }
 
 export function addIntermediateDirectories(manifest: Manifest): Manifest {
