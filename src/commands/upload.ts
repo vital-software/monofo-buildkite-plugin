@@ -101,6 +101,11 @@ locally cached
     }
 
     const fileList = await tarArgListForManifest(manifest);
+
+    if (!fileList) {
+      throw new Error('Expected file to package');
+    }
+
     log(`Giving ${count(fileList, 'argument')} to tar as input filelist`);
     const input = `${fileList.join('\n')}\n`;
 
