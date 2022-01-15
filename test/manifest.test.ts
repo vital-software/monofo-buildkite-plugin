@@ -1,9 +1,9 @@
 import * as fs from 'fs';
 import { promisify } from 'util';
 import { directory } from 'tempy';
-import { addIntermediateDirectories, Manifest, getManifest } from '../../src/artifacts/matcher';
-import { mergeBase, diff, revList } from '../../src/git';
-import { fakeProcess, COMMIT } from '../fixtures';
+import { mergeBase, diff, revList } from '../src/git';
+import { addIntermediateDirectories, Manifest, getManifest } from '../src/manifest';
+import { fakeProcess, COMMIT } from './fixtures';
 
 const writeFile = promisify(fs.writeFile);
 
