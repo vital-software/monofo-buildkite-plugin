@@ -4,6 +4,7 @@ import rimrafCb from 'rimraf';
 import tempy from 'tempy';
 import { Compression, compressors, inflator } from '../../src/artifacts/compression';
 import { Artifact } from '../../src/artifacts/model';
+import { exec } from '../../src/util/exec';
 import { fakeProcess, getFixturePath } from '../fixtures';
 
 const rimraf = promisify(rimrafCb);
@@ -38,10 +39,9 @@ describe('compression', () => {
       const compression: Compression = compressors[extension];
       const compressed = `${dir}/test.${extension}`;
 
-      await compression.deflate({
-        output: new Artifact(compressed),
-        tarInputArgs: { file: getFixturePath('qux.tar') },
-      });
+      const args = await compression.deflate(new Artifact(compressed));
+
+      await exec('cat', [getFixturePath('qux.tar'), ...args]);
 
       expect(fs.existsSync(compressed)).toBe(true);
 

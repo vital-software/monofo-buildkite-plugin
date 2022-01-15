@@ -5,6 +5,7 @@ import { deflator } from '../artifacts/compression';
 import { Artifact } from '../artifacts/model';
 import { BaseCommand, BaseFlags } from '../command';
 import { tarArgListForManifest, getManifest } from '../manifest';
+import { exec } from '../util/exec';
 import { count } from '../util/helper';
 import { tar } from '../util/tar';
 
@@ -110,21 +111,24 @@ locally cached
     const input = `${fileList.join('\n')}\n`;
 
     const tarBin = await tar();
-    const tarArgs = [
+    const allArgs = [
       'set',
       '-euo',
       'pipefail',
       ';',
       tarBin.bin,
       '-c',
-      ...tarBin.createArgs,
+      ...tarBin.argsFor.create,
       '--hard-dereference',
       '--files-from',
       '-',
+      ...(await deflator(artifact)),
     ];
 
     log(`Deflating to ${args.output}`);
-    await deflator(artifact, { argv: tarArgs, input });
+    await exec(allArgs[0], allArgs.slice(1), {
+      input,
+    });
     log(`Archive deflated at ${args.output}`);
 
     log('Uploading to Buildkite');

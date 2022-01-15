@@ -20,9 +20,9 @@ async function checkEnabled() {
 }
 
 export const lz4: Compression = {
-  async deflate({ output, tarInputArgs }): Promise<execa.ExecaChildProcess> {
+  async deflate(output): Promise<string[]> {
     await checkEnabled();
-    return execFromTar(tarInputArgs, ['|', 'lz4', '-2', '>', output.filename]);
+    return ['|', 'lz4', '-2', '>', output.filename];
   },
 
   async inflate({ input, outputPath = '.' }): Promise<ExecaReturnValue> {

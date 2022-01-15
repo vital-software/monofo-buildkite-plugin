@@ -11,8 +11,9 @@ export interface Compression {
   inflate(options: { input: stream.Readable; outputPath?: string; verbose?: boolean }): Promise<unknown>;
 
   /**
-   * deflate either takes a tar, or creates one on the fly, and passes this to a compression algorithm, outputting the
-   * desired artifact
+   * deflate doesn't do anything, but rather returns a shell script, split into arguments
+   *
+   * The script receives a tar on stdin, and deflates it into a compressed artifact
    */
-  deflate(options: { output: Artifact; tarInputArgs: TarInputArgs }): Promise<unknown>;
+  deflate(output: Artifact): Promise<string[]>;
 }

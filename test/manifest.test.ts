@@ -7,8 +7,8 @@ import { fakeProcess, COMMIT } from './fixtures';
 
 const writeFile = promisify(fs.writeFile);
 
-jest.mock('../../src/git');
-jest.mock('../../src/buildkite/client');
+jest.mock('../src/git');
+jest.mock('../src/buildkite/client');
 
 const mockMergeBase = mergeBase as jest.Mock<Promise<string>>;
 mockMergeBase.mockImplementation(() => Promise.resolve(COMMIT));

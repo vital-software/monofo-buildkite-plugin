@@ -195,11 +195,11 @@ export const desync: Compression = {
   /**
    * Deflate a tar file, creating a content-addressed index file
    */
-  async deflate({ output, tarInputArgs }): Promise<execa.ExecaChildProcess> {
+  async deflate(output): Promise<string[]> {
     await checkEnabled();
 
     // prettier-ignore
-    return execFromTar(tarInputArgs, [
+    return [
       '|',
       'desync', 'tar',
         '--config', configPath,
@@ -223,7 +223,7 @@ export const desync: Compression = {
           'exit', '2', ';',
         ')',
       ')',
-    ]);
+    ];
   },
 
   /**

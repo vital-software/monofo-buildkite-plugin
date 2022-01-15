@@ -20,9 +20,9 @@ async function checkEnabled() {
 }
 
 export const gzip: Compression = {
-  async deflate({ output, tarInputArgs }): Promise<execa.ExecaChildProcess> {
+  async deflate(output): Promise<string[]> {
     await checkEnabled();
-    return execFromTar(tarInputArgs, ['|', 'gzip', '>', output.filename]);
+    return ['|', 'gzip', '>', output.filename];
   },
 
   async inflate({ input, outputPath = '.' }): Promise<ExecaReturnValue> {
