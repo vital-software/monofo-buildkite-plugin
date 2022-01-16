@@ -9,3 +9,4 @@ output/
 oclif.manifest.json
 .combined-docs.md
 .eslintcache
+test/fixtures/desync-store/

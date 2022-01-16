@@ -121,23 +121,27 @@ export async function getManifest({
   filesFrom,
   globs,
   useNull = false,
+  globsRecurse = true, // TODO: wire through from pipeline.yml
 }: {
   filesFrom?: string;
   globs?: string[];
   useNull?: boolean;
+  globsRecurse?: boolean;
 }): Promise<Manifest> {
   if (!filesFrom && !globs) {
     return {};
   }
 
-  const paths: Record<string, { recurse: boolean }> = Object.fromEntries(
-    (
-      await globSet(
-        _.castArray(globs).filter((v) => v),
-        { matchBase: false }
+  const globArray = _.castArray(globs).filter((v) => v);
+
+  const paths: Manifest = globArray.length
+    ? Object.fromEntries(
+        (await globSet(globArray, { matchBase: false })).map((p) => [
+          p.startsWith('./') ? p : `./${p}`,
+          { recurse: globsRecurse },
+        ])
       )
-    ).map((p) => [`./${p}`, { recurse: false }])
-  );
+    : {};
 
   if (filesFrom) {
     if (filesFrom !== '-' && !(await exists(filesFrom))) {
