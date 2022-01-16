@@ -77,6 +77,7 @@ export async function tarArgListForManifest(manifest: Manifest): Promise<string[
 
 export function addIntermediateDirectories(manifest: Manifest): Manifest {
   const repacked: Manifest = {};
+  const added: string[] = [];
 
   const addWithParents = (p: string, recurse: boolean): void => {
     if (isRoot(p)) {
@@ -86,7 +87,7 @@ export function addIntermediateDirectories(manifest: Manifest): Manifest {
     const parent = path.dirname(p);
 
     if (!isRoot(parent) && !(parent in repacked)) {
-      log(`Adding intermediate directory to included paths to upload: ${parent}`);
+      added.push(parent);
       addWithParents(parent, false);
     }
 
@@ -95,6 +96,10 @@ export function addIntermediateDirectories(manifest: Manifest): Manifest {
 
   for (const [p, { recurse }] of Object.entries(manifest)) {
     addWithParents(p, recurse);
+  }
+
+  if (added) {
+    log(`Adding intermediate directories to upload`, added);
   }
 
   return repacked;
@@ -116,23 +121,27 @@ export async function getManifest({
   filesFrom,
   globs,
   useNull = false,
+  globsRecurse = true, // TODO: wire through from pipeline.yml
 }: {
   filesFrom?: string;
   globs?: string[];
   useNull?: boolean;
+  globsRecurse?: boolean;
 }): Promise<Manifest> {
   if (!filesFrom && !globs) {
     return {};
   }
 
-  const paths: Record<string, { recurse: boolean }> = Object.fromEntries(
-    (
-      await globSet(
-        _.castArray(globs).filter((v) => v),
-        { matchBase: false }
+  const globArray = _.castArray(globs).filter((v) => v);
+
+  const paths: Manifest = globArray.length
+    ? Object.fromEntries(
+        (await globSet(globArray, { matchBase: false })).map((p) => [
+          p.startsWith('./') ? p : `./${p}`,
+          { recurse: globsRecurse },
+        ])
       )
-    ).map((p) => [`./${p}`, { recurse: false }])
-  );
+    : {};
 
   if (filesFrom) {
     if (filesFrom !== '-' && !(await exists(filesFrom))) {

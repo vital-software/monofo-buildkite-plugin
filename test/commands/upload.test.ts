@@ -96,8 +96,7 @@ describe('cmd upload', () => {
         'foo/qux/**/*.txt',
       ]);
 
-      expect(stderr).toContain('Adding intermediate directory to included paths to upload: ./foo');
-      expect(stderr).toContain('Adding intermediate directory to included paths to upload: ./foo/qux/quux');
+      expect(stderr).toContain("Adding intermediate directories to upload [ './foo/qux/quux', './foo/qux', './foo' ]");
       expect(stderr).toContain('Globs and file input matched 4 paths');
       expect(stderr).toContain('Successfully uploaded some-upload');
 
@@ -117,5 +116,12 @@ describe('cmd upload', () => {
 
       expect(stderr).toContain('Successfully uploaded some-upload');
     });
+  });
+
+  it('works functionally on ./node_modules/ here', async () => {
+    jest.setTimeout(50000);
+    process.chdir(`${__dirname}/../../`);
+    const { stderr } = await testRun(Upload, ['node-modules.caidx', './node_modules/']);
+    expect(stderr).toContain('Successfully uploaded node-modules');
   });
 });
