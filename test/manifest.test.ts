@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import { promisify } from 'util';
+import mkdirp from 'mkdirp';
 import { directory } from 'tempy';
 import { mergeBase, diff, revList } from '../src/git';
 import { addIntermediateDirectories, Manifest, getManifest } from '../src/manifest';
@@ -74,8 +75,28 @@ describe('artifact matcher', () => {
       });
 
       expect(Object.keys(result)).toHaveLength(2);
-      expect(result['./foo.txt']).toStrictEqual({ recurse: false });
-      expect(result['./bar.txt']).toStrictEqual({ recurse: false });
+      expect(result['./foo.txt']).toStrictEqual({ recurse: true });
+      expect(result['./bar.txt']).toStrictEqual({ recurse: true });
+    });
+  });
+
+  it('can match a directory glob recursively', async () => {
+    await directory.task(async (dir) => {
+      process.chdir(dir);
+
+      await mkdirp(`${dir}/fake_modules/some-module-a/something`);
+      await mkdirp(`${dir}/fake_modules/some-module-b/something`);
+      await mkdirp(`${dir}/fake_modules/some-module-c/something`);
+      await writeFile(`${dir}/fake_modules/some-module-a/something/foo.txt`, 'bar\n');
+      await writeFile(`${dir}/fake_modules/some-module-b/something/foo.txt`, 'bar\n');
+      await writeFile(`${dir}/fake_modules/some-module-c/something/foo.txt`, 'bar\n');
+
+      const result = await getManifest({
+        globs: ['./fake_modules/'],
+      });
+
+      expect(result['./fake_modules/']).toStrictEqual({ recurse: true });
+      expect(Object.keys(result)).toHaveLength(1);
     });
   });
 });
