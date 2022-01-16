@@ -20,7 +20,7 @@ steps:
     plugins:
       - docker-compose#v3.9.0:
           run: node
-      - vital-software/monofo#v3.7.1:
+      - vital-software/monofo#v3.8.0:
           download: node-modules.caidx # pre-cache the old node_modules into place before yarn install
           upload:
             node-modules.caidx:
