@@ -1,5 +1,7 @@
+import { promises as fs } from 'fs';
 import { flags as f } from '@oclif/command';
 import debug from 'debug';
+import prettyBytes from 'pretty-bytes';
 import { upload } from '../artifacts/api';
 import { deflator } from '../artifacts/compression';
 import { Artifact } from '../artifacts/model';
@@ -129,7 +131,8 @@ locally cached
     await exec(allArgs[0], allArgs.slice(1), {
       input,
     });
-    log(`Archive deflated at ${args.output}`);
+    const stats = await fs.stat(args.output);
+    log(`Archive deflated at ${args.output} as ${prettyBytes(stats.size)}`);
 
     log('Uploading to Buildkite');
     await upload(artifact);
