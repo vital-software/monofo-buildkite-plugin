@@ -1,3 +1,11 @@
+## [3.7.3-beta.1](https://github.com/vital-software/monofo/compare/v3.7.2...v3.7.3-beta.1) (2022-01-16)
+
+
+### Bug Fixes
+
+* check for empty file list ([9fa238b](https://github.com/vital-software/monofo/commit/9fa238b43b0927f102430e35c011b59cf3449bef))
+* remember to push the final group ([c93188b](https://github.com/vital-software/monofo/commit/c93188b50e6e7113d565d29dc7acf86ac7c4d7c2))
+
 ## [3.7.2](https://github.com/vital-software/monofo/compare/v3.7.1...v3.7.2) (2022-01-15)
 
 
