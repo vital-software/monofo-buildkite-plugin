@@ -1,3 +1,17 @@
+# [3.8.0](https://github.com/vital-software/monofo/compare/v3.7.2...v3.8.0) (2022-01-16)
+
+
+### Bug Fixes
+
+* check for empty file list ([4b60985](https://github.com/vital-software/monofo/commit/4b60985137a3ff5f6952f68740ece1527be51167))
+* globs are recursive (because they can match directories) ([51bd769](https://github.com/vital-software/monofo/commit/51bd769bc08e29e31f3c34cb394ec5a91c401b4c))
+* remember to push the final group ([3cd64d4](https://github.com/vital-software/monofo/commit/3cd64d43c5e968f594ebf5b4896b05040a39233c))
+
+
+### Features
+
+* output byte-size of artifact before upload ([39aebaa](https://github.com/vital-software/monofo/commit/39aebaa91e4cbb101313f4ff713a2d00014ac887))
+
 ## [3.7.2](https://github.com/vital-software/monofo/compare/v3.7.1...v3.7.2) (2022-01-15)
 
 
