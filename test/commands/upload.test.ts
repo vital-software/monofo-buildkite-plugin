@@ -119,9 +119,8 @@ describe('cmd upload', () => {
   });
 
   it('works functionally on ./node_modules/ here', async () => {
-    jest.setTimeout(50000);
     process.chdir(`${__dirname}/../../`);
     const { stderr } = await testRun(Upload, ['node-modules.caidx', './node_modules/']);
     expect(stderr).toContain('Successfully uploaded node-modules');
-  });
+  }, 30000);
 });
