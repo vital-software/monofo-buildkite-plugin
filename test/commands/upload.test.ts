@@ -122,5 +122,5 @@ describe('cmd upload', () => {
     process.chdir(`${__dirname}/../../`);
     const { stderr } = await testRun(Upload, ['node-modules.caidx', './node_modules/']);
     expect(stderr).toContain('Successfully uploaded node-modules');
-  }, 30000);
+  }, 60000);
 });
