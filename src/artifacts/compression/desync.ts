@@ -4,7 +4,8 @@ import { promisify } from 'util';
 import { fromEnv, fromInstanceMetadata } from '@aws-sdk/credential-providers';
 import { Credentials } from '@aws-sdk/types';
 import debug from 'debug';
-import execa, { ExecaReturnValue } from 'execa';
+import execa from 'execa';
+import mkdirp from 'mkdirp';
 import rimrafCb from 'rimraf';
 import tempy from 'tempy';
 import { exec, hasBin } from '../../util/exec';
@@ -52,30 +53,6 @@ function cacheFlags(as = 'cache'): string[] {
   return process.env.MONOFO_DESYNC_CACHE ? [`--${as}`, process.env.MONOFO_DESYNC_CACHE] : [];
 }
 
-/**
- * Recursively creates a directory if it doesn't exist, ignoring any path parts that do exist
- *
- * @param maybeDir function returning string because it'll throw if there's no such configured store/cache directory type
- */
-async function ensureExists(maybeDir: () => string) {
-  try {
-    const dir = maybeDir();
-
-    // Only local caches/stores
-    if (dir.indexOf(':') !== -1 || dir.startsWith('s3')) {
-      return;
-    }
-
-    if (dir) {
-      log(`Ensuring ${dir} exists via mkdir`);
-      await fs.mkdir(dir, { recursive: true });
-    }
-  } catch (err: unknown) {
-    if (err instanceof MissingConfigError) return;
-    throw err;
-  }
-}
-
 async function writeCredentialsFile(credentials: Credentials): Promise<void> {
   await fs.writeFile(
     credentialsPath,
@@ -87,10 +64,14 @@ ${credentials.sessionToken ? `aws_session_token = ${credentials.sessionToken}\n`
   );
 }
 
-async function writeConfigFile(): Promise<void> {
+async function setUpConfig(): Promise<void> {
+  if (!needsDynamicConfig()) {
+    return;
+  }
+
   await fs.writeFile(
     configPath,
-    JSON.stringify(
+    `${JSON.stringify(
       {
         's3-credentials': {
           'https://s3-us-west-2.amazonaws.com': {
@@ -102,9 +83,13 @@ async function writeConfigFile(): Promise<void> {
       },
       null,
       4
-    ),
+    )}\n`,
     { mode: 0o640 }
   );
+}
+
+function needsDynamicConfig(): boolean {
+  return !process.env.S3_ACCESS_KEY || !process.env.S3_SECRET_KEY;
 }
 
 /**
@@ -122,27 +107,19 @@ async function writeConfigFile(): Promise<void> {
  *
  * So, we write out a temporary credentials file and mutate process.env to refer to it.
  */
-async function ensureConfigExists(): Promise<void> {
-  log('Checking whether to create config file');
+async function setUpCredentials(): Promise<void> {
+  if (!needsDynamicConfig()) {
+    if (!process.env.S3_REGION) {
+      // This is only used with static security credentials :(
+      // See https://github.com/folbricht/desync/blob/5dd803ef214b97059acffeddd156594fcc63edd8/cmd/desync/config.go#L61
+      log(`Setting S3_REGION=${region()}`);
+      process.env.S3_REGION = region();
+    }
 
-  // This doesn't get used in the absence of static security credentials :(
-  // See https://github.com/folbricht/desync/blob/5dd803ef214b97059acffeddd156594fcc63edd8/cmd/desync/config.go#L61
-  if (!process.env.S3_REGION) {
-    log(`Setting S3_REGION=${region()}`);
-    process.env.S3_REGION = region();
-  }
-
-  /*
-   * Desync only understands S3_ACCESS_KEY, S3_SECRET_KEY - not the standard AWS_*
-   *
-   * We will translated those, via the configuration file. But first, if they're not already set, perhaps we can
-   * load them from the instance metadata (i.e. if you're in EC2)
-   */
-  if (process.env.S3_ACCESS_KEY && process.env.S3_SECRET_KEY) {
-    log('Using static S3 credentials');
     return;
   }
 
+  // For dynamic cde
   if (process.env.AWS_SESSION_TOKEN && process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY) {
     try {
       log('Loading env var security credentials into file', credentialsPath);
@@ -151,10 +128,13 @@ async function ensureConfigExists(): Promise<void> {
       log('Successfully loaded');
       process.env.AWS_PROFILE = 'desync';
       process.env.AWS_SHARED_CREDENTIALS_FILE = credentialsPath;
+
+      return;
     } catch (err: unknown) {
       log('Failed to use env var credentials directly', err);
     }
   }
+
   try {
     log('Loading instance profile security credentials into file', credentialsPath);
     await writeCredentialsFile(await fromInstanceMetadata()());
@@ -162,26 +142,24 @@ async function ensureConfigExists(): Promise<void> {
     log('Successfully loaded');
     process.env.AWS_PROFILE = 'desync';
     process.env.AWS_SHARED_CREDENTIALS_FILE = credentialsPath;
+
+    return;
   } catch (err: unknown) {
     log('Failed to use instance profile from metadata service', err);
   }
 
-  // Furthermore, we need to use an actual config file: https://github.com/folbricht/desync/blob/5dd803ef214b97059acffeddd156594fcc63edd8/cmd/desync/config.go#L61
-  // Because otherwise there's no way to supply the region here
-  await writeConfigFile();
+  throw new Error('Failed to write credentials for desync process');
 }
 
 async function checkEnabled(): Promise<void> {
-  if (!store()) {
-    throw new Error('Desync compression disabled due to no MONOFO_DESYNC_STORE given');
-  }
-
   if (enabled === undefined) {
-    await ensureConfigExists();
+    if (!store()) {
+      throw new Error('Desync compression disabled due to no MONOFO_DESYNC_STORE given');
+    }
 
-    await ensureExists(() => store());
-    await ensureExists(() => cache());
+    const setup = [setUpConfig(), setUpCredentials(), mkdirp(store()), mkdirp(cache())];
 
+    await Promise.all(setup);
     enabled = await hasBin('desync');
   }
 
@@ -201,15 +179,15 @@ export const desync: Compression = {
     return [
       '|',
       'desync', 'tar',
-        '--config', configPath,
+        ...(needsDynamicConfig() ? ['--config', configPath] : []),
         '--verbose',
         '--tar-add-root',
         '--input-format', 'tar',
         '--index',
         '--store', store(),
 
-        output.filename, // caidx file
-        '-',             // tar will be received on input
+      output.filename, // caidx file
+      '-',             // tar will be received on input
     ];
   },
 
@@ -222,7 +200,7 @@ export const desync: Compression = {
    *
    * @return ExecaChildProcess The result of running desync untar
    */
-  async inflate({ input, outputPath = '.', verbose = false }): Promise<ExecaReturnValue> {
+  async inflate({ input, outputPath = '.', verbose = false }): Promise<execa.ExecaReturnValue> {
     await checkEnabled();
 
     const allArgs = [
