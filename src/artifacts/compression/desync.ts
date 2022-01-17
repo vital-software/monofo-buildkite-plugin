@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import { promisify } from 'util';
-import { fromEnv, fromInstanceMetadata } from '@aws-sdk/credential-providers';
+import { defaultProvider } from '@aws-sdk/credential-provider-node';
 import { Credentials } from '@aws-sdk/types';
 import debug from 'debug';
 import execa from 'execa';
@@ -53,15 +53,8 @@ function cacheFlags(as = 'cache'): string[] {
   return process.env.MONOFO_DESYNC_CACHE ? [`--${as}`, process.env.MONOFO_DESYNC_CACHE] : [];
 }
 
-async function writeCredentialsFile(credentials: Credentials): Promise<void> {
-  await fs.writeFile(
-    credentialsPath,
-    `[profile_desync]
-aws_access_key_id = ${credentials.accessKeyId}
-aws_secret_access_key = ${credentials.secretAccessKey}
-${credentials.sessionToken ? `aws_session_token = ${credentials.sessionToken}\n` : ''}`,
-    { mode: 0o600 }
-  );
+function needsDynamicConfig(): boolean {
+  return !process.env.S3_ACCESS_KEY || !process.env.S3_SECRET_KEY;
 }
 
 async function setUpConfig(): Promise<void> {
@@ -86,10 +79,6 @@ async function setUpConfig(): Promise<void> {
     )}\n`,
     { mode: 0o640 }
   );
-}
-
-function needsDynamicConfig(): boolean {
-  return !process.env.S3_ACCESS_KEY || !process.env.S3_SECRET_KEY;
 }
 
 /**
@@ -119,36 +108,24 @@ async function setUpCredentials(): Promise<void> {
     return;
   }
 
-  // For dynamic cde
-  if (process.env.AWS_SESSION_TOKEN && process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY) {
-    try {
-      log('Loading env var security credentials into file', credentialsPath);
-      await writeCredentialsFile(await fromEnv()());
-
-      log('Successfully loaded');
-      process.env.AWS_PROFILE = 'desync';
-      process.env.AWS_SHARED_CREDENTIALS_FILE = credentialsPath;
-
-      return;
-    } catch (err: unknown) {
-      log('Failed to use env var credentials directly', err);
-    }
-  }
+  let credentials: Credentials;
 
   try {
-    log('Loading instance profile security credentials into file', credentialsPath);
-    await writeCredentialsFile(await fromInstanceMetadata()());
-
-    log('Successfully loaded');
-    process.env.AWS_PROFILE = 'desync';
-    process.env.AWS_SHARED_CREDENTIALS_FILE = credentialsPath;
-
-    return;
+    credentials = await defaultProvider({ timeout: 3000, maxRetries: 3 })();
   } catch (err: unknown) {
-    log('Failed to use instance profile from metadata service', err);
+    log('Could not find AWS credentials, but require dynamic credentials for desync');
+    throw err;
   }
 
-  throw new Error('Failed to write credentials for desync process');
+  log('Loading env var security credentials into file', credentialsPath);
+  await fs.writeFile(
+    credentialsPath,
+    `[profile_desync]
+aws_access_key_id = ${credentials.accessKeyId}
+aws_secret_access_key = ${credentials.secretAccessKey}
+${credentials.sessionToken ? `aws_session_token = ${credentials.sessionToken}\n` : ''}`,
+    { mode: 0o600 }
+  );
 }
 
 async function checkEnabled(): Promise<void> {
