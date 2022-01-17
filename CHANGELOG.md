@@ -1,3 +1,11 @@
+## [3.8.1](https://github.com/vital-software/monofo/compare/v3.8.0...v3.8.1) (2022-01-17)
+
+
+### Bug Fixes
+
+* only include config values when needed ([5df879b](https://github.com/vital-software/monofo/commit/5df879b76dc2e2c5fd379626454b21de14a7b2a9))
+* use the default credential chain ([9bfd084](https://github.com/vital-software/monofo/commit/9bfd0847f212cd99c4124eaf556b2cce6b095b1e))
+
 # [3.8.0](https://github.com/vital-software/monofo/compare/v3.7.2...v3.8.0) (2022-01-16)
 
 
