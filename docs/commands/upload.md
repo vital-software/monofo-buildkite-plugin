@@ -25,7 +25,7 @@ USAGE
   $ monofo upload <output> [globs...]
 
 ARGUMENTS
-  OUTPUT  The output file to produce (foo.tar.lz4 or bar.caidx, etc.)
+  OUTPUT  The output file to produce (foo.tar.lz4 or bar.catar.caibx, etc.)
   GLOBS   [default: ] A list of glob patterns; matching files are included in the artifact upload
 
 OPTIONS

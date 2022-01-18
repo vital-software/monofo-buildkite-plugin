@@ -69,7 +69,7 @@ locally cached
     {
       name: 'output',
       required: true,
-      description: 'The output file to produce (foo.tar.lz4 or bar.caidx, etc.)',
+      description: 'The output file to produce (foo.tar.lz4 or bar.catar.caibx, etc.)',
     },
     {
       name: 'globs',

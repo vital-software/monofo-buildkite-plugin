@@ -109,11 +109,11 @@ steps:
     plugins:
       - vital-software/monofo#v3.8.1:
           upload:
-            node-modules.caidx:
+            node-modules.catar.caibx:
               - "node_modules/"
 ```
 
-The resulting `node-modules.caidx` only contains pointers to the full content
+The resulting `node-modules.catar.caibx` only contains pointers to the full content
 chunks, and as a result, is only 200KiB for a 500MB node_modules/ artifact. This
 means it can upload/download in seconds.
 

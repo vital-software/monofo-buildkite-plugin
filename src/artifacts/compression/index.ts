@@ -13,7 +13,7 @@ const log = debug('monofo:artifact:compression');
 export * from './compressor';
 
 export const compressors: Record<string, Compressor> = {
-  caidx: desync,
+  'catar.caibx': desync,
   'tar.gz': gzip,
   'tar.lz4': lz4,
   tar,

@@ -15,7 +15,7 @@ USAGE
 
 ARGUMENTS
   TARFILE  Path to a .tar file
-  OUTPUT   Path to a target deflated artifact file, like something.tar.gz or something.caidx
+  OUTPUT   Path to a target deflated artifact file, like something.tar.gz or something.catar.caibx
 
 OPTIONS
   -C, --chdir=chdir  Directory to change to before executing command

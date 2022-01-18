@@ -41,7 +41,7 @@ describe('cmd download', () => {
   it.each([
     ['foo.tar.lz4', 'foo/bar'],
     ['bar.tar.gz', 'bar/baz'],
-    ['beep.caidx', 'beep/boop'],
+    ['beep.catar.caibx', 'beep/boop'],
   ])('downloads a single archive and inflates it: %s inflates %s', async (fixture, inflatedFileToExpect) => {
     const { stderr } = await testRun(Download, ['-v', fixture]);
     expect(stderr).toContain('Downloading 1 artifact');

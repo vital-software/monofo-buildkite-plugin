@@ -40,7 +40,7 @@ steps:
             node-modules.tar.lz4:
               filesFrom: node-modules.list
               null:      true
-            build.caidx:
+            build.catar.caibx:
               - "dist/**"
               - "another/dist/**"
 ```
@@ -67,7 +67,7 @@ steps:
       - vital-software/monofo#v3.8.1:
           download:
             - node-modules.tar.lz4
-            - build.caidx
+            - build.catar.caibx
 ```
 
 ## Compression
@@ -79,7 +79,7 @@ The supported compression types are:
 - `.tar`: uses no compression
 - `.tar.gz`: uses `gzip` to compress the tar
 - `.tar.lz4`: uses `lz4` to compress the tar
-- `.caidx`: uses `desync` to store the tar in a content-addressed store,
+- `.catar.caibx`: uses `desync` to store the tar in a content-addressed store,
   replacing the tarball with an "index file"
 
 ### Desync

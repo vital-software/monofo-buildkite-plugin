@@ -34,7 +34,7 @@ describe('compression', () => {
   });
 
   describe('round-trip', () => {
-    it.each([['tar.gz'], ['tar.lz4'], ['caidx']])('compression algorithm: %s', async (extension) => {
+    it.each([['tar.gz'], ['tar.lz4'], ['catar.caibx']])('compression algorithm: %s', async (extension) => {
       const compressor: Compressor = compressors[extension];
 
       const compressed = `${dir}/test.${extension}`;
@@ -42,7 +42,6 @@ describe('compression', () => {
 
       await compressor.deflate({ artifact, input: { tarPath: getFixturePath('qux.tar') } });
 
-      // await exec(['cat', getFixturePath('qux.tar'), ...args]);
       expect(existsSync(compressed)).toBe(true);
 
       await compressor.inflate({ input: createReadStream(compressed), artifact, outputPath: dir });

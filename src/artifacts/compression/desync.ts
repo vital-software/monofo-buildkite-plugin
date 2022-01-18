@@ -62,16 +62,16 @@ function needsDynamicConfig(): boolean {
   return !process.env.S3_ACCESS_KEY || !process.env.S3_SECRET_KEY;
 }
 
-function generateTemporaryFilePaths(artifact: Artifact): { caidx: string; catar: string } {
+function generateTemporaryFilePaths(artifact: Artifact): { caibx: string; catar: string } {
   const tmpDir = tempy.directory();
 
   log(`Will store temporary output to ${tmpDir} as a ${artifact.name}.catar`);
-  log(`Will store temporary stdin to ${tmpDir} as ${artifact.name}.caidx`);
+  log(`Will store temporary stdin to ${tmpDir} as ${artifact.name}.catar.caibx`);
 
   const catar = [tmpDir, `${artifact.name}.catar`].join(path.sep);
-  const caidx = [tmpDir, `${artifact.name}.caidx`].join(path.sep);
+  const caibx = [tmpDir, `${artifact.name}.catar.caibx`].join(path.sep);
 
-  return { catar, caidx };
+  return { catar, caibx };
 }
 
 async function setUpConfig(): Promise<void> {
@@ -166,7 +166,7 @@ async function inflateCatar({
   artifact,
   input,
   catar,
-  caidx,
+  caibx,
   verbose = false,
 }: {
   /**
@@ -175,14 +175,14 @@ async function inflateCatar({
   artifact: Artifact;
 
   /**
-   * A stream of the caidx contents
+   * A stream of the caibx contents
    */
   input: stream.Readable;
 
   /**
-   * An output path the caidx is written to
+   * An output path the caibx is written to
    */
-  caidx: string;
+  caibx: string;
 
   /**
    * An output path the catar is written to
@@ -194,11 +194,11 @@ async function inflateCatar({
    */
   verbose?: boolean;
 }) {
-  log('Inflating .caidx into .catar');
+  log('Inflating .catar.caibx into .catar');
   await exec(
     [
       'tee',
-      caidx,
+      caibx,
       `| desync extract`,
       `--config ${configPath}`,
       '--verbose',
@@ -211,7 +211,7 @@ async function inflateCatar({
     { input },
     verbose
   );
-  log('Finished inflating .caidx into .catar');
+  log('Finished inflating .catar.caibx into .catar');
 }
 
 /**
@@ -226,18 +226,18 @@ async function inflateCatar({
  */
 async function moveToSeed({
   catar,
-  caidx,
+  caibx,
   artifact,
 }: {
   catar: string;
-  caidx: string;
+  caibx: string;
   artifact: Artifact;
 }): Promise<void> {
   const seed = await artifact.seedFiles();
 
   await Promise.all([
     // important to cp the index, because it might have been placed at artifact.filename
-    exec(['cp', '-f', caidx, seed.caidx]),
+    exec(['cp', '-f', caibx, seed.caibx]),
     // important to mv the archive, because we have no guarantees of its location, and it can be huge
     exec(['mv', '-f', catar, seed.catar]),
   ]);
@@ -262,11 +262,11 @@ async function extractToOutput({
   return result;
 }
 
-async function printSizes({ catar, caidx }: { catar: string; caidx: string }): Promise<void> {
-  const caidxStat = await fs.stat(caidx);
+async function printSizes({ catar, caibx }: { catar: string; caibx: string }): Promise<void> {
+  const caibxStat = await fs.stat(caibx);
   const catarStat = await fs.stat(catar);
 
-  log(`Stored caidx file is ${prettyBytes(caidxStat.size)}`);
+  log(`Stored caibx file is ${prettyBytes(caibxStat.size)}`);
   log(`Stored catar file is ${prettyBytes(catarStat.size)}`);
 }
 
@@ -293,42 +293,42 @@ export const desync: Compressor = {
     log(`Finished generating catar for ${artifact.name}`, tarResult.stderr);
 
     log(`Chunking, indexing and storing ${artifact.name} to local cache first`);
-    const makeResult = await exec(['desync tar', '--index', ...cacheFlags('store'), artifact.filename, catar]);
+    const makeResult = await exec(['desync make', ...cacheFlags('store'), artifact.filename, catar]);
     log(`Chunking and storing finished, index file created at ${artifact.filename}`, makeResult.stderr);
 
     // We've successfully made an index file
-    const caidx = artifact.filename;
-    await printSizes({ catar, caidx });
+    const caibx = artifact.filename;
+    await printSizes({ catar, caibx });
 
     log(`Chopping ${artifact.name} into remote store (S3)`);
 
     const seed = await artifact.seedFiles();
-    const hasSeed = await exists(seed.caidx);
+    const hasSeed = await exists(seed.caibx);
 
     await exec([
       'desync chop',
       ...(needsDynamicConfig() ? ['--config', configPath] : []),
       '--verbose',
       `--store ${store()}`,
-      hasSeed ? `--ignore ${seed.caidx}` : ``,
-      caidx,
+      hasSeed ? `--ignore ${seed.caibx}` : ``,
+      caibx,
       catar,
     ]);
 
     log(`Finished chopping ${artifact.name} into remote store`);
 
-    await moveToSeed({ catar, caidx, artifact });
-    // TODO: copy the catar and caidx to the seed dir
+    await moveToSeed({ catar, caibx, artifact });
+    // TODO: copy the catar and caibx to the seed dir
 
     // TODO: chop into the local cache
-    //   if working.caidx is the output.filename, and working.catar is the intermediate output from the above process, then
-    //   desync chop ...cacheFlags('store') working.caidx working.catar
+    //   if working.catar.caibx is the output.filename, and working.catar is the intermediate output from the above process, then
+    //   desync chop ...cacheFlags('store') working.catar.caibx working.catar
   },
 
   /**
    * Untar an index file, inflating it at the output path
    *
-   * - Expects the contents of a .caidx file to be piped into the returned writable stream
+   * - Expects the contents of a .catar.caibx file to be piped into the returned writable stream
    * - Only outputs debugging information to stdout/stderr
    * - Directly inflates the extracted files and writes them to disk
    *
@@ -337,11 +337,11 @@ export const desync: Compressor = {
   async inflate({ input, artifact, outputPath = '.', verbose = false }): Promise<void> {
     await checkEnabled();
 
-    const { catar, caidx } = generateTemporaryFilePaths(artifact);
+    const { catar, caibx } = generateTemporaryFilePaths(artifact);
 
-    await inflateCatar({ artifact, input, catar, caidx, verbose });
-    await printSizes({ catar, caidx });
+    await inflateCatar({ artifact, input, catar, caibx, verbose });
+    await printSizes({ catar, caibx });
     await extractToOutput({ catar, outputPath, verbose });
-    await moveToSeed({ caidx, catar, artifact });
+    await moveToSeed({ caibx, catar, artifact });
   },
 };
