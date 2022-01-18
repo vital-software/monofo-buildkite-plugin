@@ -16,7 +16,7 @@ describe('model Artifact', () => {
   it.each([
     ['node-modules.tar.gz', 'node-modules', 'tar.gz'],
     ['/some/path/node-modules.tar.gz', 'node-modules', 'tar.gz'],
-    ['./node-modules.caidx', 'node-modules', 'caidx'],
+    ['./node-modules.catar.caibx', 'node-modules', 'catar.caibx'],
   ])('when given file %s produces name %s and ext %s', (filename, name, ext) => {
     process.env.BUILDKITE_BUILD_ID = BUILD_ID;
     process.env.MONOFO_ARTIFACT_NODE_MODULES_BUILD_ID = BUILD_ID_2;

@@ -120,7 +120,7 @@ describe('cmd upload', () => {
 
   it('works functionally on ./src/ here', async () => {
     process.chdir(`${__dirname}/../../`);
-    const { stderr } = await testRun(Upload, ['src.caidx', './src/']);
+    const { stderr } = await testRun(Upload, ['src.catar.caibx', './src/']);
     expect(stderr).toContain('Successfully uploaded src');
   }, 60000);
 });
