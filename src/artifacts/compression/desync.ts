@@ -252,9 +252,9 @@ async function extractToOutput({
   catar: string;
   verbose?: boolean;
 }): Promise<execa.ExecaReturnValue> {
-  log(`Extracting archive to output path ${outputPath}`);
+  log(`Extracting archive to output path ${outputPath} (from ${process.cwd()})`);
   const result = await exec(
-    ['desync', 'untar', '--config', configPath, '--verbose', '--no-same-owner', catar, outputPath, '&'] as string[],
+    ['desync untar', `--config ${configPath}`, '--verbose', '--no-same-owner', catar, outputPath],
     {},
     verbose
   );
