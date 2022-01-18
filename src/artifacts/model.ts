@@ -1,4 +1,7 @@
 import _ from 'lodash';
+import mkdirp from 'mkdirp';
+
+const seedDirBase: string = process.env?.MONOFO_DESYNC_SEED_DIR || '/var/tmp/desync-seeds';
 
 export class Artifact {
   readonly name: string;
@@ -10,6 +13,8 @@ export class Artifact {
   readonly skip: boolean;
 
   readonly softFail: boolean;
+
+  private createdSeedDir = false;
 
   /**
    * @param filename A relative path to the artifact file
@@ -29,5 +34,19 @@ export class Artifact {
     if (!this.buildId) {
       throw new Error(`Expected BUILDKITE_BUILD_ID or MONOFO_ARTIFACT_${envName}_BUILD_ID to be set`);
     }
+
+    // This is a valid fallback, because if we don't pass --build <build-id> this env var would be used anyway
+    this.buildId = process.env?.[`MONOFO_ARTIFACT_${envName}_BUILD_ID`] || process.env?.BUILDKITE_BUILD_ID;
+  }
+
+  public async seedDir(): Promise<string> {
+    const seedDir = `${seedDirBase}/${process.env.BUILDKITE_ORGANIZATION_SLUG}/${process.env.BUILDKITE_PIPELINE_SLUG}/${this.name}`;
+
+    if (!this.createdSeedDir) {
+      await mkdirp(seedDir);
+      this.createdSeedDir = true;
+    }
+
+    return seedDir;
   }
 }

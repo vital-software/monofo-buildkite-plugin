@@ -6,7 +6,12 @@ export interface Compression {
    * inflate decompresses an input stream (usually an in-progress artifact download), writing decompressed files to disk
    * at the given outputPath (usually the working dir)
    */
-  inflate(options: { input: stream.Readable; outputPath?: string; verbose?: boolean }): Promise<unknown>;
+  inflate(options: {
+    input: stream.Readable;
+    artifact: Artifact;
+    outputPath?: string;
+    verbose?: boolean;
+  }): Promise<unknown>;
 
   /**
    * deflate doesn't do anything, but rather returns a shell script, split into arguments

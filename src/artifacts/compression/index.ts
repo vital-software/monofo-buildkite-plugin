@@ -30,18 +30,18 @@ export function deflator(output: Artifact): Promise<string[]> {
   return compressor.deflate(output);
 }
 
-export async function inflator(input: stream.Readable, artifact: Artifact, outputPath = '.'): Promise<unknown> {
+export async function inflator(input: stream.Readable, artifact: Artifact, outputPath = '.'): Promise<void> {
   if (artifact.skip) {
     log(`Skipping download and inflate for ${artifact.name} because skip is enabled`);
-    return Promise.resolve(execa('true'));
+  } else {
+    const compressor = compressors?.[artifact.ext];
+
+    if (!compressor) {
+      log(`Using no compression: inflating ${artifact.name} "as-is"`);
+      await exec('cat', ['>', artifact.filename], { input });
+      return;
+    }
+
+    await compressor.inflate({ input, artifact, outputPath });
   }
-
-  const compressor = compressors?.[artifact.ext];
-
-  if (!compressor) {
-    log(`Using no compression: inflating ${artifact.name} "as-is"`);
-    return exec('cat', ['>', artifact.filename], { input });
-  }
-
-  return compressor.inflate({ input, outputPath });
 }
