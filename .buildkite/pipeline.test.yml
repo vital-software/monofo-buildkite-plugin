@@ -3,8 +3,8 @@
 monorepo:
   pure: true
   expects:
-    - node-modules.caidx
-    - typescript.caidx
+    - node-modules.catar.caibx
+    - typescript.catar.caibx
   matches:
     - "**/*.ts"
     - "test/**/*.yml"
@@ -36,10 +36,10 @@ steps:
     command: yarn test
     <<: *step
     plugins:
-      - vital-software/monofo#v3.8.0:
+      - vital-software/monofo#v3.9.0-alpha.1:
           download:
-            - node-modules.caidx
-            - typescript.caidx
+            - node-modules.catar.caibx
+            - typescript.catar.caibx
       - *dc
 
   - label: ":eslint: Lint"
@@ -47,8 +47,8 @@ steps:
     command: yarn lint
     <<: *step
     plugins:
-      - vital-software/monofo#v3.8.0:
+      - vital-software/monofo#v3.9.0-alpha.1:
           download:
-            - node-modules.caidx
-            - typescript.caidx
+            - node-modules.catar.caibx
+            - typescript.catar.caibx
       - *dc
