@@ -52,4 +52,17 @@ export class Artifact {
 
     return seedDir;
   }
+
+  public async seedFiles(key = 'latest'): Promise<{ caidx: string; catar: string }> {
+    const dir = await this.seedDir();
+
+    // TODO: possibly rotate how many seeds we keep here, so that we can
+    //       get slightly better performance with e.g. concurrent differences
+
+    return {
+      // We need to be able to reference this from --ignore foo.caidx (on desync chop)
+      caidx: `${dir}/${key}.caidx`,
+      catar: `${dir}/${key}.catar`,
+    };
+  }
 }
