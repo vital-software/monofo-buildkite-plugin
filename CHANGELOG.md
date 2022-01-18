@@ -1,3 +1,17 @@
+# [3.9.0-alpha.1](https://github.com/vital-software/monofo/compare/v3.8.1...v3.9.0-alpha.1) (2022-01-18)
+
+
+### Bug Fixes
+
+* calculate artifact name without pathname part ([96ea80f](https://github.com/vital-software/monofo/commit/96ea80f1b069a71c374b87c97151b44280b15e22))
+
+
+### Features
+
+* Added chop ([0ea6f41](https://github.com/vital-software/monofo/commit/0ea6f411c655a2f312aba4cf04f71a996d504b21))
+* after inflating, write artifacts to seed dir ([67e56a2](https://github.com/vital-software/monofo/commit/67e56a2441e9619af9ab9e5d12e355517441d39e))
+* use .catar.caibx instead of .caidx for archiving ([7c3580f](https://github.com/vital-software/monofo/commit/7c3580f4518d8114ea8ed6a02c95d15bdb68bc52))
+
 ## [3.8.1](https://github.com/vital-software/monofo/compare/v3.8.0...v3.8.1) (2022-01-17)
 
 
