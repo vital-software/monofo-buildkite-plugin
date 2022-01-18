@@ -4,10 +4,10 @@ author: https://github.com/vital-software
 requirements:
   - git
   - npx
-  - mktemp
   - bash
   - cat
   - mkdir
+  - mktemp
 configuration:
   properties:
     generate:

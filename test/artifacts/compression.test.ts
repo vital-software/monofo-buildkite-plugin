@@ -38,14 +38,15 @@ describe('compression', () => {
     it.each([['tar.gz'], ['tar.lz4'], ['caidx']])('compression algorithm: %s', async (extension) => {
       const compression: Compression = compressors[extension];
       const compressed = `${dir}/test.${extension}`;
+      const artifact = new Artifact(compressed);
 
-      const args = await compression.deflate(new Artifact(compressed));
+      const args = await compression.deflate(artifact);
 
       await exec('cat', [getFixturePath('qux.tar'), ...args]);
 
       expect(fs.existsSync(compressed)).toBe(true);
 
-      await compression.inflate({ input: fs.createReadStream(compressed), outputPath: dir });
+      await compression.inflate({ input: fs.createReadStream(compressed), artifact, outputPath: dir });
 
       expect(fs.existsSync(`${dir}/qux/quux`)).toBe(true);
     });
