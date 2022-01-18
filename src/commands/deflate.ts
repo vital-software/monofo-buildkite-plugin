@@ -1,6 +1,6 @@
 import { promises as fs } from 'fs';
 import debug from 'debug';
-import { deflator } from '../artifacts/compression';
+import { compressors } from '../artifacts/compression';
 import { Artifact } from '../artifacts/model';
 import { BaseCommand } from '../command';
 
@@ -40,6 +40,13 @@ export default class Deflate extends BaseCommand {
     }
 
     const artifact = new Artifact(args.output);
-    await deflator(artifact);
+
+    const compressor = compressors?.[artifact.ext];
+
+    if (!compressor) {
+      throw new Error(`Unsupported output artifact format: ${artifact.ext}`);
+    }
+
+    await compressor.deflate({ artifact, input: { tarPath: args.tarFile } });
   }
 }

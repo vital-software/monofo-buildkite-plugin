@@ -3,7 +3,7 @@ import { flags as f } from '@oclif/command';
 import debug from 'debug';
 import prettyBytes from 'pretty-bytes';
 import { upload } from '../artifacts/api';
-import { deflator } from '../artifacts/compression';
+import { compressorFor } from '../artifacts/compression';
 import { Artifact } from '../artifacts/model';
 import { BaseCommand, BaseFlags } from '../command';
 import { tarArgListForManifest, getManifest } from '../manifest';
@@ -96,6 +96,12 @@ locally cached
       .slice(1);
 
     const artifact = new Artifact(args.output);
+    const compressor = compressorFor(artifact);
+
+    if (!compressor) {
+      throw new Error(`Unsupported output artifact format: ${artifact.ext}`);
+    }
+
     const manifest = await getManifest({ globs: args.globs, filesFrom: flags['files-from'], useNull: flags.null });
 
     if (Object.keys(manifest).length === 0) {
@@ -103,34 +109,10 @@ locally cached
       return;
     }
 
-    const fileList = await tarArgListForManifest(manifest);
-
-    if (!fileList) {
-      throw new Error('Expected file to package');
-    }
-
-    log(`Giving ${count(fileList, 'argument')} to tar as input filelist`);
-    const input = `${fileList.join('\n')}\n`;
-
-    const tarBin = await tar();
-    const allArgs = [
-      'set',
-      '-euo',
-      'pipefail',
-      ';',
-      tarBin.bin,
-      '-c',
-      ...tarBin.argsFor.create,
-      '--hard-dereference',
-      '--files-from',
-      '-',
-      ...(await deflator(artifact)),
-    ];
-
     log(`Deflating to ${args.output}`);
-    await exec(allArgs[0], allArgs.slice(1), {
-      input,
-    });
+    await compressor.deflate({ artifact, input: { manifest } });
+    log(`Finished deflating`);
+
     const stats = await fs.stat(args.output);
     log(`Archive deflated at ${args.output} as ${prettyBytes(stats.size)}`);
 

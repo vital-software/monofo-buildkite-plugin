@@ -2,9 +2,8 @@ import { promises as fs, createReadStream, existsSync } from 'fs';
 import { promisify } from 'util';
 import rimrafCb from 'rimraf';
 import tempy from 'tempy';
-import { Compression, compressors, inflator } from '../../src/artifacts/compression';
+import { Compressor, compressors, inflator } from '../../src/artifacts/compression';
 import { Artifact } from '../../src/artifacts/model';
-import { exec } from '../../src/util/exec';
 import { fakeProcess, getFixturePath } from '../fixtures';
 
 const rimraf = promisify(rimrafCb);
@@ -36,15 +35,17 @@ describe('compression', () => {
 
   describe('round-trip', () => {
     it.each([['tar.gz'], ['tar.lz4'], ['caidx']])('compression algorithm: %s', async (extension) => {
-      const compression: Compression = compressors[extension];
+      const compressor: Compressor = compressors[extension];
+
       const compressed = `${dir}/test.${extension}`;
       const artifact = new Artifact(compressed);
 
-      const args = await compression.deflate(artifact);
-      await exec('cat', [getFixturePath('qux.tar'), ...args]);
+      await compressor.deflate({ artifact, input: { tarPath: getFixturePath('qux.tar') } });
+
+      // await exec(['cat', getFixturePath('qux.tar'), ...args]);
       expect(existsSync(compressed)).toBe(true);
 
-      await compression.inflate({ input: createReadStream(compressed), artifact, outputPath: dir });
+      await compressor.inflate({ input: createReadStream(compressed), artifact, outputPath: dir });
       expect(existsSync(`${dir}/qux/quux`)).toBe(true);
     });
   });

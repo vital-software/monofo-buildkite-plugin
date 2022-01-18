@@ -11,8 +11,9 @@ import prettyBytes from 'pretty-bytes';
 import rimrafCb from 'rimraf';
 import tempy from 'tempy';
 import { exec, hasBin } from '../../util/exec';
+import { execFromTar } from '../../util/tar';
 import { Artifact } from '../model';
-import { Compression } from './compression';
+import { Compressor } from './compressor';
 
 const log = debug('monofo:artifact:compression:desync');
 
@@ -182,8 +183,8 @@ async function inflateCatar({
 }) {
   log('Inflating .caidx into .catar');
   await exec(
-    'tee',
     [
+      'tee',
       caidx,
       `| desync extract`,
       `--config ${configPath}`,
@@ -209,7 +210,7 @@ async function moveToSeed({
   caidx: string;
   artifact: Artifact;
 }): Promise<void> {
-  await exec('mv', ['-f', catar, caidx, `${await artifact.seedDir()}/`]);
+  await exec(['mv', '-f', catar, caidx, `${await artifact.seedDir()}/`]);
 }
 
 async function extractToOutput({
@@ -223,8 +224,7 @@ async function extractToOutput({
 }): Promise<execa.ExecaReturnValue> {
   log(`Extracting archive to output path ${outputPath}`);
   const result = await exec(
-    'desync',
-    ['untar', '--config', configPath, '--verbose', '--no-same-owner', catar, outputPath, '&'] as string[],
+    ['desync', 'untar', '--config', configPath, '--verbose', '--no-same-owner', catar, outputPath, '&'] as string[],
     {},
     verbose
   );
@@ -240,28 +240,32 @@ async function printSizes({ catar, caidx }: { catar: string; caidx: string }): P
   log(`Stored catar file is ${prettyBytes(catarStat.size)}`);
 }
 
-export const desync: Compression = {
+export const desync: Compressor = {
   /**
    * Deflate a tar file, creating a content-addressed index file
    */
-  async deflate(output): Promise<string[]> {
+  async deflate({ artifact, input }): Promise<void> {
     await checkEnabled();
+
     // TODO: split into tar->catar, and catar->store, tee and keep the intermediate catar
 
-    // prettier-ignore
-    return [
+    log('Indexing and storing catar directly (TODO: fix)');
+    await execFromTar(input)([
       '|',
-      'desync', 'tar',
-        ...(needsDynamicConfig() ? ['--config', configPath] : []),
-        '--verbose',
-        '--tar-add-root',
-        '--input-format', 'tar',
-        '--index',
-        '--store', store(),
+      'desync',
+      'tar',
+      ...(needsDynamicConfig() ? ['--config', configPath] : []),
+      '--verbose',
+      '--tar-add-root',
+      '--input-format',
+      'tar',
+      '--index',
+      '--store',
+      store(),
 
-      output.filename, // caidx file
-      '-',             // tar will be received on input
-    ];
+      artifact.filename, // caidx file
+      '-', // tar will be received on input
+    ]);
 
     // TODO: copy the catar and caidx to the seed dir
 

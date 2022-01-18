@@ -1,8 +1,8 @@
 import debug from 'debug';
 import execa, { ExecaReturnValue } from 'execa';
 import { hasBin } from '../../util/exec';
-import { tar } from '../../util/tar';
-import { Compression } from './compression';
+import { execFromTar, tar } from '../../util/tar';
+import { Compressor } from './compressor';
 
 const log = debug('monofo:artifact:compression:lz4');
 
@@ -18,10 +18,10 @@ async function checkEnabled() {
   }
 }
 
-export const lz4: Compression = {
-  async deflate(output): Promise<string[]> {
+export const lz4: Compressor = {
+  async deflate({ artifact, input }): Promise<void> {
     await checkEnabled();
-    return ['|', 'lz4', '-2', '>', output.filename];
+    await execFromTar(input)(['|', 'lz4', '-2', '>', artifact.filename]);
   },
 
   async inflate({ input, outputPath = '.' }): Promise<ExecaReturnValue> {

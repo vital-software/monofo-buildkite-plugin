@@ -13,9 +13,10 @@ const log = debug('monofo:artifact:api');
  *                 a build ID, the search will be filtered to that build
  */
 export async function search(artifact: Artifact): Promise<string> {
-  log('Searching for artifact');
+  log(`Searching for artifact ${artifact.name}`);
 
   const args = [
+    'buildkite-agent',
     'artifact',
     'search',
     artifact.filename,
@@ -25,9 +26,7 @@ export async function search(artifact: Artifact): Promise<string> {
     artifact.buildId ? artifact.buildId : '',
   ];
 
-  log(`Calling buildkite-agent ${args.join(' ')}`);
-
-  return (await exec('buildkite-agent', args, { stderr: 'inherit' })).stdout.split('\n')[0];
+  return (await exec(args, { stderr: 'inherit' })).stdout.split('\n')[0];
 }
 
 /**
@@ -39,7 +38,7 @@ export async function search(artifact: Artifact): Promise<string> {
  * @param artifact The artifact to upload
  */
 export async function upload(artifact: Artifact): Promise<void> {
-  await exec('buildkite-agent', ['artifact', 'upload', artifact.filename], {
+  await exec(['buildkite-agent', 'artifact', 'upload', artifact.filename], {
     stdio: ['inherit', 'inherit', 'inherit'],
   });
 }
