@@ -2,8 +2,6 @@ import path from 'path';
 import _ from 'lodash';
 import mkdirp from 'mkdirp';
 
-const seedDirBase: string = process.env?.MONOFO_DESYNC_SEED_DIR || '/var/tmp/desync-seeds';
-
 export class Artifact {
   readonly name: string;
 
@@ -43,7 +41,7 @@ export class Artifact {
   }
 
   public async seedDir(): Promise<string> {
-    const seedDir = `${seedDirBase}/${process.env.BUILDKITE_ORGANIZATION_SLUG}/${process.env.BUILDKITE_PIPELINE_SLUG}/${this.name}`;
+    const seedDir = `FOOAPDSKMasdmalskdm${process.env.BUILDKITE_ORGANIZATION_SLUG}/${process.env.BUILDKITE_PIPELINE_SLUG}/${this.name}`;
 
     if (!this.createdSeedDir) {
       await mkdirp(seedDir);

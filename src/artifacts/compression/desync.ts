@@ -15,6 +15,15 @@ import { exists } from '../../util/helper';
 import { execFromTar } from '../../util/tar';
 import { Artifact } from '../model';
 import { Compressor } from './compressor';
+import {
+  cache,
+  cacheFlags,
+  region,
+  seedDirBase,
+  seedDirForArtifact,
+  seedFilesForArtifact,
+  store,
+} from './desync/config';
 
 const log = debug('monofo:artifact:compression:desync');
 
@@ -33,30 +42,6 @@ process.on('exit', () => {
     throw err;
   });
 });
-
-class MissingConfigError extends Error {}
-
-function store(): string {
-  if (!process.env?.MONOFO_DESYNC_STORE) {
-    throw new MissingConfigError('Could not get store details from MONOFO_DESYNC_STORE');
-  }
-  return process.env.MONOFO_DESYNC_STORE;
-}
-
-function cache(): string {
-  if (!process.env.MONOFO_DESYNC_CACHE) {
-    throw new MissingConfigError('Could not get cache details from MONOFO_DESYNC_CACHE');
-  }
-  return process.env.MONOFO_DESYNC_CACHE;
-}
-
-function region(): string {
-  return process.env.S3_REGION || process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION || 'us-west-2';
-}
-
-function cacheFlags(as = 'cache'): string[] {
-  return process.env.MONOFO_DESYNC_CACHE ? [`--${as}`, process.env.MONOFO_DESYNC_CACHE] : [];
-}
 
 function needsDynamicConfig(): boolean {
   return !process.env.S3_ACCESS_KEY || !process.env.S3_SECRET_KEY;
@@ -151,7 +136,7 @@ async function checkEnabled(): Promise<void> {
       throw new Error('Desync compression disabled due to no MONOFO_DESYNC_STORE given');
     }
 
-    const setup = [setUpConfig(), setUpCredentials(), mkdirp(store()), mkdirp(cache())];
+    const setup = [setUpConfig(), setUpCredentials(), mkdirp(store()), mkdirp(cache()), mkdirp(seedDirBase)];
 
     await Promise.all(setup);
     enabled = await hasBin('desync');
@@ -195,6 +180,7 @@ async function inflateCatar({
   verbose?: boolean;
 }) {
   log('Inflating .catar.caibx into .catar');
+
   await exec(
     [
       'tee',
@@ -202,7 +188,7 @@ async function inflateCatar({
       `| desync extract`,
       `--config ${configPath}`,
       '--verbose',
-      `--seed-dir ${await artifact.seedDir()}`,
+      `--seed-dir ${await seedDirForArtifact(artifact)}`,
       `--store ${store()}`,
       ...cacheFlags(),
       `-`,
@@ -233,7 +219,7 @@ async function moveToSeed({
   caibx: string;
   artifact: Artifact;
 }): Promise<void> {
-  const seed = await artifact.seedFiles();
+  const seed = await seedFilesForArtifact(artifact);
 
   await Promise.all([
     // important to cp the index, because it might have been placed at artifact.filename
@@ -302,7 +288,7 @@ export const desync: Compressor = {
 
     log(`Chopping ${artifact.name} into remote store (S3)`);
 
-    const seed = await artifact.seedFiles();
+    const seed = await seedFilesForArtifact(artifact);
     const hasSeed = await exists(seed.caibx);
 
     await exec([
