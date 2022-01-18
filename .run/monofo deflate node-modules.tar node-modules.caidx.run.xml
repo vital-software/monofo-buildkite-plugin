@@ -1,11 +1,11 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="monofo deflate node-modules.tar node-modules.caidx" type="js.build_tools.npm" folderName="monofo">
+  <configuration default="false" name="monofo deflate node-modules.tar node-modules.catar.caibx" type="js.build_tools.npm" folderName="monofo">
     <package-json value="$PROJECT_DIR$/package.json" />
     <command value="run" />
     <scripts>
       <script value="monofo" />
     </scripts>
-    <arguments value="deflate node-modules.tar node-modules.caidx" />
+    <arguments value="deflate node-modules.tar node-modules.catar.caibx" />
     <node-interpreter value="project" />
     <node-options value="--unhandled-rejections=strict" />
     <envs>

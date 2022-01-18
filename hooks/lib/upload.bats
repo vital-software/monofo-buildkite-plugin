@@ -18,7 +18,7 @@ teardown() {
   echo "if [[ \$4 = \"monofo@\"* && \$5 = \"upload\" ]]; then echo \"npx output\"; else echo \"Unknown npx utility \$4\" >&2; exit 2; fi" >> "$BATS_TMPDIR/npx"
   chmod +x "$BATS_TMPDIR/npx"
 
-  export BUILDKITE_PLUGIN_CONFIGURATION='{"upload":{"build.caidx":["dist/**","another/dist/**"],"node-modules.tar.lz4":{"filesFrom":"node-modules.list","null":true}}}'
+  export BUILDKITE_PLUGIN_CONFIGURATION='{"upload":{"build.catar.caibx":["dist/**","another/dist/**"],"node-modules.tar.lz4":{"filesFrom":"node-modules.list","null":true}}}'
 
   # shellcheck source=./upload.bash
   output="$(source $SUT)"
@@ -33,7 +33,7 @@ teardown() {
   echo "if [[ \$4 = \"monofo@\"* && \$5 = \"upload\" ]]; then echo \"fake error output\"; exit 2; else echo \"Unknown npx utility \$4\" >&2; exit 2; fi" >> "$BATS_TMPDIR/npx"
   chmod +x "$BATS_TMPDIR/npx"
 
-  export BUILDKITE_PLUGIN_CONFIGURATION='{"upload":{"build.caidx":["dist/**","another/dist/**"],"node-modules.tar.lz4":{"filesFrom":"node-modules.list","null":true}}}'
+  export BUILDKITE_PLUGIN_CONFIGURATION='{"upload":{"build.catar.caibx":["dist/**","another/dist/**"],"node-modules.tar.lz4":{"filesFrom":"node-modules.list","null":true}}}'
 
   set +e
   # shellcheck source=./upload.bash

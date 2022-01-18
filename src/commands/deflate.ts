@@ -20,7 +20,7 @@ export default class Deflate extends BaseCommand {
     { name: 'tarFile', description: 'Path to a .tar file', required: true },
     {
       name: 'output',
-      description: 'Path to a target deflated artifact file, like something.tar.gz or something.caidx',
+      description: 'Path to a target deflated artifact file, like something.tar.gz or something.catar.caibx',
       required: true,
     },
   ];
