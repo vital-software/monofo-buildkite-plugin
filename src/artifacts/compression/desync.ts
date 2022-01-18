@@ -11,6 +11,7 @@ import prettyBytes from 'pretty-bytes';
 import rimrafCb from 'rimraf';
 import tempy from 'tempy';
 import { exec, hasBin } from '../../util/exec';
+import { exists } from '../../util/helper';
 import { execFromTar } from '../../util/tar';
 import { Artifact } from '../model';
 import { Compressor } from './compressor';
@@ -59,6 +60,18 @@ function cacheFlags(as = 'cache'): string[] {
 
 function needsDynamicConfig(): boolean {
   return !process.env.S3_ACCESS_KEY || !process.env.S3_SECRET_KEY;
+}
+
+function generateTemporaryFilePaths(artifact: Artifact): { caidx: string; catar: string } {
+  const tmpDir = tempy.directory();
+
+  log(`Will store temporary output to ${tmpDir} as a ${artifact.name}.catar`);
+  log(`Will store temporary stdin to ${tmpDir} as ${artifact.name}.caidx`);
+
+  const catar = [tmpDir, `${artifact.name}.catar`].join(path.sep);
+  const caidx = [tmpDir, `${artifact.name}.caidx`].join(path.sep);
+
+  return { catar, caidx };
 }
 
 async function setUpConfig(): Promise<void> {
@@ -201,6 +214,16 @@ async function inflateCatar({
   log('Finished inflating .caidx into .catar');
 }
 
+/**
+ * Moves the artifact files to the seed dir
+ *
+ * The contract of our seed dir is:
+ *  - IFF files are there, they have been chunked and stored to the main S3 storage
+ *  - So, it's safe to ignore (i.e. not chop/upload) any chunks present in any
+ *    index file in the seed dir
+ *
+ * So, take care that you wait for the successful S3 upload before calling this
+ */
 async function moveToSeed({
   catar,
   caidx,
@@ -210,7 +233,14 @@ async function moveToSeed({
   caidx: string;
   artifact: Artifact;
 }): Promise<void> {
-  await exec(['mv', '-f', catar, caidx, `${await artifact.seedDir()}/`]);
+  const seed = await artifact.seedFiles();
+
+  await Promise.all([
+    // important to cp the index, because it might have been placed at artifact.filename
+    exec(['cp', '-f', caidx, seed.caidx]),
+    // important to mv the archive, because we have no guarantees of its location, and it can be huge
+    exec(['mv', '-f', catar, seed.catar]),
+  ]);
 }
 
 async function extractToOutput({
@@ -247,26 +277,47 @@ export const desync: Compressor = {
   async deflate({ artifact, input }): Promise<void> {
     await checkEnabled();
 
-    // TODO: split into tar->catar, and catar->store, tee and keep the intermediate catar
+    const { catar } = generateTemporaryFilePaths(artifact);
 
-    log('Indexing and storing catar directly (TODO: fix)');
-    await execFromTar(input)([
+    log(`Generating catar at ${catar}`);
+    const tarResult = await execFromTar(input)([
       '|',
-      'desync',
-      'tar',
+      'desync tar',
       ...(needsDynamicConfig() ? ['--config', configPath] : []),
       '--verbose',
       '--tar-add-root',
-      '--input-format',
-      'tar',
-      '--index',
-      '--store',
-      store(),
+      '--input-format tar',
+      catar,
+      '-',
+    ]);
+    log(`Finished generating catar for ${artifact.name}`, tarResult.stderr);
 
-      artifact.filename, // caidx file
-      '-', // tar will be received on input
+    log(`Chunking, indexing and storing ${artifact.name} to local cache first`);
+    const makeResult = await exec(['desync tar', '--index', ...cacheFlags('store'), artifact.filename, catar]);
+    log(`Chunking and storing finished, index file created at ${artifact.filename}`, makeResult.stderr);
+
+    // We've successfully made an index file
+    const caidx = artifact.filename;
+    await printSizes({ catar, caidx });
+
+    log(`Chopping ${artifact.name} into remote store (S3)`);
+
+    const seed = await artifact.seedFiles();
+    const hasSeed = await exists(seed.caidx);
+
+    await exec([
+      'desync chop',
+      ...(needsDynamicConfig() ? ['--config', configPath] : []),
+      '--verbose',
+      `--store ${store()}`,
+      hasSeed ? `--ignore ${seed.caidx}` : ``,
+      caidx,
+      catar,
     ]);
 
+    log(`Finished chopping ${artifact.name} into remote store`);
+
+    await moveToSeed({ catar, caidx, artifact });
     // TODO: copy the catar and caidx to the seed dir
 
     // TODO: chop into the local cache
@@ -286,12 +337,7 @@ export const desync: Compressor = {
   async inflate({ input, artifact, outputPath = '.', verbose = false }): Promise<void> {
     await checkEnabled();
 
-    const tmpDir = tempy.directory();
-
-    log(`Will store temporary stdin to ${tmpDir} as ${artifact.name}.caidx`);
-    log(`Will store temporary output to ${tmpDir} as a ${artifact.name}.catar`);
-    const catar = [tmpDir, `${artifact.name}.catar`].join(path.sep);
-    const caidx = [tmpDir, `${artifact.name}.caidx`].join(path.sep);
+    const { catar, caidx } = generateTemporaryFilePaths(artifact);
 
     await inflateCatar({ artifact, input, catar, caidx, verbose });
     await printSizes({ catar, caidx });
