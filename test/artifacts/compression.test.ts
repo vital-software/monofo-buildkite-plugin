@@ -1,4 +1,4 @@
-import fs from 'fs';
+import { promises as fs, createReadStream, existsSync } from 'fs';
 import { promisify } from 'util';
 import rimrafCb from 'rimraf';
 import tempy from 'tempy';
@@ -27,10 +27,10 @@ describe('compression', () => {
     it('can download and inflate .tar.lz4 files correctly', async () => {
       const artifact = new Artifact('foo.tar.lz4');
 
-      await inflator(fs.createReadStream(getFixturePath('foo.tar.lz4')), artifact);
+      await inflator(createReadStream(getFixturePath('foo.tar.lz4')), artifact);
 
-      expect(fs.existsSync(`${dir}`)).toBe(true);
-      expect(fs.existsSync(`${dir}/foo/bar`)).toBe(true);
+      expect(existsSync(`${dir}`)).toBe(true);
+      expect(existsSync(`${dir}/foo/bar`)).toBe(true);
     });
   });
 
@@ -41,14 +41,11 @@ describe('compression', () => {
       const artifact = new Artifact(compressed);
 
       const args = await compression.deflate(artifact);
-
       await exec('cat', [getFixturePath('qux.tar'), ...args]);
+      expect(existsSync(compressed)).toBe(true);
 
-      expect(fs.existsSync(compressed)).toBe(true);
-
-      await compression.inflate({ input: fs.createReadStream(compressed), artifact, outputPath: dir });
-
-      expect(fs.existsSync(`${dir}/qux/quux`)).toBe(true);
+      await compression.inflate({ input: createReadStream(compressed), artifact, outputPath: dir });
+      expect(existsSync(`${dir}/qux/quux`)).toBe(true);
     });
   });
 });

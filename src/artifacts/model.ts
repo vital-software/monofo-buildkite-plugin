@@ -1,3 +1,4 @@
+import path from 'path';
 import _ from 'lodash';
 import mkdirp from 'mkdirp';
 
@@ -20,8 +21,10 @@ export class Artifact {
    * @param filename A relative path to the artifact file
    */
   constructor(readonly filename: string) {
-    [this.name] = this.filename.split('.');
-    this.ext = this.filename.split('.').slice(1).join('.'); // Not extname() because that only gives the last ext
+    const basename = path.basename(filename);
+
+    [this.name] = basename.split('.');
+    this.ext = basename.split('.').slice(1).join('.'); // Not extname() because that only gives the last ext
 
     const envName = _.snakeCase(this.name).toUpperCase();
 
