@@ -1,3 +1,18 @@
+# [4.0.0-alpha.1](https://github.com/vital-software/monofo/compare/v3.9.0-alpha.1...v4.0.0-alpha.1) (2022-01-18)
+
+
+* feat(compression)!: use .catar.caibx instead of .caidx for archiving ([29c43d8](https://github.com/vital-software/monofo/commit/29c43d88bb5b89dbeccf6e7a69991450e68909d4))
+
+
+### Features
+
+* add support for `desync chop` to fill the local cache on upload ([d260be8](https://github.com/vital-software/monofo/commit/d260be8a672211f46563fc7034057d9ec80ea3dc))
+
+
+### BREAKING CHANGES
+
+* removed support for .caidx artifact compression
+
 # [3.9.0-alpha.1](https://github.com/vital-software/monofo/compare/v3.8.1...v3.9.0-alpha.1) (2022-01-18)
 
 

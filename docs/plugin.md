@@ -13,7 +13,7 @@ steps:
       - yarn install
       - yarn build
     plugins:
-      - vital-software/monofo#v3.9.0-alpha.1:
+      - vital-software/monofo#v4.0.0-alpha.1:
           upload:
             node-modules.tar.lz4:
               - ./node_modules/
