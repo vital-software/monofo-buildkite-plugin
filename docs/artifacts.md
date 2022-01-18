@@ -22,7 +22,7 @@ This list can be passed using:
 
 The glob expressions and paths must be relative, and point to locations below
 the working directory. Intermediate directories between the working directory
-and the target paths will be included in the archive as (otherwise empty) 
+and the target paths will be included in the archive as (otherwise empty)
 placeholder structure.
 
 Passing `-` as the file to read from will cause `upload` to read the list of
@@ -82,11 +82,24 @@ The supported compression types are:
 - `.catar.caibx`: uses `desync` to store the tar in a content-addressed store,
   replacing the tarball with an "index file"
 
-### Desync
+### Desync (for content-addressed caching)
 
-Monofo uses [desync](https://github.com/folbricht/desync) to provide content-addressed
-caching and storage, speeding up the upload and download of artifacts and cached
-files.
+Monofo uses [desync](https://github.com/folbricht/desync) to provide
+content-addressed caching and storage, speeding up the upload and download of
+artifacts and cached files.
+
+It uses it in a few ways:
+
+ - We use it to turn a `.tar` archive into a `.catar` archive
+   - This makes it more amenable to further content-addressing by addressing directories by their contents, and chunking by directory
+   - It doesn't reorder entries, so we have to make sure the input tar is nicely
+ - We then index that `.catar` into an index file (given a `.caibx` extension)
+   - This chops the file up into chunks, which are stored on S3 (and in a local
+     cache). The index file then contains the hashes (content addresses) of the
+     chunked parts of the original file.
+   - We keep the original `.catar` around for "seeding": large parts of the
+     inflated archive can be used the next time we need to extract the same _or
+     a similar_ archive (they'll be directly copied, which should be very fast)
 
 #### Installing desync
 
