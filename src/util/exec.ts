@@ -23,11 +23,14 @@ export class EmptyArgsError extends Error {
  * Announces what it's about to execute, then runs it, returning the output
  */
 export async function exec(
-  command: string,
-  args: string[],
+  argv: string[],
   options: execa.Options = {},
   verbose = false
 ): Promise<execa.ExecaChildProcess> {
+  if (argv.length < 1) {
+    throw new EmptyArgsError();
+  }
+
   const opts: execa.Options = {
     shell: 'bash',
     stderr: verbose ? 'inherit' : undefined,
@@ -35,16 +38,16 @@ export async function exec(
     ...options,
   };
 
-  logUpdate(`${chalk.yellow('Running...')} ${command} ${args.join(' ')}...`);
+  logUpdate(`${chalk.yellow('Running...')} ${argv.join(' ')}...`);
 
   try {
-    const result = await execa(command, args, opts);
-    logUpdate(`${chalk.green('Done:')}      ${command} ${args.join(' ')}\t✅ `);
+    const result = await execa(argv[0], argv.slice(1), opts);
+    logUpdate(`${chalk.green('Done:')}      ${argv.join(' ')}\t✅ `);
     logUpdate.done();
 
     return result;
   } catch (err) {
-    logUpdate(`${chalk.red('Error:')}     ${command} ${args.join(' ')}\t❌ `);
+    logUpdate(`${chalk.red('Error:')}     ${argv.join(' ')}\t❌ `);
     logUpdate.done();
 
     throw err;

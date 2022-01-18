@@ -118,9 +118,9 @@ describe('cmd upload', () => {
     });
   });
 
-  it('works functionally on ./node_modules/ here', async () => {
+  it('works functionally on ./src/ here', async () => {
     process.chdir(`${__dirname}/../../`);
-    const { stderr } = await testRun(Upload, ['node-modules.caidx', './node_modules/']);
-    expect(stderr).toContain('Successfully uploaded node-modules');
+    const { stderr } = await testRun(Upload, ['src.caidx', './src/']);
+    expect(stderr).toContain('Successfully uploaded src');
   }, 60000);
 });

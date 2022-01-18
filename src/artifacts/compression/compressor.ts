@@ -1,7 +1,8 @@
 import stream from 'stream';
+import { TarInput } from '../../util/tar';
 import { Artifact } from '../model';
 
-export interface Compression {
+export interface Compressor {
   /**
    * inflate decompresses an input stream (usually an in-progress artifact download), writing decompressed files to disk
    * at the given outputPath (usually the working dir)
@@ -14,9 +15,10 @@ export interface Compression {
   }): Promise<unknown>;
 
   /**
-   * deflate doesn't do anything, but rather returns a shell script, split into arguments
+   * Runs tar and passes the uncompressed tarball to the compressor process
    *
-   * The script receives a tar on stdin, and deflates it into a compressed artifact
+   * Results in a file at artifact.filename, with the compressed contents of TarInput
+   * (so, in this context, the artifact is the output)
    */
-  deflate(output: Artifact): Promise<string[]>;
+  deflate(options: { input: TarInput; artifact: Artifact }): Promise<unknown>;
 }
