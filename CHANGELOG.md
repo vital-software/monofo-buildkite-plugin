@@ -1,3 +1,10 @@
+# [4.0.0-beta.2](https://github.com/vital-software/monofo/compare/v4.0.0-beta.1...v4.0.0-beta.2) (2022-01-19)
+
+
+### Bug Fixes
+
+* cause release ([90b9ad7](https://github.com/vital-software/monofo/commit/90b9ad7d0fa6b458acbbb9adf00e0e68062e3bd9))
+
 # [4.0.0-beta.1](https://github.com/vital-software/monofo/compare/v3.8.1...v4.0.0-beta.1) (2022-01-19)
 
 
