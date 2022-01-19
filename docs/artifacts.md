@@ -112,19 +112,24 @@ GOOS=linux GOARCH=amd64 go install github.com/folbricht/desync/cmd/desync@latest
 
 #### Configuring desync
 
-There are two main configuration environment variables:
+There are a few main configuration environment variables:
 
 - `MONOFO_DESYNC_STORE`: Usually, an S3 bucket, used to store content-addressed
    chunks
 - `MONOFO_DESYNC_CACHE`: Usually, a local directory, used as a look-through
    cache when they'd otherwise be downloaded from S3
+- `MONOFO_DESYNC_SEED_DIR`: Always a local directory, used as a place to retain
+   inflated archives for use as seed files for later extract operations
+
+It's important that any of these that refer to local paths are on the same
+filesystem, e.g. so that `mv` is atomic and fast.
 
 These environment variables are substituted into the eventual desync command as
 the `--store` and `--cache` options. For example, Monofo itself uses:
 
 ```typescript
 MONOFO_DESYNC_STORE: "s3+https://s3-us-west-2.amazonaws.com/some-s3-bucket-name/desync/store"
-MONOFO_DESYNC_CACHE: "/tmp/desync/monofo"
+MONOFO_DESYNC_CACHE: "/tmp/monofo/desync"
 ```
 
 The `s3+https://` scheme is explained at [folbricht/desync](https://github.com/folbricht/desync#s3-chunk-stores)
