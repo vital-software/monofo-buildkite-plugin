@@ -1,3 +1,24 @@
+# [4.0.0-beta.1](https://github.com/vital-software/monofo/compare/v3.8.1...v4.0.0-beta.1) (2022-01-19)
+
+
+* feat(compression)!: use .catar.caibx instead of .caidx for archiving ([c39424e](https://github.com/vital-software/monofo/commit/c39424e4def93bfdc9a182eb0db2f60c1b2a9f0d))
+
+
+### Bug Fixes
+
+* calculate artifact name without pathname part ([0906954](https://github.com/vital-software/monofo/commit/090695492f8bae5f8ca850820eee1ae89add5295))
+
+
+### Features
+
+* add support for `desync chop` to fill the local cache on upload ([7714b36](https://github.com/vital-software/monofo/commit/7714b3693c5e81ada70a086706a57ebf622b06a6))
+* after inflating, write artifacts to seed dir ([f3f5c7d](https://github.com/vital-software/monofo/commit/f3f5c7d9a3288fc6ffd6b62fc411c7e1ca710b4f))
+
+
+### BREAKING CHANGES
+
+* removed support for .caidx artifact compression
+
 ## [3.8.1](https://github.com/vital-software/monofo/compare/v3.8.0...v3.8.1) (2022-01-17)
 
 
