@@ -102,7 +102,7 @@ the chunks locally and on S3:
 ```yaml
 env:
   MONOFO_DESYNC_STORE: "s3+https://s3.amazonaws.com/some-bucket/desync/store"
-  MONOFO_DESYNC_CACHE: "/tmp/desync/monofo"
+  MONOFO_DESYNC_CACHE: "/tmp/monofo/desync-store"
 
 steps:
   - command: yarn install

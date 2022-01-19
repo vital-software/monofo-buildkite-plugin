@@ -2,13 +2,13 @@
 
 monorepo:
   pure: true
-  expects: node-modules.caidx
+  expects: node-modules.catar.caibx
   matches:
     - "**/*.ts"
     - tsconfig.json
     - package.json
     - yarn.lock
-  produces: typescript.caidx
+  produces: typescript.catar.caibx
 
 steps:
   - name: ":typescript: Build"
@@ -22,9 +22,9 @@ steps:
     plugins:
       - docker-compose#v3.9.0:
           run: node
-      - vital-software/monofo#v3.8.0:
+      - vital-software/monofo#v4.0.0-beta.1:
           download:
-            - node-modules.caidx
+            - node-modules.catar.caibx
           upload:
-            typescript.caidx:
+            typescript.catar.caibx:
               - ./dist/

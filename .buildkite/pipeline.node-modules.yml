@@ -5,7 +5,7 @@ monorepo:
   matches:
     - package.json
     - yarn.lock
-  produces: node-modules.caidx
+  produces: node-modules.catar.caibx
 
 steps:
   - name: ":yarn: Install"
@@ -20,9 +20,9 @@ steps:
     plugins:
       - docker-compose#v3.9.0:
           run: node
-      - vital-software/monofo#v3.8.0:
-          download: node-modules.caidx # pre-cache the old node_modules into place before yarn install
+      - vital-software/monofo#v4.0.0-beta.1:
+          download: node-modules.catar.caibx # pre-cache the old node_modules into place before yarn install
           upload:
-            node-modules.caidx:
+            node-modules.catar.caibx:
               - ./node_modules/
 

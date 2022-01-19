@@ -19,10 +19,10 @@ steps:
     plugins:
       - improbable-eng/metahook#v0.4.1:
           pre-command: git fetch --tags -f # To allow mutating build tags for now
-      - vital-software/monofo#v3.8.0:
+      - vital-software/monofo#v4.0.0-beta.1:
           download:
-            - node-modules.caidx
-            - typescript.caidx
+            - node-modules.catar.caibx
+            - typescript.catar.caibx
       - docker-compose#v3.9.0:
           run: node
       - seek-oss/aws-sm#v2.3.1:

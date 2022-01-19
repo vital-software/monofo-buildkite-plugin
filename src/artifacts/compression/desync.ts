@@ -12,9 +12,11 @@ import rimrafCb from 'rimraf';
 import tempy from 'tempy';
 import { exec, hasBin } from '../../util/exec';
 import { exists } from '../../util/helper';
-import { execFromTar } from '../../util/tar';
+import { execFromTar, TarInput } from '../../util/tar';
 import { Artifact } from '../model';
 import { Compressor } from './compressor';
+import { cacheDir, cacheFlags, region, seedBaseDir, store } from './desync/config';
+import { seedDirForArtifact, seedFilesForArtifact } from './desync/seeds';
 
 const log = debug('monofo:artifact:compression:desync');
 
@@ -33,30 +35,6 @@ process.on('exit', () => {
     throw err;
   });
 });
-
-class MissingConfigError extends Error {}
-
-function store(): string {
-  if (!process.env?.MONOFO_DESYNC_STORE) {
-    throw new MissingConfigError('Could not get store details from MONOFO_DESYNC_STORE');
-  }
-  return process.env.MONOFO_DESYNC_STORE;
-}
-
-function cache(): string {
-  if (!process.env.MONOFO_DESYNC_CACHE) {
-    throw new MissingConfigError('Could not get cache details from MONOFO_DESYNC_CACHE');
-  }
-  return process.env.MONOFO_DESYNC_CACHE;
-}
-
-function region(): string {
-  return process.env.S3_REGION || process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION || 'us-west-2';
-}
-
-function cacheFlags(as = 'cache'): string[] {
-  return process.env.MONOFO_DESYNC_CACHE ? [`--${as}`, process.env.MONOFO_DESYNC_CACHE] : [];
-}
 
 function needsDynamicConfig(): boolean {
   return !process.env.S3_ACCESS_KEY || !process.env.S3_SECRET_KEY;
@@ -86,7 +64,7 @@ async function setUpConfig(): Promise<void> {
         's3-credentials': {
           'https://s3-us-west-2.amazonaws.com': {
             'aws-credentials-file': credentialsPath,
-            'aws-region': region(),
+            'aws-region': region,
             'aws-profile': 'profile_desync',
           },
         },
@@ -118,8 +96,8 @@ async function setUpCredentials(): Promise<void> {
     if (!process.env.S3_REGION) {
       // This is only used with static security credentials :(
       // See https://github.com/folbricht/desync/blob/5dd803ef214b97059acffeddd156594fcc63edd8/cmd/desync/config.go#L61
-      log(`Setting S3_REGION=${region()}`);
-      process.env.S3_REGION = region();
+      log(`Setting S3_REGION=${region}`);
+      process.env.S3_REGION = region;
     }
 
     return;
@@ -151,7 +129,7 @@ async function checkEnabled(): Promise<void> {
       throw new Error('Desync compression disabled due to no MONOFO_DESYNC_STORE given');
     }
 
-    const setup = [setUpConfig(), setUpCredentials(), mkdirp(store()), mkdirp(cache())];
+    const setup = [setUpConfig(), setUpCredentials(), mkdirp(store()), mkdirp(cacheDir), mkdirp(seedBaseDir)];
 
     await Promise.all(setup);
     enabled = await hasBin('desync');
@@ -195,6 +173,7 @@ async function inflateCatar({
   verbose?: boolean;
 }) {
   log('Inflating .catar.caibx into .catar');
+
   await exec(
     [
       'tee',
@@ -202,7 +181,7 @@ async function inflateCatar({
       `| desync extract`,
       `--config ${configPath}`,
       '--verbose',
-      `--seed-dir ${await artifact.seedDir()}`,
+      `--seed-dir ${await seedDirForArtifact(artifact)}`,
       `--store ${store()}`,
       ...cacheFlags(),
       `-`,
@@ -233,7 +212,7 @@ async function moveToSeed({
   caibx: string;
   artifact: Artifact;
 }): Promise<void> {
-  const seed = await artifact.seedFiles();
+  const seed = await seedFilesForArtifact(artifact);
 
   await Promise.all([
     // important to cp the index, because it might have been placed at artifact.filename
@@ -270,17 +249,20 @@ async function printSizes({ catar, caibx }: { catar: string; caibx: string }): P
   log(`Stored catar file is ${prettyBytes(catarStat.size)}`);
 }
 
-export const desync: Compressor = {
-  /**
-   * Deflate a tar file, creating a content-addressed index file
-   */
-  async deflate({ artifact, input }): Promise<void> {
-    await checkEnabled();
-
-    const { catar } = generateTemporaryFilePaths(artifact);
-
-    log(`Generating catar at ${catar}`);
-    const tarResult = await execFromTar(input)([
+async function createCatar({
+  artifact,
+  input,
+  catar,
+  verbose = false,
+}: {
+  artifact: Artifact;
+  input: TarInput;
+  catar: string;
+  verbose?: boolean;
+}) {
+  log(`Generating catar at ${catar}`);
+  const tarResult = await execFromTar(input)(
+    [
       '|',
       'desync tar',
       ...(needsDynamicConfig() ? ['--config', configPath] : []),
@@ -289,23 +271,43 @@ export const desync: Compressor = {
       '--input-format tar',
       catar,
       '-',
-    ]);
-    log(`Finished generating catar for ${artifact.name}`, tarResult.stderr);
+    ],
+    {},
+    verbose
+  );
+  log(`Finished generating catar for ${artifact.name}`, tarResult.stderr);
+}
 
-    log(`Chunking, indexing and storing ${artifact.name} to local cache first`);
-    const makeResult = await exec(['desync make', ...cacheFlags('store'), artifact.filename, catar]);
-    log(`Chunking and storing finished, index file created at ${artifact.filename}`, makeResult.stderr);
+async function indexCatar({
+  artifact,
+  catar,
+  verbose = false,
+}: {
+  artifact: Artifact;
+  catar: string;
+  verbose?: boolean;
+}): Promise<void> {
+  log(`Chunking, indexing and storing ${artifact.name} to local cache first`);
+  const makeResult = await exec(['desync make', ...cacheFlags('store'), artifact.filename, catar], {}, verbose);
+  log(`Chunking and storing finished, index file created at ${artifact.filename}`, makeResult.stderr);
+}
 
-    // We've successfully made an index file
-    const caibx = artifact.filename;
-    await printSizes({ catar, caibx });
+async function chopIntoRemoteStorage({
+  artifact,
+  caibx,
+  catar,
+  verbose = false,
+}: {
+  artifact: Artifact;
+  caibx: string;
+  catar: string;
+  verbose?: boolean;
+}) {
+  const seed = await seedFilesForArtifact(artifact);
+  const hasSeed = await exists(seed.caibx);
 
-    log(`Chopping ${artifact.name} into remote store (S3)`);
-
-    const seed = await artifact.seedFiles();
-    const hasSeed = await exists(seed.caibx);
-
-    await exec([
+  await exec(
+    [
       'desync chop',
       ...(needsDynamicConfig() ? ['--config', configPath] : []),
       '--verbose',
@@ -313,16 +315,33 @@ export const desync: Compressor = {
       hasSeed ? `--ignore ${seed.caibx}` : ``,
       caibx,
       catar,
-    ]);
+    ],
+    {},
+    verbose
+  );
 
-    log(`Finished chopping ${artifact.name} into remote store`);
+  log(`Finished chopping ${artifact.name} into remote store`);
+}
 
+export const desync: Compressor = {
+  /**
+   * Deflate a tar file, creating a content-addressed index file
+   */
+  async deflate({ artifact, input }): Promise<void> {
+    await checkEnabled();
+
+    const { catar } = generateTemporaryFilePaths(artifact);
+    const verbose = 'MONOFO_HOOK_DEBUG' in process.env;
+
+    await createCatar({ artifact, input, catar, verbose });
+    await indexCatar({ artifact, catar, verbose });
+
+    // We've successfully made an index file
+    const caibx = artifact.filename;
+
+    await printSizes({ catar, caibx });
+    await chopIntoRemoteStorage({ artifact, caibx, catar });
     await moveToSeed({ catar, caibx, artifact });
-    // TODO: copy the catar and caibx to the seed dir
-
-    // TODO: chop into the local cache
-    //   if working.catar.caibx is the output.filename, and working.catar is the intermediate output from the above process, then
-    //   desync chop ...cacheFlags('store') working.catar.caibx working.catar
   },
 
   /**
