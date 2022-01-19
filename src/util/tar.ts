@@ -112,10 +112,18 @@ async function tarExecOptions(input: TarInput): Promise<Partial<execa.Options>> 
 }
 
 export function execFromTar(input: TarInput) {
-  return async (args: string[], options: Partial<execa.Options> = {}): Promise<execa.ExecaReturnValue> => {
-    return exec([...(await tarExecArgs(input)), ...args], {
-      ...(await tarExecOptions(input)),
-      ...options,
-    });
+  return async (
+    args: string[],
+    options: Partial<execa.Options> = {},
+    verbose = false
+  ): Promise<execa.ExecaReturnValue> => {
+    return exec(
+      [...(await tarExecArgs(input)), ...args],
+      {
+        ...(await tarExecOptions(input)),
+        ...options,
+      },
+      verbose
+    );
   };
 }

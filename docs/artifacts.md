@@ -129,7 +129,8 @@ the `--store` and `--cache` options. For example, Monofo itself uses:
 
 ```typescript
 MONOFO_DESYNC_STORE: "s3+https://s3-us-west-2.amazonaws.com/some-s3-bucket-name/desync/store"
-MONOFO_DESYNC_CACHE: "/tmp/monofo/desync"
+MONOFO_DESYNC_CACHE: "/tmp/monofo/desync-store"
+MONOFO_DESYNC_SEED_DIR: "/tmp/monofo/desync-seeds"
 ```
 
 The `s3+https://` scheme is explained at [folbricht/desync](https://github.com/folbricht/desync#s3-chunk-stores)
