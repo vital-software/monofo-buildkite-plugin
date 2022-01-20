@@ -81,7 +81,7 @@
     "toposort": "2.0.2"
   },
   "devDependencies": {
-    "@commitlint/cli": "16.0.3",
+    "@commitlint/cli": "16.1.0",
     "@commitlint/config-conventional": "16.0.0",
     "@google/semantic-release-replace-plugin": "1.1.0",
     "@oclif/dev-cli": "1.26.10",
