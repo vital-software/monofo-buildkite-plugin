@@ -1,3 +1,11 @@
+## [4.0.1](https://github.com/vital-software/monofo/compare/v4.0.0...v4.0.1) (2022-01-21)
+
+
+### Bug Fixes
+
+* **deps:** update aws-sdk-js-v3 monorepo to v[secure] ([3e7c960](https://github.com/vital-software/monofo/commit/3e7c9603a8cc8d854f4ad19b7c589f13f88a6c26))
+* **hooks:** make plugin conf checks safe for nounset ([2645ca5](https://github.com/vital-software/monofo/commit/2645ca55dab7fd978b87d889e0802803bc5d58f4))
+
 # [4.0.0](https://github.com/vital-software/monofo/compare/v3.8.1...v4.0.0) (2022-01-19)
 
 
