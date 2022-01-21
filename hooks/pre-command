@@ -13,7 +13,7 @@ if [[ "${MONOFO_HOOK_DEBUG:-0}" -eq 1 ]]; then
   export DEBUG="*"
 fi
 
-if [[ -z "$BUILDKITE_PLUGIN_CONFIGURATION" ]]; then
+if [[ -z "${BUILDKITE_PLUGIN_CONFIGURATION:-}" ]]; then
   echo "Expected BUILDKITE_PLUGIN_CONFIGURATION to be set" >&2
   exit 1
 fi
