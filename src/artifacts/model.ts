@@ -1,6 +1,7 @@
 import path from 'path';
 import _ from 'lodash';
 import mkdirp from 'mkdirp';
+import { isUuid } from '../util/helper';
 
 export class Artifact {
   readonly name: string;
@@ -33,7 +34,11 @@ export class Artifact {
     this.buildId = process.env?.[`MONOFO_ARTIFACT_${envName}_BUILD_ID`] || process.env?.BUILDKITE_BUILD_ID;
 
     if (!this.buildId) {
-      throw new Error(`Expected BUILDKITE_BUILD_ID or MONOFO_ARTIFACT_${envName}_BUILD_ID to be set`);
+      throw new Error(`Expected BUILDKITE_BUILD_ID or MONOFO_ARTIFACT_${envName}_BUILD_ID to be set to a UUID`);
+    }
+
+    if (!isUuid(this.buildId)) {
+      throw new Error(`Expected build ID ${this.buildId} to be a UUID`);
     }
 
     // This is a valid fallback, because if we don't pass --build <build-id> this env var would be used anyway
