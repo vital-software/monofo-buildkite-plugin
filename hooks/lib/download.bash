@@ -13,9 +13,13 @@ fi
 
 # Downloads and inflates artifacts
 #
-# The only format supported is a simple list of artifact filenames
+# The only format supported is a simple list of artifact filenames: [filename] [filename] [filename]
+#
+# There is one added consideration: the list of files we're uploading from the same step is also
+# provided as `--preload-for` flags. This is so that we can ensure the
 #
 # Example: BUILDKITE_PLUGIN_CONFIGURATION='{"download":["build.catar.caibx","node-modules.tar.lz4"]}'
+# Example: BUILDKITE_PLUGIN_CONFIGURATION='{"download":["build.catar.caibx","node-modules.tar.lz4"],"upload":{"node-modules.tar.lz4":{"filesFrom":"foo.list"}}}'
 # Example: BUILDKITE_PLUGIN_CONFIGURATION='{"download":"node-modules.tar.lz4"}'
 
 if [[ "${MONOFO_HOOK_DEBUG:-0}" -eq 1 ]]; then
