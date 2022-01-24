@@ -10,8 +10,8 @@ export const PIPELINE = 'monofo';
 export const BRANCH = 'main';
 export const COMMIT = 'f993bd4d8d59b9c70c8092d327c6ac1c6a263b1f';
 export const BUILD_ID = 'f62a1b4d-10f9-4790-bc1c-e2c3a0c80983';
-export const BUILD_ID_2 = 'beefbeef-beef-beef-beef-beefbeefbeef';
-export const BUILD_ID_3 = 'cafecafe-cafe-cafe-cafe-cafecafecafe';
+export const BUILD_ID_2 = 'beefbeef-beef-4eef-aeef-beefbeefbeef';
+export const BUILD_ID_3 = 'cafecafe-cafe-4afe-aafe-cafecafecafe';
 
 export const BASE_BUILD: BuildkiteBuild = {
   blocked: false,
