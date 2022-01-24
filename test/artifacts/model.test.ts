@@ -13,6 +13,12 @@ describe('model Artifact', () => {
     expect(noExtraEnvVar.buildId).toBe(BUILD_ID);
   });
 
+  it('errors early if given an invalid build ID', () => {
+    process.env.BUILDKITE_BUILD_ID = BUILD_ID;
+    process.env.MONOFO_ARTIFACT_NODE_MODULES_BUILD_ID = 'skip';
+    expect(() => new Artifact('node-modules.tar.gz')).toThrowError();
+  });
+
   it.each([
     ['node-modules.tar.gz', 'node-modules', 'tar.gz'],
     ['/some/path/node-modules.tar.gz', 'node-modules', 'tar.gz'],
