@@ -1,3 +1,10 @@
+## [4.0.3](https://github.com/vital-software/monofo/compare/v4.0.2...v4.0.3) (2022-01-24)
+
+
+### Bug Fixes
+
+* **deps:** remove an unused dependency ([e0a680c](https://github.com/vital-software/monofo/commit/e0a680c91bda341e63500f30c942250ed9f337cc))
+
 ## [4.0.2](https://github.com/vital-software/monofo/compare/v4.0.1...v4.0.2) (2022-01-24)
 
 
