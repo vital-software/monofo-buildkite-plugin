@@ -1,3 +1,11 @@
+## [4.0.2](https://github.com/vital-software/monofo/compare/v4.0.1...v4.0.2) (2022-01-24)
+
+
+### Bug Fixes
+
+* **artifact:** error early on non-uuid build ID ([6909be6](https://github.com/vital-software/monofo/commit/6909be6d4d788bb5aaf919ec48d0d819ddd82d65))
+* **deps:** update aws-sdk-js-v3 monorepo to v[secure] ([4255cc7](https://github.com/vital-software/monofo/commit/4255cc777bf74033039792f4b203964d46e7ea04))
+
 ## [4.0.1](https://github.com/vital-software/monofo/compare/v4.0.0...v4.0.1) (2022-01-21)
 
 
