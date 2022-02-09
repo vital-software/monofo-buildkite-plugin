@@ -1,3 +1,11 @@
+## [4.0.4](https://github.com/vital-software/monofo/compare/v4.0.3...v4.0.4) (2022-02-09)
+
+
+### Bug Fixes
+
+* **deps:** update aws-sdk-js-v3 monorepo to v[secure] ([d4d4ac0](https://github.com/vital-software/monofo/commit/d4d4ac09bf61f5fdf622a0afa5759ef277f43cd9))
+* configure got timeouts in detail ([bada981](https://github.com/vital-software/monofo/commit/bada9810bf8ccd7fff0f26203c96dee16759f66d))
+
 ## [4.0.3](https://github.com/vital-software/monofo/compare/v4.0.2...v4.0.3) (2022-01-24)
 
 
