@@ -35,7 +35,7 @@ steps:
       - yarn install
       - yarn build
     plugins:
-      - vital-software/monofo#v4.0.4:
+      - vital-software/monofo#v4.0.5:
           upload:
             node-modules.tar.lz4:
               filesFrom: node-modules.list
@@ -64,7 +64,7 @@ steps:
   - commands:
       - yarn run some-command
     plugins:
-      - vital-software/monofo#v4.0.4:
+      - vital-software/monofo#v4.0.5:
           download:
             - node-modules.tar.lz4
             - build.catar.caibx

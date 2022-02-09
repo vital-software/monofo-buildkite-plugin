@@ -1,3 +1,10 @@
+## [4.0.5](https://github.com/vital-software/monofo/compare/v4.0.4...v4.0.5) (2022-02-09)
+
+
+### Bug Fixes
+
+* **deps:** update oclif ([41c9732](https://github.com/vital-software/monofo/commit/41c97321f5fbd3a69f1e09da46b3153d15b5c6cd))
+
 ## [4.0.4](https://github.com/vital-software/monofo/compare/v4.0.3...v4.0.4) (2022-02-09)
 
 
