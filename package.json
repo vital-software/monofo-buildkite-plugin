@@ -59,7 +59,7 @@
     "@oclif/plugin-autocomplete": "1.1.1",
     "@oclif/plugin-help": "5.1.10",
     "@oclif/plugin-not-found": "2.2.4",
-    "@oclif/plugin-which": "2.0.5",
+    "@oclif/plugin-which": "2.1.0",
     "bluebird": "3.7.2",
     "chalk": "4.1.2",
     "command-exists": "1.2.9",
