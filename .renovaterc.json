@@ -15,6 +15,11 @@
       "depTypeList": ["devDependencies"],
       "automerge": true,
       "automergeType": "branch"
+    },
+    {
+      "matchPackagePatterns": ["^@oclif/"],
+      "matchPackageNames": ["oclif"],
+      "groupName": "oclif"
     }
   ]
 }
