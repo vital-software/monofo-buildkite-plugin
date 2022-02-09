@@ -2,6 +2,7 @@ import stream from 'stream';
 import debug from 'debug';
 import got from 'got';
 import { exec } from '../util/exec';
+import { getTimeouts } from '../util/got';
 import { Artifact } from './model';
 
 const log = debug('monofo:artifact:api');
@@ -47,7 +48,11 @@ export async function download(artifact: Artifact): Promise<stream.Readable> {
   const url = await search(artifact);
   log('Downloading: ', url);
 
-  return got.stream(url).on('end', () => {
-    log('Finished downloading: ', url);
-  });
+  return got
+    .stream(url, {
+      timeout: getTimeouts(),
+    })
+    .on('end', () => {
+      log('Finished downloading: ', url);
+    });
 }
