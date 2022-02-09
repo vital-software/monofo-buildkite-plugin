@@ -55,7 +55,7 @@
     "@aws-sdk/lib-dynamodb": "3.50.0",
     "@aws-sdk/types": "3.50.0",
     "@oclif/command": "1.8.16",
-    "@oclif/config": "1.18.2",
+    "@oclif/config": "1.18.3",
     "@oclif/plugin-autocomplete": "1.1.1",
     "@oclif/plugin-help": "5.1.10",
     "@oclif/plugin-not-found": "2.2.4",
