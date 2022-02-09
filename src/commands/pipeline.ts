@@ -14,11 +14,6 @@ export default class Pipeline extends BaseCommand {
 
   static override flags = { ...BaseCommand.flags };
 
-  /**
-   * This command is the default one to run if no subcommand is given
-   */
-  static override aliases = [''];
-
   run() {
     return Config.getAll(process.cwd())
       .then((c) =>
