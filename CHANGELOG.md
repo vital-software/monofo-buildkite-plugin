@@ -1,3 +1,10 @@
+## [5.0.2](https://github.com/vital-software/monofo/compare/v5.0.1...v5.0.2) (2022-02-10)
+
+
+### Bug Fixes
+
+* Use the new oclif CLI ([ec0884c](https://github.com/vital-software/monofo/commit/ec0884ccdadbec9bdf1881926105c985f90bc66e))
+
 ## [5.0.1](https://github.com/vital-software/monofo/compare/v5.0.0...v5.0.1) (2022-02-10)
 
 
