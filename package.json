@@ -1,6 +1,6 @@
 {
   "name": "monofo",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "description": "Dynamic Buildkite pipeline generator for monorepos",
   "author": "Dominic Scheirlinck <dominic@vitaler.com>",
   "bin": {
@@ -44,8 +44,12 @@
       "@oclif/plugin-not-found",
       "@oclif/plugin-version"
     ],
-    "additionalHelpFlags": ["-h"],
-    "additionalVersionFlags": ["-v"]
+    "additionalHelpFlags": [
+      "-h"
+    ],
+    "additionalVersionFlags": [
+      "-v"
+    ]
   },
   "files": [
     "/bin",

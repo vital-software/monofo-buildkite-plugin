@@ -1,3 +1,10 @@
+## [5.0.1](https://github.com/vital-software/monofo/compare/v5.0.0...v5.0.1) (2022-02-10)
+
+
+### Bug Fixes
+
+* prompt a release after oclifv2 upgrade ([eed711d](https://github.com/vital-software/monofo/commit/eed711ddb7c9299b6d3155ace4ac0225fb90a618))
+
 # [5.0.0](https://github.com/vital-software/monofo/compare/v4.0.6...v5.0.0) (2022-02-10)
 
 
