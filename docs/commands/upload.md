@@ -31,7 +31,7 @@ ARGUMENTS
 OPTIONS
   -C, --chdir=chdir            Directory to change to before executing command
   -F, --files-from=files-from  A path to a file containing a list of files to upload, or - to use stdin
-  -V, --version                show CLI version
+  -V, --version                Show CLI version.
   -h, --help                   Show this help message
   -v, --verbose                Run with verbose logging
   -z, --null                   If given, the list of files is expected to be null-separated (a la find's -print0)
@@ -52,4 +52,4 @@ EXAMPLE
   $ find . -name node_modules -type d -prune -print0 | monofo upload --files-from - --null
 ```
 
-_See code: [dist/src/commands/upload.ts](https://github.com/vital-software/monofo/blob/v3.5.3/dist/src/commands/upload.ts)_
+_See code: [dist/src/commands/upload.ts](https://github.com/vital-software/monofo/blob/v5.0.0/dist/src/commands/upload.ts)_

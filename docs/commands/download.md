@@ -32,7 +32,7 @@ ARGUMENTS
 
 OPTIONS
   -C, --chdir=chdir  Directory to change to before executing command
-  -V, --version      show CLI version
+  -V, --version      Show CLI version.
   -h, --help         Show this help message
   -v, --verbose      Run with verbose logging
 
@@ -53,4 +53,4 @@ DESCRIPTION
     - MONOFO_ARTIFACT_<NAME>_BUILD_ID=<build UUID> - allows selecting a specific build to pull the artifact from
 ```
 
-_See code: [dist/src/commands/download.ts](https://github.com/vital-software/monofo/blob/v3.5.3/dist/src/commands/download.ts)_
+_See code: [dist/src/commands/download.ts](https://github.com/vital-software/monofo/blob/v5.0.0/dist/src/commands/download.ts)_
