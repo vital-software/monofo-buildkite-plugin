@@ -1,3 +1,16 @@
+# [5.0.0](https://github.com/vital-software/monofo/compare/v4.0.6...v5.0.0) (2022-02-10)
+
+
+### Features
+
+* **pipeline:** removed the default command alias for pipeline ([4dcd6b5](https://github.com/vital-software/monofo/commit/4dcd6b53d783a4c60254f43ef42c1912e0509061))
+
+
+### BREAKING CHANGES
+
+* **pipeline:** If you called `npx monofo` before, you'll now need to
+call `npx monofo pipeline` explicitly
+
 ## [4.0.6](https://github.com/vital-software/monofo/compare/v4.0.5...v4.0.6) (2022-02-10)
 
 

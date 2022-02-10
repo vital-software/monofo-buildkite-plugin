@@ -25,7 +25,7 @@ steps:
       - seek-oss/aws-sm#v2.2.1: # for example, but your secret management might be e.g. via S3 bucket or "env" file instead
           env:
             BUILDKITE_API_ACCESS_TOKEN: "global/buildkite-api-access-token"
-      - vital-software/monofo#v4.0.6:
+      - vital-software/monofo#v5.0.0:
           generate: pipeline
 ```
 
@@ -107,7 +107,7 @@ env:
 steps:
   - command: yarn install
     plugins:
-      - vital-software/monofo#v4.0.6:
+      - vital-software/monofo#v5.0.0:
           upload:
             node-modules.catar.caibx:
               - "node_modules/"
