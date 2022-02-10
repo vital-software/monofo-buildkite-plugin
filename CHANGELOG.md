@@ -1,3 +1,10 @@
+## [4.0.6](https://github.com/vital-software/monofo/compare/v4.0.5...v4.0.6) (2022-02-10)
+
+
+### Bug Fixes
+
+* **deps:** update dependency minimatch to v3.0.5 ([186329c](https://github.com/vital-software/monofo/commit/186329c3f0dd7a095571761d9cb6f18a1e08c685))
+
 ## [4.0.5](https://github.com/vital-software/monofo/compare/v4.0.4...v4.0.5) (2022-02-09)
 
 
