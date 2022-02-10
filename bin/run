@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-
-process.env.OCLIF_TS_NODE = '0';
+// @see https://github.com/oclif/hello-world/blob/b9a3dbccf2a3ebfdadbe4bf0767ecfa2eda9b4e1/bin/run
 
 const fs = require('fs')
 const path = require('path')
@@ -9,6 +8,6 @@ if (!fs.existsSync(path.join(__dirname, '../dist'))) {
   throw new Error("Monofo expects to run with Typescript compiled; try running yarn build")
 }
 
-require('@oclif/command').run()
-.then(require('@oclif/command/flush'))
-.catch(require('@oclif/errors/handle'))
+const oclif = require('@oclif/core')
+oclif.settings.tsnodeEnabled = false
+oclif.run().then(require('@oclif/core/flush')).catch(require('@oclif/core/handle'))

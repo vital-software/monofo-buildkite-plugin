@@ -21,7 +21,7 @@ export default class List extends BaseCommand {
   async run() {
     const {
       args: { componentName },
-    } = this.parse<unknown, ListArgs>(List);
+    } = await this.parse<unknown, ListArgs>(List);
 
     const config: Config | undefined = await Config.getOne(process.cwd(), componentName);
 

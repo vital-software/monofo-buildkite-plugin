@@ -1,4 +1,4 @@
-import Command from '@oclif/command';
+import { Command } from '@oclif/core';
 import debug from 'debug';
 import { stderr as mockStderr, stdout as mockStdout } from 'stdout-stderr';
 import tempy from 'tempy';

@@ -22,7 +22,7 @@ export default class Hash extends BaseCommand {
   async run(): Promise<void> {
     const {
       args: { pipeline },
-    } = this.parse<unknown, HashArgs>(Hash);
+    } = await this.parse<unknown, HashArgs>(Hash);
 
     const config: Config | undefined = await Config.getOne(process.cwd(), pipeline);
 

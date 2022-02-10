@@ -1,15 +1,12 @@
 import { promises as fs } from 'fs';
-import { flags as f } from '@oclif/command';
+import { Flags } from '@oclif/core';
 import debug from 'debug';
 import prettyBytes from 'pretty-bytes';
 import { upload } from '../artifacts/api';
 import { compressorFor } from '../artifacts/compression';
 import { Artifact } from '../artifacts/model';
 import { BaseCommand, BaseFlags } from '../command';
-import { tarArgListForManifest, getManifest } from '../manifest';
-import { exec } from '../util/exec';
-import { count } from '../util/helper';
-import { tar } from '../util/tar';
+import { getManifest } from '../manifest';
 
 const log = debug('monofo:cmd:upload');
 
@@ -54,11 +51,11 @@ locally cached
 
   static override flags = {
     ...BaseCommand.flags,
-    'files-from': f.string({
+    'files-from': Flags.string({
       char: 'F',
       description: 'A path to a file containing a list of files to upload, or - to use stdin',
     }),
-    null: f.boolean({
+    null: Flags.boolean({
       char: 'z',
       dependsOn: ['files-from'],
       description: "If given, the list of files is expected to be null-separated (a la find's -print0)",
@@ -81,7 +78,7 @@ locally cached
   ];
 
   async run() {
-    const { args, flags, raw } = this.parse<UploadFlags, UploadArgs>(Upload);
+    const { args, flags, raw } = await this.parse<UploadFlags, UploadArgs>(Upload);
 
     if (!args.output) {
       throw new Error(

@@ -26,7 +26,7 @@ export default class RecordSuccess extends BaseCommand {
   async run() {
     const {
       args: { componentName, contentHash },
-    } = this.parse<unknown, RecordSuccessArgs>(RecordSuccess);
+    } = await this.parse<unknown, RecordSuccessArgs>(RecordSuccess);
     const { buildId, pipeline, commit } = getBuildkiteInfo();
 
     const ddb = new DynamoDB({});

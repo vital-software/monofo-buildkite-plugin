@@ -26,7 +26,7 @@ export default class Deflate extends BaseCommand {
   ];
 
   async run(): Promise<void> {
-    const { args } = this.parse<unknown, DeflateArguments>(Deflate);
+    const { args } = await this.parse<unknown, DeflateArguments>(Deflate);
 
     try {
       const stat = await fs.stat(args.tarFile);
