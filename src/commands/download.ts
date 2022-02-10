@@ -49,7 +49,7 @@ expected to be inflated in the working directory. For each artifact, we support 
   static override flags = { ...BaseCommand.flags };
 
   async run() {
-    const { argv } = this.parse<unknown, ArtifactArguments>(Download);
+    const { argv } = await this.parse<unknown, ArtifactArguments>(Download);
 
     const artifacts: Artifact[] = _.castArray<string>(argv).map((filename) => new Artifact(filename));
     log(`Downloading ${count(artifacts, 'artifact')}: ${artifacts.map((artifact) => artifact.name).join(', ')}`);
