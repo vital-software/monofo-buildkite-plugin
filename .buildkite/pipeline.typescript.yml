@@ -22,7 +22,7 @@ steps:
     plugins:
       - docker-compose#v3.9.0:
           run: node
-      - vital-software/monofo#v4.0.6:
+      - vital-software/monofo#v5.0.0:
           download:
             - node-modules.catar.caibx
           upload:
