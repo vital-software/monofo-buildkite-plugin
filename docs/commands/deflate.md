@@ -11,17 +11,20 @@ deflate a tar resource into a given artifact name
 
 ```
 USAGE
-  $ monofo deflate TARFILE OUTPUT
+  $ monofo deflate [TARFILE] [OUTPUT] [-C <value>] [-v] [-V] [-h]
 
 ARGUMENTS
   TARFILE  Path to a .tar file
   OUTPUT   Path to a target deflated artifact file, like something.tar.gz or something.catar.caibx
 
-OPTIONS
-  -C, --chdir=chdir  Directory to change to before executing command
-  -V, --version      Show CLI version.
-  -h, --help         Show this help message
-  -v, --verbose      Run with verbose logging
+FLAGS
+  -C, --chdir=<value>  Directory to change to before executing command
+  -V, --version        Show CLI version.
+  -h, --help           Show this help message
+  -v, --verbose        Run with verbose logging
+
+DESCRIPTION
+  deflate a tar resource into a given artifact name
 ```
 
-_See code: [dist/src/commands/deflate.ts](https://github.com/vital-software/monofo/blob/v5.0.0/dist/src/commands/deflate.ts)_
+_See code: [dist/src/commands/deflate.ts](https://github.com/vital-software/monofo/blob/v5.0.1/dist/src/commands/deflate.ts)_

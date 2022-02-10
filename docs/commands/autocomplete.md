@@ -11,18 +11,24 @@ display autocomplete installation instructions
 
 ```
 USAGE
-  $ monofo autocomplete [SHELL]
+  $ monofo autocomplete [SHELL] [-r]
 
 ARGUMENTS
   SHELL  shell type
 
-OPTIONS
+FLAGS
   -r, --refresh-cache  Refresh cache (ignores displaying instructions)
+
+DESCRIPTION
+  display autocomplete installation instructions
 
 EXAMPLES
   $ monofo autocomplete
+
   $ monofo autocomplete bash
+
   $ monofo autocomplete zsh
+
   $ monofo autocomplete --refresh-cache
 ```
 
