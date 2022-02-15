@@ -78,7 +78,7 @@
     "js-yaml": "4.1.0",
     "lodash": "4.17.21",
     "log-update": "4.0.0",
-    "minimatch": "3.0.5",
+    "minimatch": "4.2.1",
     "mkdirp": "1.0.4",
     "pretty-bytes": "5.6.0",
     "rimraf": "3.0.2",
