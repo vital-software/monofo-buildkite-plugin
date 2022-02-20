@@ -5,10 +5,12 @@ import { fakeProcess, getProjectFixturePath } from './fixtures';
 
 const fs = fsCb.promises;
 
-function* configSteps(configs: Config[]): IterableIterator<Step> {
-  for (const config of configs) {
-    yield* config.allSteps();
-  }
+function configSteps(configs: Config[]): Step[] {
+  return [...configs.flatMap((config) => config.allSteps())];
+}
+
+function configOuterSteps(configs: Config[]): Step[] {
+  return [...configs.flatMap((config) => config.outerSteps())];
 }
 
 async function configNames(scenario: string): Promise<string[]> {
@@ -44,12 +46,31 @@ describe('getConfig()', () => {
     ]);
   });
 
-  it('reads pipeline files and can iterate over steps - group', async () => {
-    const names = await configNames('group');
-    const steps = [...configSteps(await Config.getAll(getProjectFixturePath('group')))];
+  describe('allSteps()', () => {
+    it('reads pipeline files and can iterate over steps - group', async () => {
+      expect(await configNames('groups')).toStrictEqual(['foo1', 'foo2', 'foo3', 'foo4']);
+      expect(configSteps(await Config.getAll(getProjectFixturePath('groups'))).map((step) => step.key)).toStrictEqual([
+        'foo1',
+        'foo1-group',
+        'foo2',
+        'foo1-group', // Note: merging groups with the same key together hasn't happened at this point
+        'foo3',
+        'foo3-group',
+        'foo4',
+        'foo4-group',
+      ]);
+    });
+  });
 
-    // expect(names).toHaveLength(16);
-    expect(names).toStrictEqual(['foo1-group', 'foo3-group', 'foo1', 'foo2', 'foo3', 'foo4']);
+  describe('outerSteps()', () => {
+    it('reads pipeline files and can iterate over steps - group', async () => {
+      const names = await configNames('groups');
+      const steps = [...configOuterSteps(await Config.getAll(getProjectFixturePath('groups')))];
+      expect(names).toStrictEqual(['foo1', 'foo2', 'foo3', 'foo4']);
+
+      // Note: merging groups with the same key together hasn't happened at this point
+      expect(steps.map((step) => step.key)).toStrictEqual(['foo1-group', 'foo1-group', 'foo3-group', 'foo4-group']);
+    });
   });
 
   it('reads pipeline files and returns an array of config files - invalid', async () => {

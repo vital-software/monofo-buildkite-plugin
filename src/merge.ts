@@ -135,7 +135,9 @@ export default async function mergePipelines(configs: Config[]): Promise<Pipelin
   await sendBuildkiteAnnotation(configs);
 
   const artifactSteps = artifactInjectionSteps(configs);
+
   replaceExcludedKeys(configs, artifactSteps.length > 0);
+
   mergeGroups(configs);
 
   const pipelineParts: Pipeline[] = [
@@ -145,7 +147,9 @@ export default async function mergePipelines(configs: Config[]): Promise<Pipelin
     toPipeline(await recordSuccessSteps(configs)),
   ];
 
-  return _.mergeWith({}, ...pipelineParts, (dst: unknown, src: unknown) =>
+  const merged: Pipeline = _.mergeWith({}, ...pipelineParts, (dst: unknown, src: unknown) =>
     _.isArray(dst) ? dst.concat(src) : undefined
   ) as Pipeline;
+
+  return merged;
 }
