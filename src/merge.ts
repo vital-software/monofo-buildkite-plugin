@@ -2,12 +2,14 @@ import chalk from 'chalk';
 import debug from 'debug';
 import _ from 'lodash';
 import sendBuildkiteAnnotation from './annotate';
-import { groupKey, isGroupStep, Pipeline, Step } from './buildkite/types';
-import Config from './config';
+import Config from './models/config';
 import { updateDecisions } from './decide';
+import { isGroupStep, mergeGroups } from './models/group-step';
+import { Step } from './models/step';
 import { ARTIFACT_INJECTION_STEP_KEY, artifactInjectionSteps } from './steps/artifact-injection';
 import { nothingToDoSteps } from './steps/nothing-to-do';
 import { recordSuccessSteps } from './steps/record-success';
+import { Pipeline } from './models/pipeline';
 
 const log = debug('monofo:merge');
 
@@ -19,8 +21,6 @@ const log = debug('monofo:merge');
  * steps
  *
  * This method also mutates the steps of the passed-in configs directly
- *
- * TODO: use the iter on the config to find steps
  */
 function replaceExcludedKeys(configs: Config[], hasArtifactStep: boolean): void {
   const excludedKeys: string[] = configs
@@ -52,32 +52,6 @@ function replaceExcludedKeys(configs: Config[], hasArtifactStep: boolean): void 
       }
     }
   }
-}
-
-/**
- * The problem as it stands is that the combining step needs to remove steps from
- * the combined run. But the combined run is represented as Config[], not some other
- * aggregate type. So, e.g. it's hard to safely remove steps (part of merging them)
- * until they've undergone toMerge()
- *
- * @param _unused
- */
-function mergeGroups(_unused: Config[]): void {
-  // const groupToStep: Record<string, Step> = {};
-  //
-  // for (const config of configs) {
-  //   for (const step of config.outerSteps()) {
-  //     if (!isGroupStep(step)) continue;
-  //     const key = groupKey(step);
-  //
-  //     if (!(key in groupToStep)) {
-  //       groupToStep[key] = step;
-  //     } else {
-  //       mergeGroupToGroup(groupToStep[key], step);
-  //       // TODO merge
-  //     }
-  //   }
-  // }
 }
 
 /**
@@ -138,8 +112,6 @@ export default async function mergePipelines(configs: Config[]): Promise<Pipelin
 
   replaceExcludedKeys(configs, artifactSteps.length > 0);
 
-  mergeGroups(configs);
-
   const pipelineParts: Pipeline[] = [
     toPipeline(artifactSteps),
     ...configs.map(toMerge),
@@ -150,6 +122,8 @@ export default async function mergePipelines(configs: Config[]): Promise<Pipelin
   const merged: Pipeline = _.mergeWith({}, ...pipelineParts, (dst: unknown, src: unknown) =>
     _.isArray(dst) ? dst.concat(src) : undefined
   ) as Pipeline;
+
+  mergeGroups(merged);
 
   return merged;
 }

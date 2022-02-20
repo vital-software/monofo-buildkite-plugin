@@ -1,13 +1,14 @@
-import path from 'path';
 import { createTables, startDb, stopDb } from 'jest-dynalite';
 import { load as loadYaml } from 'js-yaml';
+import { Pipeline as BuildkitePipeline } from './../../src/models/pipeline'
 import _ from 'lodash';
-import { CommandStep, Pipeline as BuildkitePipeline, Step } from '../../src/buildkite/types';
 import { CacheMetadataRepository } from '../../src/cache-metadata';
 import Pipeline from '../../src/commands/pipeline';
 import { service } from '../../src/dynamodb';
 import { mergeBase, diff, revList } from '../../src/git';
+import { CommandStep } from '../../src/models/step';
 import { BUILD_ID, BUILD_ID_2, BUILD_ID_3, COMMIT, fakeProcess, selectScenario, testRun } from '../fixtures';
+import { Step } from '../../src/models/step'
 
 jest.mock('../../src/git');
 jest.mock('../../src/buildkite/client');
@@ -214,7 +215,6 @@ describe('monofo pipeline', () => {
 
     it('can be executed with pure components with cache hits', async () => {
       process.env = fakeProcess({ BUILDKITE_PIPELINE_SLUG: 'pure-hit' });
-      process.chdir(path.resolve(__dirname, '../projects/pure'));
 
       const repo = new CacheMetadataRepository(service);
 

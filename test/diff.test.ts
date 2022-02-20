@@ -1,8 +1,7 @@
-import path from 'path';
 import { getBuildkiteInfo } from '../src/buildkite/config';
-import Config from '../src/config';
 import { getBaseBuild, matchConfigs } from '../src/diff';
 import { commitExists, mergeBase, revList } from '../src/git';
+import Config from '../src/models/config';
 import { BASE_BUILD, COMMIT, fakeProcess, selectScenario } from './fixtures';
 
 jest.mock('../src/git');

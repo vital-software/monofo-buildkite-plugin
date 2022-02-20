@@ -1,9 +1,9 @@
 import debug from 'debug';
 import _ from 'lodash';
-import BuildkiteClient from './buildkite/client';
-import { BuildkiteBuild, BuildkiteEnvironment } from './buildkite/types';
-import Config from './config';
+import BuildkiteClient, { BuildkiteBuild } from './buildkite/client';
+import { BuildkiteEnvironment } from './buildkite/config';
 import { commitExists, mergeBase, revList } from './git';
+import Config from './models/config';
 import { filterAsync } from './util/async';
 import { count } from './util/helper';
 

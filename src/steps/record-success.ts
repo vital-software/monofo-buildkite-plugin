@@ -1,9 +1,9 @@
 import crypto from 'crypto';
 import { getBuildkiteInfo } from '../buildkite/config';
-import { CommandStep, Step } from '../buildkite/types';
 import { CACHE_METADATA_TABLE_NAME } from '../cache-metadata';
-import Config from '../config';
 import { FileHasher } from '../hash';
+import Config from '../models/config';
+import { CommandStep, Step } from '../models/step';
 
 export const RECORD_SUCCESS_STEP_KEY = 'record-success-';
 const RECORD_SUCCESS_STEP_LABEL = `:ok:`;
