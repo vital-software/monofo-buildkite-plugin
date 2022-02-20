@@ -119,8 +119,13 @@ describe('cmd upload', () => {
   });
 
   it('works functionally on ./src/ here', async () => {
-    process.chdir(`${__dirname}/../../`);
-    const { stderr } = await testRun(Upload, ['src.catar.caibx', './src/']);
-    expect(stderr).toContain('Successfully uploaded src');
-  }, 60000);
+    await tempy.file.task(
+      async (tempArchive) => {
+        process.chdir(`${__dirname}/../../`);
+        const { stderr } = await testRun(Upload, [tempArchive, './src/']);
+        expect(stderr).toContain('Successfully uploaded');
+      },
+      { extension: '.catar.caibx' }
+    );
+  });
 });

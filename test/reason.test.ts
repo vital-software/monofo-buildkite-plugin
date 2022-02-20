@@ -1,18 +1,17 @@
-import path from 'path';
 import { createTables, startDb, stopDb } from 'jest-dynalite';
 import { CacheMetadataRepository } from '../src/cache-metadata';
 import Config from '../src/config';
 import { updateDecisions } from '../src/decide';
 import { matchConfigs } from '../src/diff';
 import { service } from '../src/dynamodb';
-import { BASE_BUILD, BUILD_ID_2, BUILD_ID_3, COMMIT, fakeProcess } from './fixtures';
+import { BASE_BUILD, BUILD_ID_2, BUILD_ID_3, COMMIT, fakeProcess, selectScenario } from './fixtures';
 
 async function getInclusionReasons(
   changedFiles: string[] = [],
   env = {}
 ): Promise<{ name: string; included: boolean | undefined; reason: string }[]> {
   process.env = fakeProcess(env);
-  process.chdir(path.resolve(__dirname, './projects/kitchen-sink'));
+  selectScenario('kitchen-sink');
   const configs = await Config.getAll(process.cwd());
   matchConfigs(BASE_BUILD, configs, changedFiles);
   await updateDecisions(configs);
@@ -152,8 +151,7 @@ describe('config.reason', () => {
   });
 
   it("matches expected reasons when there isn't a previous build", async () => {
-    process.env = fakeProcess();
-    process.chdir(path.resolve(__dirname, './projects/kitchen-sink'));
+    selectScenario('kitchen-sink');
     const configs = await Config.getAll(process.cwd());
     await updateDecisions(configs);
 
@@ -193,7 +191,7 @@ describe('config.reason', () => {
 
   it('matches expected reasons when cache hits/misses', async () => {
     process.env = fakeProcess({ BUILDKITE_PIPELINE_SLUG: 'pure-hit' });
-    process.chdir(path.resolve(__dirname, './projects/pure'));
+    selectScenario('pure');
 
     const repo = new CacheMetadataRepository(service);
 

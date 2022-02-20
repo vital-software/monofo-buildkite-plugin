@@ -1,7 +1,6 @@
-import path from 'path';
 import BaseCommit from '../../src/commands/base-commit';
 import { mergeBase, diff, revList } from '../../src/git';
-import { fakeProcess, COMMIT, testRun } from '../fixtures';
+import { fakeProcess, COMMIT, testRun, selectScenario } from '../fixtures';
 
 jest.mock('../../src/git');
 jest.mock('../../src/buildkite/client');
@@ -37,7 +36,7 @@ describe('cmd base-commit', () => {
 
   it('can be executed with simple configuration', async () => {
     process.env = fakeProcess();
-    process.chdir(path.resolve(__dirname, '../projects/kitchen-sink'));
+    selectScenario('kitchen-sink');
 
     const { stdout } = await testRun(BaseCommit, []);
     expect(stdout).toContain(COMMIT);
