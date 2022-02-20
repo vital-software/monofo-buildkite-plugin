@@ -1,9 +1,15 @@
 import fsCb from 'fs';
-import path from 'path';
+import { Step } from '../src/buildkite/types';
 import Config from '../src/config';
 import { fakeProcess, getProjectFixturePath } from './fixtures';
 
 const fs = fsCb.promises;
+
+function* configSteps(configs: Config[]): IterableIterator<Step> {
+  for (const config of configs) {
+    yield* config.allSteps();
+  }
+}
 
 async function configNames(scenario: string): Promise<string[]> {
   return (await Config.getAll(getProjectFixturePath(scenario))).map((c) => c.monorepo.name);
@@ -36,6 +42,14 @@ describe('getConfig()', () => {
       'some-long-name',
       'unreferenced',
     ]);
+  });
+
+  it('reads pipeline files and can iterate over steps - group', async () => {
+    const names = await configNames('group');
+    const steps = [...configSteps(await Config.getAll(getProjectFixturePath('group')))];
+
+    // expect(names).toHaveLength(16);
+    expect(names).toStrictEqual(['foo1-group', 'foo3-group', 'foo1', 'foo2', 'foo3', 'foo4']);
   });
 
   it('reads pipeline files and returns an array of config files - invalid', async () => {

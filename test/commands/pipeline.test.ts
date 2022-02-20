@@ -7,7 +7,7 @@ import { CacheMetadataRepository } from '../../src/cache-metadata';
 import Pipeline from '../../src/commands/pipeline';
 import { service } from '../../src/dynamodb';
 import { mergeBase, diff, revList } from '../../src/git';
-import { BUILD_ID, BUILD_ID_2, BUILD_ID_3, COMMIT, fakeProcess, testRun } from '../fixtures';
+import { BUILD_ID, BUILD_ID_2, BUILD_ID_3, COMMIT, fakeProcess, selectScenario, testRun } from '../fixtures';
 
 jest.mock('../../src/git');
 jest.mock('../../src/buildkite/client');
@@ -39,10 +39,6 @@ function commandSummary(steps: Step[]): string[] {
 async function run(args: string[] = []): Promise<BuildkitePipeline> {
   const { stdout } = await testRun(Pipeline, args);
   return (await loadYaml(stdout)) as BuildkitePipeline;
-}
-
-function selectScenario(scenario: string): void {
-  process.chdir(path.resolve(__dirname, `../projects/${scenario}`));
 }
 
 describe('monofo pipeline', () => {
@@ -184,24 +180,26 @@ describe('monofo pipeline', () => {
     });
   });
 
-  describe('scenario: flexible-structure', () => {});
+  describe('scenario: flexible-structure', () => {
+    beforeAll(() => {
+      selectScenario('flexible-structure');
+    });
 
-  it('can be executed with flexible structure', async () => {
-    process.env = fakeProcess();
-    process.chdir(path.resolve(__dirname, '../projects/flexible-structure'));
+    it('can be executed with flexible structure', async () => {
+      const pipeline = await run([]);
 
-    const pipeline = await run([]);
-
-    expect(pipeline).toBeDefined();
-    expect(pipeline.steps).toHaveLength(3);
-    expect(pipeline.steps.map((s) => s.key)).toStrictEqual(['foo1Key', 'foo2Key', 'foo3Key']);
+      expect(pipeline).toBeDefined();
+      expect(pipeline.steps).toHaveLength(3);
+      expect(pipeline.steps.map((s) => s.key)).toStrictEqual(['foo1Key', 'foo2Key', 'foo3Key']);
+    });
   });
 
   describe('scenario: pure', () => {
-    it('can be executed with pure components', async () => {
-      process.env = fakeProcess();
-      process.chdir(path.resolve(__dirname, '../projects/pure'));
+    beforeAll(() => {
+      selectScenario('pure');
+    });
 
+    it('can be executed with pure components', async () => {
       const pipeline = await run([]);
 
       expect(pipeline).toBeDefined();
@@ -263,7 +261,6 @@ describe('monofo pipeline', () => {
 
     it('can be executed with pure components with cache hits, but PIPELINE_RUN_ALL forces them to run', async () => {
       process.env = fakeProcess({ BUILDKITE_PIPELINE_SLUG: 'pure-hit', PIPELINE_RUN_ALL: '1' });
-      process.chdir(path.resolve(__dirname, '../projects/pure'));
 
       const repo = new CacheMetadataRepository(service);
 
@@ -306,6 +303,33 @@ describe('monofo pipeline', () => {
     });
   });
 
-  describe('scenario: groups', () => {});
-  describe('scenario: bad-groups', () => {});
+  describe('scenario: groups', () => {
+    beforeAll(() => {
+      selectScenario('groups');
+    });
+
+    it('can merge across groups and understand their depends_on', async () => {
+      const pipeline = await run([]);
+
+      expect(pipeline).toBeDefined();
+      expect(pipeline.steps.map((s) => s.key)).toStrictEqual([
+        'foo1-group', // merged entry
+        'foo3-group',
+        'foo4-group',
+      ]);
+    });
+  });
+
+  describe('scenario: bad-groups', () => {
+    beforeAll(() => {
+      selectScenario('bad-groups');
+    });
+
+    it('can not merge across groups when they have different settings', async () => {
+      const pipeline = await run([]);
+
+      expect(pipeline).toBeDefined();
+      expect(pipeline.steps.map((s) => s.key)).toStrictEqual([]);
+    });
+  });
 });

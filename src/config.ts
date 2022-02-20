@@ -7,7 +7,7 @@ import minimatch from 'minimatch';
 import toposort from 'toposort';
 import { parseBranchList } from './branch-list';
 import { getBuildkiteInfo } from './buildkite/config';
-import { BuildkiteBuild, Step } from './buildkite/types';
+import { BuildkiteBuild, isGroupStep, Step } from './buildkite/types';
 import ConfigFile from './config-file';
 import { FileHasher } from './hash';
 import Reason, { ExcludeReasonType } from './reason';
@@ -22,7 +22,7 @@ interface MonorepoConfig {
   produces: string[];
   matches: string[] | boolean;
   depends_on: string[];
-  excluded_steps: Record<string, unknown>[];
+  excluded_steps: Step[];
   excluded_env: Record<string, string>;
   pure: boolean;
   branches: string; // "!dev main !other foo*"
@@ -104,8 +104,22 @@ export default class Config {
     this.reason = reason;
   }
 
-  public mapSteps(mapFn: (s: Step) => Step): void {
-    this.steps = this.steps.map(mapFn);
+  /**
+   * Iterator that yields every step in the config, including sub-steps attached to group steps
+   *
+   * Useful for e.g. filtering
+   */
+  public *allSteps(): IterableIterator<Step> {
+    yield* this.steps.flatMap((step) => {
+      if (isGroupStep(step)) {
+        return [...step.steps, step];
+      }
+      return [step];
+    });
+  }
+
+  public *outerSteps(): IterableIterator<Step> {
+    yield* this.steps;
   }
 
   public useFallback(): void {

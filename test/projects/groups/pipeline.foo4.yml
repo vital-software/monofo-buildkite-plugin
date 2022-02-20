@@ -6,7 +6,7 @@ monorepo:
 
 steps:
   - group: "foo4 group"
-    key: "foo3-group"
+    key: "foo4-group"
     depends_on: foo1-group
     steps:
       - command: echo "foo4" > foo4

@@ -48,7 +48,8 @@ module.exports = {
     'import/prefer-default-export': 'off',
     'max-classes-per-file': 'off',
     'no-underscore-dangle': 'off',
-    'no-void': 'off'
+    'no-void': 'off',
+    'no-continue': 'off',
   },
   overrides: [
     {
