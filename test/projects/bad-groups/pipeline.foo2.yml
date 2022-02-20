@@ -1,0 +1,13 @@
+monorepo:
+  matches: "foo/**/README.md"
+
+steps:
+  - group: "foo1 group"
+    key: "foo1-group"
+
+    # We'd normally be able to merge these definitions, but this being different means we can't, so we should error
+    allow_dependency_failure: true
+
+    steps:
+      - command: echo "foo2" > foo2
+        key: foo2

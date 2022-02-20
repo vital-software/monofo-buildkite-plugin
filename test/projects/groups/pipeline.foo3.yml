@@ -1,0 +1,14 @@
+monorepo:
+  matches: "foo/**/README.md"
+  expects: foo1
+
+# This tests the group step depends_on property
+
+steps:
+  - group: "foo3 group"
+    key: "foo3-group"
+    depends_on:
+      - foo1-group
+    steps:
+      - command: echo "foo3" > foo3
+        key: foo3
