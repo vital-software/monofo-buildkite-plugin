@@ -1,3 +1,4 @@
+import path from 'path';
 import { Command } from '@oclif/core';
 import debug from 'debug';
 import { stderr as mockStderr, stdout as mockStdout } from 'stdout-stderr';
@@ -24,7 +25,11 @@ export function getFixturePath(fileName: string): string {
   return `${__dirname}/fixtures/${fileName}`;
 }
 
-export function fakeProcess(merge: Record<string, string> = {}): NodeJS.ProcessEnv {
+export function getProjectFixturePath(scenario: string): string {
+  return `${__dirname}/projects/${scenario}`;
+}
+
+export function fakeProcess(merge: Partial<NodeJS.ProcessEnv> = {}): NodeJS.ProcessEnv {
   return {
     MONOFO_DESYNC_CACHE: tempy.directory(),
     MONOFO_DESYNC_STORE: getFixturePath('desync-store'),
@@ -182,4 +187,8 @@ export async function testRun(command: typeof Command, args: string[] = []): Pro
     stdout: mockStdout.output,
     stderr: mockStderr.output,
   };
+}
+
+export function selectScenario(scenario: string): void {
+  process.chdir(path.resolve(__dirname, getProjectFixturePath(scenario)));
 }

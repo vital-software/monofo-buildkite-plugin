@@ -1,9 +1,13 @@
 import fsCb from 'fs';
 import path from 'path';
 import Config from '../src/config';
-import { fakeProcess } from './fixtures';
+import { fakeProcess, getProjectFixturePath } from './fixtures';
 
 const fs = fsCb.promises;
+
+async function configNames(scenario: string): Promise<string[]> {
+  return (await Config.getAll(getProjectFixturePath(scenario))).map((c) => c.monorepo.name);
+}
 
 describe('getConfig()', () => {
   it('reads pipeline files and returns an array of config files - no such directory', async () => {
@@ -12,11 +16,9 @@ describe('getConfig()', () => {
   });
 
   it('reads pipeline files and returns an array of config files - simple', async () => {
-    const configNames = (await Config.getAll(path.resolve(__dirname, 'projects/kitchen-sink'))).map(
-      (c) => c.monorepo.name
-    );
-    expect(configNames).toHaveLength(16);
-    expect(configNames).toStrictEqual([
+    const names = await configNames('kitchen-sink');
+    expect(names).toHaveLength(16);
+    expect(names).toStrictEqual([
       'branch-excluded',
       'changed',
       'dependedon',
@@ -37,9 +39,9 @@ describe('getConfig()', () => {
   });
 
   it('reads pipeline files and returns an array of config files - invalid', async () => {
-    const configNames = (await Config.getAll(path.resolve(__dirname, 'projects/invalid'))).map((c) => c.monorepo.name);
-    expect(configNames).toHaveLength(1);
-    expect(configNames).toStrictEqual(['invalid']);
+    const names = await configNames('invalid');
+    expect(names).toHaveLength(1);
+    expect(names).toStrictEqual(['invalid']);
   });
 
   it('reads pipeline files - custom glob', async () => {
@@ -47,11 +49,9 @@ describe('getConfig()', () => {
       PIPELINE_FILE_GLOB: '**/pipeline.foo*.yml', // excludes foo1
     });
 
-    const configNames = (await Config.getAll(path.resolve(__dirname, 'projects/flexible-structure'))).map(
-      (c) => c.monorepo.name
-    );
-    expect(configNames).toHaveLength(2);
-    expect(configNames).toStrictEqual(['foo2', 'foo3']);
+    const names = await configNames('flexible-structure');
+    expect(names).toHaveLength(2);
+    expect(names).toStrictEqual(['foo2', 'foo3']);
   });
 
   it('reads pipeline files - custom ignore glob', async () => {
@@ -59,10 +59,8 @@ describe('getConfig()', () => {
       PIPELINE_FILE_IGNORE_GLOB: '**/node_modules/**:foo/**', // excludes foo2
     });
 
-    const configNames = (await Config.getAll(path.resolve(__dirname, 'projects/flexible-structure'))).map(
-      (c) => c.monorepo.name
-    );
-    expect(configNames).toHaveLength(2);
-    expect(configNames).toStrictEqual(['foo1', 'foo3']);
+    const names = await configNames('flexible-structure');
+    expect(names).toHaveLength(2);
+    expect(names).toStrictEqual(['foo1', 'foo3']);
   });
 });

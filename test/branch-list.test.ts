@@ -1,8 +1,9 @@
 import path from 'path';
 import Config from '../src/config';
+import { getProjectFixturePath } from './fixtures';
 
 async function getIncludedPipelinesForBranchName(branchName: string): Promise<string[]> {
-  return (await Config.getAll(path.resolve(__dirname, 'projects/branch-exclusion')))
+  return (await Config.getAll(getProjectFixturePath('branch-exclusion')))
     .filter((config) => {
       return config.includedInBranchList(branchName);
     })

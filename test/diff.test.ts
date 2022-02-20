@@ -3,7 +3,7 @@ import { getBuildkiteInfo } from '../src/buildkite/config';
 import Config from '../src/config';
 import { getBaseBuild, matchConfigs } from '../src/diff';
 import { commitExists, mergeBase, revList } from '../src/git';
-import { BASE_BUILD, COMMIT, fakeProcess } from './fixtures';
+import { BASE_BUILD, COMMIT, fakeProcess, selectScenario } from './fixtures';
 
 jest.mock('../src/git');
 jest.mock('../src/buildkite/client');
@@ -75,8 +75,7 @@ describe('matchConfigs', () => {
     const changedFiles = ['foo/abc.js', 'foo/README.md', 'bar/abc.ts', 'baz/abc.ts'];
 
     it('matches changed files against configs', async () => {
-      process.env = fakeProcess();
-      process.chdir(path.resolve(__dirname, './projects/kitchen-sink'));
+      selectScenario('kitchen-sink');
       const configs = await Config.getAll(process.cwd());
       matchConfigs(BASE_BUILD, configs, changedFiles);
       const changes = configs.map((r) => r.changes);
@@ -107,8 +106,7 @@ describe('matchConfigs', () => {
     const changedFiles: string[] = [];
 
     it('still matches configs that have matches hard-coded to true', async () => {
-      process.env = fakeProcess();
-      process.chdir(path.resolve(__dirname, './projects/kitchen-sink'));
+      selectScenario('kitchen-sink');
       const configs = await Config.getAll(process.cwd());
       matchConfigs(BASE_BUILD, configs, changedFiles);
       const changes = configs.map((r) => r.changes);
