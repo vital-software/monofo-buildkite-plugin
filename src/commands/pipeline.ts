@@ -14,27 +14,27 @@ export default class Pipeline extends BaseCommand {
 
   static override flags = { ...BaseCommand.flags };
 
-  run() {
-    return Config.getAll(process.cwd())
-      .then((c) =>
-        c.length > 0 ? c : Promise.reject(new Error(`No pipeline files to process (cwd: ${process.cwd()})`))
-      )
-      .then((configs) => {
-        return getBaseBuild(getBuildkiteInfo(process.env))
-          .then((baseBuild) =>
-            diff(baseBuild.commit).then((changedFiles) => matchConfigs(baseBuild, configs, changedFiles))
-          )
-          .catch((e: unknown) => {
-            log('Failed to find base commit or diff changes, falling back to do a full build', e);
-            Config.configureFallback(configs);
-            return Promise.resolve();
-          })
-          .then(() => mergePipelines(configs));
-      })
-      .then(dumpYaml)
-      .then((v) => {
-        process.stdout.write(`${v}\n`);
-        return v;
-      });
+  async run() {
+    const configs = await Config.getAll(process.cwd());
+
+    if (configs.length < 1) {
+      throw new Error(`No pipeline files to process (cwd: ${process.cwd()})`);
+    }
+
+    try {
+      const baseBuild = await getBaseBuild(getBuildkiteInfo(process.env));
+      const changedFiles = await diff(baseBuild.commit);
+
+      matchConfigs(baseBuild, configs, changedFiles);
+    } catch (err: unknown) {
+      log('Failed to find base commit or diff changes, falling back to do a full build', err);
+      Config.configureFallback(configs);
+      return Promise.resolve();
+    }
+
+    const yaml = dumpYaml(await mergePipelines(configs));
+
+    process.stdout.write(`${yaml}\n`);
+    return yaml;
   }
 }

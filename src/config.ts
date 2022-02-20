@@ -105,12 +105,12 @@ export default class Config {
   }
 
   /**
-   * Iterator that yields every step in the config, including sub-steps attached to group steps
+   * Every step in the config, including sub-steps attached to group steps
    *
    * Useful for e.g. filtering
    */
-  public *allSteps(): IterableIterator<Step> {
-    yield* this.steps.flatMap((step) => {
+  public allSteps(): Step[] {
+    return this.steps.flatMap((step) => {
       if (isGroupStep(step)) {
         return [...step.steps, step];
       }
@@ -118,8 +118,8 @@ export default class Config {
     });
   }
 
-  public *outerSteps(): IterableIterator<Step> {
-    yield* this.steps;
+  public outerSteps(): Step[] {
+    return this.steps;
   }
 
   public useFallback(): void {
