@@ -1,0 +1,11 @@
+monorepo:
+  matches: "foo/**/README.md"
+
+# This tests our ability to stitch together groups, because otherwise Buildkite only supports appending to groups from later uploads
+
+steps:
+  - group: "foo1 group"
+    key: "foo1-group"
+    steps:
+      - command: echo "foo2" > foo2
+        key: foo2

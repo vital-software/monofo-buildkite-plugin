@@ -1,0 +1,10 @@
+monorepo:
+  matches: "foo/**/README.md"
+  produces: foo1
+
+steps:
+  - group: "foo1 group"
+    key: "foo1-group"
+    steps:
+      - command: echo "foo1" > foo1
+        key: foo1
