@@ -2,7 +2,7 @@ import chalk from 'chalk';
 import debug from 'debug';
 import _ from 'lodash';
 import sendBuildkiteAnnotation from './annotate';
-import { Pipeline, Step } from './buildkite/types';
+import { groupKey, isGroupStep, Pipeline, Step } from './buildkite/types';
 import Config from './config';
 import { updateDecisions } from './decide';
 import { ARTIFACT_INJECTION_STEP_KEY, artifactInjectionSteps } from './steps/artifact-injection';
@@ -14,8 +14,15 @@ const log = debug('monofo:merge');
 /**
  * Loop through the decided configurations and, for any excluded parts, collect the keys of steps that are now skipped.
  * Then rewrite the depends_on of any dependent steps to point at the artifact injection step.
+ *
+ * This method must deal with depends_on being available at multiple different levels of the step in the case of group
+ * steps
+ *
+ * This method also mutates the steps of the passed-in configs directly
+ *
+ * TODO: use the iter on the config to find steps
  */
-function replaceExcludedKeys(configs: Config[], hasArtifactStep: boolean): Config[] {
+function replaceExcludedKeys(configs: Config[], hasArtifactStep: boolean): void {
   const excludedKeys: string[] = configs
     .filter((c) => !c.included)
     .flatMap((c) => c.steps.map((s) => (typeof s.key === 'string' ? s.key : '')).filter((v) => v));
@@ -30,18 +37,47 @@ function replaceExcludedKeys(configs: Config[], hasArtifactStep: boolean): Confi
       .filter((v, i, a) => a.indexOf(v) === i);
   };
 
-  configs.forEach((c) => {
-    c.mapSteps((step) =>
-      !step.depends_on
-        ? step
-        : {
-            ...step,
-            depends_on: filterDependsOn(step.depends_on),
-          }
-    );
-  });
+  for (const config of configs) {
+    for (const step of config.allSteps()) {
+      if (step.depends_on) {
+        step.depends_on = filterDependsOn(step.depends_on);
+      }
 
-  return configs;
+      if (isGroupStep(step)) {
+        for (const innerStep of step.steps) {
+          if (innerStep.depends_on) {
+            innerStep.depends_on = filterDependsOn(innerStep.depends_on);
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * The problem as it stands is that the combining step needs to remove steps from
+ * the combined run. But the combined run is represented as Config[], not some other
+ * aggregate type. So, e.g. it's hard to safely remove steps (part of merging them)
+ * until they've undergone toMerge()
+ *
+ * @param _unused
+ */
+function mergeGroups(_unused: Config[]): void {
+  // const groupToStep: Record<string, Step> = {};
+  //
+  // for (const config of configs) {
+  //   for (const step of config.outerSteps()) {
+  //     if (!isGroupStep(step)) continue;
+  //     const key = groupKey(step);
+  //
+  //     if (!(key in groupToStep)) {
+  //       groupToStep[key] = step;
+  //     } else {
+  //       mergeGroupToGroup(groupToStep[key], step);
+  //       // TODO merge
+  //     }
+  //   }
+  // }
 }
 
 /**
@@ -73,6 +109,12 @@ function toPipeline(steps: Step[]): Pipeline {
   return { env: {}, steps };
 }
 
+/**
+ * This is the main co-ordinating function at the heart of the pipeline generator
+ *
+ * It takes a set of configs, puts them through the decision-making process, and merges the final product together into
+ * a single Pipeline that is returned
+ */
 export default async function mergePipelines(configs: Config[]): Promise<Pipeline> {
   log(`Merging ${configs.length} pipelines`);
 
@@ -89,15 +131,21 @@ export default async function mergePipelines(configs: Config[]): Promise<Pipelin
     );
   });
 
+  // @todo This should be pure, not send an annotation
   await sendBuildkiteAnnotation(configs);
 
   const artifactSteps = artifactInjectionSteps(configs);
+  replaceExcludedKeys(configs, artifactSteps.length > 0);
+  mergeGroups(configs);
 
-  return _.mergeWith(
+  const pipelineParts: Pipeline[] = [
     toPipeline(artifactSteps),
-    ...replaceExcludedKeys(configs, artifactSteps.length > 0).map(toMerge),
+    ...configs.map(toMerge),
     toPipeline(nothingToDoSteps(configs)),
     toPipeline(await recordSuccessSteps(configs)),
-    (dst: unknown, src: unknown) => (_.isArray(dst) ? dst.concat(src) : undefined)
+  ];
+
+  return _.mergeWith({}, ...pipelineParts, (dst: unknown, src: unknown) =>
+    _.isArray(dst) ? dst.concat(src) : undefined
   ) as Pipeline;
 }
