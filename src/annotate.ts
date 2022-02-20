@@ -1,7 +1,7 @@
 import debug from 'debug';
 import execa from 'execa';
 import _ from 'lodash';
-import Config from './config';
+import Config from './models/config';
 import { plurals } from './util/helper';
 
 const log = debug('monofo:annotate');

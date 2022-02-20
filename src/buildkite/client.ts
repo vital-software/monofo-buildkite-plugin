@@ -1,7 +1,7 @@
 import { URL } from 'url';
 import debug from 'debug';
 import got from 'got';
-import { BuildkiteBuild, BuildkiteEnvironment } from './types';
+import { BuildkiteEnvironment } from './config';
 
 const log = debug('monofo:buildkite:client');
 
@@ -13,6 +13,17 @@ interface PaginationOptions {
 export interface GetBuildsOptions extends PaginationOptions {
   state?: string;
   'branch[]'?: string[];
+}
+
+/**
+ * As returned for a build from the Buildkite REST API
+ */
+export interface BuildkiteBuild {
+  id: string;
+  web_url?: string;
+  commit: string;
+  blocked?: boolean;
+  [others: string]: unknown;
 }
 
 export default class BuildkiteClient {

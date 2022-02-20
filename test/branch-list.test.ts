@@ -1,5 +1,4 @@
-import path from 'path';
-import Config from '../src/config';
+import Config from '../src/models/config';
 import { getProjectFixturePath } from './fixtures';
 
 async function getIncludedPipelinesForBranchName(branchName: string): Promise<string[]> {

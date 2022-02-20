@@ -2,9 +2,9 @@
 
 import { getBuildkiteInfo } from './buildkite/config';
 import { CacheMetadataKey, CacheMetadataRepository } from './cache-metadata';
-import Config from './config';
 import { service } from './dynamodb';
 import { FileHasher } from './hash';
+import Config from './models/config';
 import Reason, { ExcludeReasonType, IncludeReasonType } from './reason';
 
 /**

@@ -1,5 +1,3 @@
-import { BuildkiteEnvironment } from './types';
-
 const BUILDKITE_REQUIRED_ENV = [
   'BUILDKITE_BUILD_ID',
   'BUILDKITE_BRANCH',
@@ -10,6 +8,20 @@ const BUILDKITE_REQUIRED_ENV = [
   'BUILDKITE_SOURCE',
   'BUILDKITE_API_ACCESS_TOKEN',
 ];
+
+/**
+ * Our own internal value instance that collects environment variable values
+ */
+export interface BuildkiteEnvironment {
+  buildId: string;
+  branch: string;
+  commit: string;
+  defaultBranch: string;
+  source: string;
+  org: string;
+  pipeline: string;
+  integrationBranch?: string;
+}
 
 export function getBuildkiteInfo(e: NodeJS.ProcessEnv = process.env): BuildkiteEnvironment {
   if (typeof e !== 'object') {

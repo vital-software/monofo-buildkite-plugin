@@ -2,10 +2,10 @@ import debug from 'debug';
 import { dump as dumpYaml } from 'js-yaml';
 import { getBuildkiteInfo } from '../buildkite/config';
 import { BaseCommand } from '../command';
-import Config from '../config';
 import { getBaseBuild, matchConfigs } from '../diff';
 import { diff } from '../git';
 import mergePipelines from '../merge';
+import Config from '../models/config';
 
 const log = debug('monofo:cmd:pipeline');
 

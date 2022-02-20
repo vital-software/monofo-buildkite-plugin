@@ -1,9 +1,9 @@
 import { createTables, startDb, stopDb } from 'jest-dynalite';
 import { CacheMetadataRepository } from '../src/cache-metadata';
-import Config from '../src/config';
 import { updateDecisions } from '../src/decide';
 import { matchConfigs } from '../src/diff';
 import { service } from '../src/dynamodb';
+import Config from '../src/models/config';
 import { BASE_BUILD, BUILD_ID_2, BUILD_ID_3, COMMIT, fakeProcess, selectScenario } from './fixtures';
 
 async function getInclusionReasons(

@@ -41,7 +41,8 @@ module.exports = {
     // Soften some errors
     'no-restricted-syntax': ['warn', 'ForInStatement', 'LabeledStatement', 'WithStatement'], // Removes ForOfStatement from extended standards
     'no-return-assign': ['error', 'except-parens'],
-    'no-await-in-loop': ['warn'],
+    'no-await-in-loop': 'warn',
+    'no-param-reassign': 'warn',
 
     // And turn some completely off
     'class-methods-use-this': 'off',

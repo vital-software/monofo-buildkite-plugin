@@ -5,14 +5,16 @@ import { load as loadYaml } from 'js-yaml';
 import _ from 'lodash';
 import minimatch from 'minimatch';
 import toposort from 'toposort';
-import { parseBranchList } from './branch-list';
-import { getBuildkiteInfo } from './buildkite/config';
-import { BuildkiteBuild, isGroupStep, Step } from './buildkite/types';
-import ConfigFile from './config-file';
-import { FileHasher } from './hash';
-import Reason, { ExcludeReasonType } from './reason';
-import { globSet } from './util/glob';
-import { strings } from './util/helper';
+import { parseBranchList } from '../branch-list';
+import { BuildkiteBuild } from '../buildkite/client';
+import { getBuildkiteInfo } from '../buildkite/config';
+import ConfigFile from '../config-file';
+import { FileHasher } from '../hash';
+import Reason, { ExcludeReasonType } from '../reason';
+import { globSet } from '../util/glob';
+import { strings } from '../util/helper';
+import { isGroupStep } from './group-step';
+import { Step } from './step';
 
 const log = debug('monofo:config');
 

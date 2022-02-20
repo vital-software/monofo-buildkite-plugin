@@ -1,6 +1,6 @@
 import fsCb from 'fs';
-import { Step } from '../src/buildkite/types';
-import Config from '../src/config';
+import Config from '../src/models/config';
+import { Step } from '../src/models/step';
 import { fakeProcess, getProjectFixturePath } from './fixtures';
 
 const fs = fsCb.promises;

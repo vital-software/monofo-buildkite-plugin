@@ -3,8 +3,8 @@ import { Command } from '@oclif/core';
 import debug from 'debug';
 import { stderr as mockStderr, stdout as mockStdout } from 'stdout-stderr';
 import tempy from 'tempy';
-import { getBuildkiteInfo } from '../src/buildkite/config';
-import { BuildkiteBuild, BuildkiteEnvironment } from '../src/buildkite/types';
+import { BuildkiteBuild } from '../src/buildkite/client';
+import { BuildkiteEnvironment, getBuildkiteInfo } from '../src/buildkite/config';
 
 export const ORG = 'dominics';
 export const PIPELINE = 'monofo';

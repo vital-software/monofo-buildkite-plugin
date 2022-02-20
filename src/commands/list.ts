@@ -1,5 +1,5 @@
 import { BaseCommand } from '../command';
-import Config from '../config';
+import Config from '../models/config';
 
 interface ListArgs {
   componentName: string;

@@ -1,6 +1,6 @@
 import { BaseCommand } from '../command';
-import Config from '../config';
 import { FileHasher } from '../hash';
+import Config from '../models/config';
 
 interface HashArgs {
   pipeline: string;
