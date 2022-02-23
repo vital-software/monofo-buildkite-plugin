@@ -51,6 +51,9 @@ export function mergeGroups(pipeline: Pipeline): void {
       }
     }
   }
+
+  // eslint-disable-next-line no-param-reassign
+  pipeline.steps = pipeline.steps.filter((v) => v);
 }
 
 export function isGroupStep(step: Step): step is GroupStep {
