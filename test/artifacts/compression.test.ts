@@ -1,4 +1,4 @@
-import { promises as fs, createReadStream, existsSync } from 'fs';
+import { createReadStream, existsSync } from 'fs';
 import { promisify } from 'util';
 import rimrafCb from 'rimraf';
 import tempy from 'tempy';

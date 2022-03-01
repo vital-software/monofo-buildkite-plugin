@@ -325,7 +325,9 @@ describe('monofo pipeline', () => {
     });
 
     it('can not merge across groups when they have different settings', async () => {
-      expect(run([])).rejects.toThrowError();
+      await expect(run([])).rejects.toThrowError(
+        'Cannot merge groups under foo1-group: allow_dependency_failure does not match'
+      );
     });
   });
 });

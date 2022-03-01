@@ -1,5 +1,5 @@
 import debug from 'debug';
-import execa, { ExecaReturnValue } from 'execa';
+import { ExecaReturnValue } from 'execa';
 import { exec, hasBin } from '../../util/exec';
 import { execFromTar, tar } from '../../util/tar';
 import { Compressor } from './compressor';

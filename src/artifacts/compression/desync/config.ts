@@ -1,6 +1,3 @@
-import mkdirp from 'mkdirp';
-import { Artifact } from '../../model';
-
 class MissingConfigError extends Error {}
 
 export function store(): string {
