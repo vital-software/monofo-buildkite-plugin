@@ -2,12 +2,31 @@ import _ from 'lodash';
 import { Pipeline } from './pipeline';
 import { GroupStep, Step } from './step';
 
+/**
+ * Given a group step, returns the key that will be used for grouping on that step
+ */
+export function groupKey(step: GroupStep): string {
+  const key = step.key || step.group || step.label;
+
+  if (!key) {
+    throw new Error('Could not find group key on group step');
+  }
+
+  return key;
+}
+
 class GroupMergeMismatchError extends Error {
   constructor(step: GroupStep, propertyName: string) {
     super(`Cannot merge groups under ${groupKey(step)}: ${propertyName} does not match`);
   }
 }
 
+/**
+ * We can't arbitrarily combine groups with the same key
+ *
+ * If they have a different `if`, `depends_on` etc. then we'd lose information by combining the groups into one. So we
+ * have to throw GroupMergeMismatchError instead
+ */
 function checkSimilarEnoughToMerge(step1: GroupStep, step2: GroupStep): void {
   if (step1.allow_dependency_failure !== step2.allow_dependency_failure) {
     throw new GroupMergeMismatchError(step2, 'allow_dependency_failure');
@@ -16,6 +35,10 @@ function checkSimilarEnoughToMerge(step1: GroupStep, step2: GroupStep): void {
   if (!_.isEqual(step1.depends_on, step2.depends_on)) {
     throw new GroupMergeMismatchError(step2, 'depends_on');
   }
+}
+
+export function isGroupStep(step: Step): step is GroupStep {
+  return step?.group === null || Boolean(step?.group);
 }
 
 /**
@@ -54,20 +77,6 @@ export function mergeGroups(pipeline: Pipeline): void {
 
   // eslint-disable-next-line no-param-reassign
   pipeline.steps = pipeline.steps.filter((v) => v);
-}
-
-export function isGroupStep(step: Step): step is GroupStep {
-  return step?.group === null || Boolean(step?.group);
-}
-
-export function groupKey(step: GroupStep): string {
-  const key = step.key || step.group || step.label;
-
-  if (!key) {
-    throw new Error('Could not find group key on group step');
-  }
-
-  return key;
 }
 
 /**

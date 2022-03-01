@@ -1,4 +1,3 @@
-import path from 'path';
 import List from '../../src/commands/list';
 import { fakeProcess, selectScenario, testRun } from '../fixtures';
 
