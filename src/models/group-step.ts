@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { Pipeline } from './pipeline';
-import { GroupStep, Step } from './step';
+import { GroupStep, isGroupStep, Step } from './step';
 
 /**
  * Given a group step, returns the key that will be used for grouping on that step
@@ -35,10 +35,6 @@ function checkSimilarEnoughToMerge(step1: GroupStep, step2: GroupStep): void {
   if (!_.isEqual(step1.depends_on, step2.depends_on)) {
     throw new GroupMergeMismatchError(step2, 'depends_on');
   }
-}
-
-export function isGroupStep(step: Step): step is GroupStep {
-  return step?.group === null || Boolean(step?.group);
 }
 
 /**

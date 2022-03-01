@@ -9,6 +9,7 @@ steps:
     key: "foo3-group"
     depends_on:
       - foo1-group
+      - foo1
     steps:
       - command: echo "foo3" > foo3
         key: foo3

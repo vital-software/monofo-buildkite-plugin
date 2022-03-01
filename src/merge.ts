@@ -3,10 +3,10 @@ import debug from 'debug';
 import _ from 'lodash';
 import sendBuildkiteAnnotation from './annotate';
 import { updateDecisions } from './decide';
-import Config from './models/config';
-import { isGroupStep, mergeGroups } from './models/group-step';
+import Config, { keysInConfigs } from './models/config';
+import { mergeGroups } from './models/group-step';
 import { Pipeline } from './models/pipeline';
-import { Step } from './models/step';
+import { isGroupStep, Step } from './models/step';
 import { ARTIFACT_INJECTION_STEP_KEY, artifactInjectionSteps } from './steps/artifact-injection';
 import { nothingToDoSteps } from './steps/nothing-to-do';
 import { recordSuccessSteps } from './steps/record-success';
@@ -23,9 +23,7 @@ const log = debug('monofo:merge');
  * This method also mutates the steps of the passed-in configs directly
  */
 export function replaceExcludedKeys(configs: Config[], hasArtifactStep: boolean): void {
-  const excludedKeys: string[] = configs
-    .filter((c) => !c.included)
-    .flatMap((c) => c.steps.map((s) => (typeof s.key === 'string' ? s.key : '')).filter((v) => v));
+  const excludedKeys: string[] = keysInConfigs(configs.filter((c: Config) => !c.included));
 
   // If there's no artifact dependencies for the whole build, no need to wait for this step (it won't be added either)
   const replaceWith = hasArtifactStep ? ARTIFACT_INJECTION_STEP_KEY : '';
