@@ -13,8 +13,7 @@ import { FileHasher } from '../hash';
 import Reason, { ExcludeReasonType } from '../reason';
 import { globSet } from '../util/glob';
 import { strings } from '../util/helper';
-import { isGroupStep } from './group-step';
-import { Step } from './step';
+import { isGroupStep, keysInSteps, Step } from './step';
 
 const log = debug('monofo:config');
 
@@ -362,4 +361,8 @@ export default class Config {
   public static configureFallback(configs: Config[]): void {
     configs.forEach((c) => c.useFallback());
   }
+}
+
+export function keysInConfigs(configs: Config[]): string[] {
+  return configs.flatMap((config) => keysInSteps(config.steps));
 }

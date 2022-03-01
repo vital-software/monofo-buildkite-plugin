@@ -20,6 +20,7 @@ export enum ExcludeReasonType {
   NEVER_INCLUDED = 'been always excluded by monorepo.matches === false',
 }
 
+// TODO: should move to models, encompass decision state as well as reason (included/excluded should be modeled)
 export default class Reason {
   previousBuild?: string;
 
