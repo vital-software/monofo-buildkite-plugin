@@ -1,9 +1,9 @@
 import { createTables, startDb, stopDb } from 'jest-dynalite';
 import { CacheMetadataRepository } from '../src/cache-metadata';
 import { updateDecisions } from '../src/decide';
-import { matchConfigs } from '../src/diff';
 import { service } from '../src/dynamodb';
 import Config from '../src/models/config';
+import { MergedConfig } from '../src/models/merged-config';
 import { BASE_BUILD, BUILD_ID_2, BUILD_ID_3, COMMIT, fakeProcess, selectScenario } from './fixtures';
 
 async function getInclusionReasons(
@@ -13,8 +13,9 @@ async function getInclusionReasons(
   process.env = fakeProcess(env);
   selectScenario('kitchen-sink');
   const configs = await Config.getAll(process.cwd());
-  matchConfigs(BASE_BUILD, configs, changedFiles);
-  await updateDecisions(configs);
+  const merged = new MergedConfig(configs);
+  merged.setChangedFiles(BASE_BUILD, changedFiles);
+  await updateDecisions(merged.configs);
 
   return configs.map((c) => ({
     name: c.monorepo.name,
@@ -152,10 +153,10 @@ describe('config.reason', () => {
 
   it("matches expected reasons when there isn't a previous build", async () => {
     selectScenario('kitchen-sink');
-    const configs = await Config.getAll(process.cwd());
-    await updateDecisions(configs);
+    const merged = await MergedConfig.fromDir();
+    await updateDecisions(merged.configs);
 
-    const reasons = configs.map((c) => ({
+    const reasons = merged.configs.map((c) => ({
       name: c.monorepo.name,
       included: c.included,
       reason: c.reason.toString(),
@@ -222,11 +223,11 @@ describe('config.reason', () => {
       }),
     ]);
 
-    const configs = await Config.getAll(process.cwd());
-    matchConfigs(BASE_BUILD, configs, changedFiles);
-    await updateDecisions(configs);
+    const merged = await MergedConfig.fromDir();
+    merged.setChangedFiles(BASE_BUILD, changedFiles);
+    await updateDecisions(merged.configs);
 
-    const reasons = configs.map((c) => ({
+    const reasons = merged.configs.map((c) => ({
       name: c.monorepo.name,
       included: c.included,
       reason: c.reason.toString(),

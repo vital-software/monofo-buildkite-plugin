@@ -1,8 +1,7 @@
 import { getBuildkiteInfo } from '../src/buildkite/config';
-import { getBaseBuild, matchConfigs } from '../src/diff';
+import { getBaseBuild } from '../src/diff';
 import { commitExists, mergeBase, revList } from '../src/git';
-import Config from '../src/models/config';
-import { BASE_BUILD, COMMIT, fakeProcess, selectScenario } from './fixtures';
+import { COMMIT, fakeProcess } from './fixtures';
 
 jest.mock('../src/git');
 jest.mock('../src/buildkite/client');
@@ -61,57 +60,6 @@ describe('getBaseBuild', () => {
 
       const build = await getBaseBuild(getBuildkiteInfo());
       expect(build.commit).toBe(COMMIT);
-    });
-  });
-});
-
-describe('matchConfigs', () => {
-  it('is a function', () => {
-    expect(typeof matchConfigs).toBe('function');
-  });
-
-  describe('when many changed files', () => {
-    const changedFiles = ['foo/abc.js', 'foo/README.md', 'bar/abc.ts', 'baz/abc.ts'];
-
-    it('matches changed files against configs', async () => {
-      selectScenario('kitchen-sink');
-      const configs = await Config.getAll(process.cwd());
-      matchConfigs(BASE_BUILD, configs, changedFiles);
-      const changes = configs.map((r) => r.changes);
-
-      expect(changes).toHaveLength(16);
-      expect(changes).toStrictEqual([
-        changedFiles,
-        [],
-        [],
-        ['foo/README.md'],
-        ['foo/README.md'],
-        [],
-        [],
-        changedFiles,
-        changedFiles,
-        [],
-        changedFiles,
-        changedFiles,
-        [],
-        ['baz/abc.ts'],
-        [],
-        changedFiles,
-      ]);
-    });
-  });
-
-  describe('when no changed files', () => {
-    const changedFiles: string[] = [];
-
-    it('still matches configs that have matches hard-coded to true', async () => {
-      selectScenario('kitchen-sink');
-      const configs = await Config.getAll(process.cwd());
-      matchConfigs(BASE_BUILD, configs, changedFiles);
-      const changes = configs.map((r) => r.changes);
-
-      expect(changes).toHaveLength(16);
-      expect(changes).toStrictEqual([[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]);
     });
   });
 });
