@@ -1,3 +1,10 @@
+## [5.0.3](https://github.com/vital-software/monofo/compare/v5.0.2...v5.0.3) (2022-03-06)
+
+
+### Bug Fixes
+
+* read group sub-step IDs as excluded as well, when a pipeline is skipped ([2567240](https://github.com/vital-software/monofo/commit/2567240fc18476c137f8f175b935210d948b6b71))
+
 ## [5.0.2](https://github.com/vital-software/monofo/compare/v5.0.1...v5.0.2) (2022-02-10)
 
 
