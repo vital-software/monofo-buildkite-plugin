@@ -101,7 +101,7 @@
     "@types/glob": "7.2.0",
     "@types/jest": "27.4.1",
     "@types/js-yaml": "4.0.5",
-    "@types/lodash": "4.14.179",
+    "@types/lodash": "4.14.180",
     "@types/log-update": "3.1.0",
     "@types/minimatch": "3.0.5",
     "@types/mkdirp": "1.0.2",
