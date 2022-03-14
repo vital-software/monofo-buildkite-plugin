@@ -81,7 +81,7 @@
     "log-update": "4.0.0",
     "minimatch": "3.0.5",
     "mkdirp": "1.0.4",
-    "pretty-bytes": "5.6.0",
+    "pretty-bytes": "6.0.0",
     "rimraf": "3.0.2",
     "split2": "4.1.0",
     "tempy": "1.0.1",
