@@ -1,3 +1,11 @@
+## [5.0.4](https://github.com/vital-software/monofo/compare/v5.0.3...v5.0.4) (2022-03-14)
+
+
+### Bug Fixes
+
+* **deps:** update dependency minimatch to v3.1.2 ([083905e](https://github.com/vital-software/monofo/commit/083905eb4b1749084d96f130aad543b59783d292))
+* **deps:** update oclif ([8bb6594](https://github.com/vital-software/monofo/commit/8bb659425566f0ac1ea780c06ce9b6edd167771e))
+
 ## [5.0.3](https://github.com/vital-software/monofo/compare/v5.0.2...v5.0.3) (2022-03-06)
 
 
