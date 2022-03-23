@@ -36,7 +36,7 @@ steps:
     command: yarn test
     <<: *step
     plugins:
-      - vital-software/monofo#v5.0.5:
+      - vital-software/monofo#v5.0.6:
           download:
             - node-modules.catar.caibx
             - typescript.catar.caibx
@@ -47,7 +47,7 @@ steps:
     command: yarn lint
     <<: *step
     plugins:
-      - vital-software/monofo#v5.0.5:
+      - vital-software/monofo#v5.0.6:
           download:
             - node-modules.catar.caibx
             - typescript.catar.caibx
