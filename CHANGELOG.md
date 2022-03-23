@@ -1,3 +1,12 @@
+## [5.0.7](https://github.com/vital-software/monofo/compare/v5.0.6...v5.0.7) (2022-03-23)
+
+
+### Bug Fixes
+
+* **deps:** update aws-sdk-js-v3 monorepo to v[secure] ([ada5fc1](https://github.com/vital-software/monofo/commit/ada5fc1128b295e8661c5ed85fc455c67bf6106a))
+* **deps:** update dependency tiny-async-pool to v1.3.0 ([f1d69a3](https://github.com/vital-software/monofo/commit/f1d69a33c322a7bb6a7c3b26b3cbaedd156c27b7))
+* **deps:** update oclif ([622f59d](https://github.com/vital-software/monofo/commit/622f59df173dc759e762c217c0e24c3628cd786e))
+
 ## [5.0.6](https://github.com/vital-software/monofo/compare/v5.0.5...v5.0.6) (2022-03-14)
 
 
