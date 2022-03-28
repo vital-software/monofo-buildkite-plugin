@@ -1,3 +1,10 @@
+## [5.0.8](https://github.com/vital-software/monofo/compare/v5.0.7...v5.0.8) (2022-03-28)
+
+
+### Bug Fixes
+
+* **deps:** update dependency debug to v4.3.4 ([f36c5e8](https://github.com/vital-software/monofo/commit/f36c5e82b00b1a6df44339d3540d76a565d432fe))
+
 ## [5.0.7](https://github.com/vital-software/monofo/compare/v5.0.6...v5.0.7) (2022-03-23)
 
 
