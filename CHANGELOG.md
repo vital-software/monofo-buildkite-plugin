@@ -1,3 +1,10 @@
+## [5.0.9](https://github.com/vital-software/monofo/compare/v5.0.8...v5.0.9) (2022-03-29)
+
+
+### Bug Fixes
+
+* **deps:** update aws-sdk-js-v3 monorepo to v[secure] ([7c663e2](https://github.com/vital-software/monofo/commit/7c663e26b9deff0c42ca889a7a813d6d77ee7bba))
+
 ## [5.0.8](https://github.com/vital-software/monofo/compare/v5.0.7...v5.0.8) (2022-03-28)
 
 
