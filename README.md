@@ -1,4 +1,4 @@
-# monofo [![Build status](https://badge.buildkite.com/749c5d3cba9ef284cc4f89dc2c74d959dbfaa5ec89a07f4d29.svg)](https://buildkite.com/vital/monofo)
+# monofo [![Build status](https://badge.buildkite.com/749c5d3cba9ef284cc4f89dc2c74d959dbfaa5ec89a07f4d29.svg?branch=main)](https://buildkite.com/vital/monofo)
 
 A Buildkite dynamic pipeline generator for monorepos. `monofo` lets you split
 your `.buildkite/pipeline.yml` into multiple components, each of which will
