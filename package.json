@@ -58,10 +58,10 @@
     "/oclif.manifest.json"
   ],
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "3.58.0",
-    "@aws-sdk/credential-provider-node": "3.58.0",
-    "@aws-sdk/lib-dynamodb": "3.58.0",
-    "@aws-sdk/types": "3.55.0",
+    "@aws-sdk/client-dynamodb": "3.80.0",
+    "@aws-sdk/credential-provider-node": "3.80.0",
+    "@aws-sdk/lib-dynamodb": "3.80.0",
+    "@aws-sdk/types": "3.78.0",
     "@oclif/core": "1.7.0",
     "@oclif/plugin-autocomplete": "1.2.0",
     "@oclif/plugin-help": "5.1.12",
