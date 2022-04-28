@@ -7101,10 +7101,10 @@ jest-docblock@^27.5.1:
   dependencies:
     detect-newline "^3.0.0"
 
-jest-dynalite@3.5.0:
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/jest-dynalite/-/jest-dynalite-3.5.0.tgz#5ae10379e9e57b4031b74a4eeafebf4f04d789ae"
-  integrity sha512-02w+v8S6y0a8dXkneGz6PElvzfmRN4ARuYzQWwpKBEcS8H8tDaK+dnxLndv+D9JhoKAjU61nXPl0Uqe93eRqbQ==
+jest-dynalite@3.5.1:
+  version "3.5.1"
+  resolved "https://registry.yarnpkg.com/jest-dynalite/-/jest-dynalite-3.5.1.tgz#6cdfc71b4fc074ee3f9a1c842a8d6330c7f994e2"
+  integrity sha512-YL+LQmSwSZUEYe4khKV7srfzR7yUgMxw/Q5YhZ/Jp25bEIT4D8jbLtUM3xQnjC4lC9LLKHBVtLhVRkYV37Z5rw==
   dependencies:
     "@aws/dynamodb-auto-marshaller" "^0.7.1"
     dynalite "^3.2.1"
