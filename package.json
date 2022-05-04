@@ -7,7 +7,7 @@
     "monofo": "./bin/run"
   },
   "main": "dist/src/index.js",
-  "repository": "https://github.com/vital-software/monofo",
+  "repository": "https://github.com/vital-software/monofo-buildkite-plugin",
   "license": "GPL-3.0-or-later",
   "keywords": [
     "buildkite",
@@ -182,8 +182,8 @@
                 "docs/plugin.md",
                 "docs/pure.md"
               ],
-              "from": "vital-software/monofo#v[-0-9a-z.]*:",
-              "to": "vital-software/monofo#v${nextRelease.version}:",
+              "from": "vital-software/monofo-buildkite-plugin#v[-0-9a-z.]*:",
+              "to": "vital-software/monofo-buildkite-plugin#v${nextRelease.version}:",
               "results": [
                 {
                   "file": "README.md",
