@@ -1,3 +1,12 @@
+## [5.0.10](https://github.com/vital-software/monofo-buildkite-plugin/compare/v5.0.9...v5.0.10) (2022-05-04)
+
+
+### Bug Fixes
+
+* **deps:** update aws-sdk-js-v3 monorepo ([f700cca](https://github.com/vital-software/monofo-buildkite-plugin/commit/f700cca108b06f113b25f0eaa65674a8ce65ea1a))
+* **deps:** update dependency glob to v8 ([c560aff](https://github.com/vital-software/monofo-buildkite-plugin/commit/c560aff1515c088bba37090b8e56076676ddf5e9))
+* **deps:** update oclif ([5081ca4](https://github.com/vital-software/monofo-buildkite-plugin/commit/5081ca4c898dfca0183162ec42b41727066178a0))
+
 ## [5.0.9](https://github.com/vital-software/monofo/compare/v5.0.8...v5.0.9) (2022-03-29)
 
 
