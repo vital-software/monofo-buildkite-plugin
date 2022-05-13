@@ -1,3 +1,11 @@
+## [5.0.11](https://github.com/vital-software/monofo-buildkite-plugin/compare/v5.0.10...v5.0.11) (2022-05-13)
+
+
+### Bug Fixes
+
+* Allow for uuids up to version 7 ([f136eb1](https://github.com/vital-software/monofo-buildkite-plugin/commit/f136eb1abd9268c1fc51d0dbf2379771aee04d04))
+* Point to isUuid fix commit in order to allow monofo buildkite pipeline to pass ([47e820b](https://github.com/vital-software/monofo-buildkite-plugin/commit/47e820b7350d2d2db0684a11237cda535b0f5322))
+
 ## [5.0.10](https://github.com/vital-software/monofo-buildkite-plugin/compare/v5.0.9...v5.0.10) (2022-05-04)
 
 
