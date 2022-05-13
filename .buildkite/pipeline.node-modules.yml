@@ -20,7 +20,7 @@ steps:
     plugins:
       - docker-compose#v3.9.0:
           run: node
-      - vital-software/monofo#8ad5f9f76028a51d9ee587e75755a8e85d256977:
+      - vital-software/monofo#v5.0.11:
           download: node-modules.catar.caibx # pre-cache the old node_modules into place before yarn install
           upload:
             node-modules.catar.caibx:
