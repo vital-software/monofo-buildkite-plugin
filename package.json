@@ -119,7 +119,7 @@
     "eslint-plugin-import": "2.26.0",
     "eslint-plugin-jest": "26.1.5",
     "eslint-plugin-prettier": "4.0.0",
-    "husky": "7.0.4",
+    "husky": "8.0.1",
     "jest": "28.0.3",
     "jest-dynalite": "3.5.1",
     "nock": "13.2.4",
