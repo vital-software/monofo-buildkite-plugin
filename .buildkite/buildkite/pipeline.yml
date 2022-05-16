@@ -1,0 +1,29 @@
+---
+env:
+  # This is the dynamic image tag, used when changes have been made to the Dockerfile; it gives those changes a unique build artifact
+  NODE_IMAGE_TAG: "239595706494.dkr.ecr.us-west-2.amazonaws.com/monofo:node-${BUILDKITE_COMMIT}-${BUILDKITE_BUILD_NUMBER}"
+
+steps:
+  - name: ":docker::nodejs: Container"
+    key: node-image
+    commands:
+      - docker build -f Dockerfile -t "${NODE_IMAGE_TAG}" .
+      - docker push "${NODE_IMAGE_TAG}"
+      - >
+        if [[ "${BUILDKITE_BRANCH}" == "main" ]]; then
+          docker tag "${NODE_IMAGE_TAG}" 239595706494.dkr.ecr.us-west-2.amazonaws.com/monofo:node-main;
+          docker push 239595706494.dkr.ecr.us-west-2.amazonaws.com/monofo:node-main;
+        fi
+    timeout_in_minutes: 20
+    agents:
+      queue: docker
+
+  - name: ":yarn: Buildkite-only Install"
+    key: node-modules
+    depends_on:
+      - node-image
+    command: yarn install --frozen-lockfile
+    timeout_in_minutes: 20
+    plugins:
+      - docker-compose#v3.9.0:
+          run: node
