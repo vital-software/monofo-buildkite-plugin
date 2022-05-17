@@ -1,0 +1,80 @@
+// Refer to https://docs.renovatebot.com/configuration-options
+{
+  extends: [
+    // Group known monorepo packages together
+    // https://docs.renovatebot.com/presets-group/#groupmonorepos
+    "group:monorepos",
+
+    // https://docs.renovatebot.com/presets-group/#grouprecommended
+    "group:recommended",
+  ],
+
+  // create a "Dependency Dashboard" issue within the repository
+  dependencyDashboard: true,
+
+  masterIssue: true,
+
+  // Add a label to the updates
+  labels: ["type/update"],
+
+  timezone: "Pacific/Auckland",
+
+  // Wait for a few days before we consider new updates "stable"
+  stabilityDays: 7,
+
+  // Do not rebase open PRs when main is updated
+  rebaseWhen: "never",
+
+  // Limit the number of PRs open at any one time
+  prConcurrentLimit: 3,
+
+  // Renovate decides the policy for how to modify/update existing version ranges
+  // https://docs.renovatebot.com/configuration-options/#rangestrategy
+  rangeStrategy: "auto",
+
+  // Raise PR when vulnerability alerts are detected
+  vulnerabilityAlerts: {
+    enabled: true,
+    labels: ["arg0"],
+  },
+
+  ignorePaths: ["**/node_modules/**"],
+
+  buildkite: {
+    enabled: true,
+  },
+
+  packageRules: [
+    // Group non-major JS test package updates together,
+    {
+      extends: "packages:jsTest",
+      matchUpdateTypes: ["minor", "patch"],
+      groupName: "JS test packages",
+    },
+
+    // Group various lint packages together
+    {
+      extends: "packages:linters",
+      groupName: "linters",
+    },
+
+    // Pin github-action digests
+    {
+      matchDepTypes: ["action"],
+      pinDigests: true,
+    },
+
+    // Allow devDependencies to be automerged
+    {
+      depTypeList: ["devDependencies"],
+      automerge: true,
+      automergeType: "branch",
+    },
+
+    // Reduce the priority of dev dependencies
+    {
+      matchDepTypes: ["devDependencies"],
+      prPriority: -1,
+    },
+  ],
+}
