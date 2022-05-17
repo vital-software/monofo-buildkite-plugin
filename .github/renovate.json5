@@ -76,5 +76,16 @@
       matchDepTypes: ["devDependencies"],
       prPriority: -1,
     },
+
+    {
+      "packageNames": ["aws-sdk"],
+      "extends": ["schedule:monthly"]
+    },
+
+    {
+      "matchPackagePatterns": ["^@oclif/"],
+      "matchPackageNames": ["oclif"],
+      "groupName": "oclif"
+    }
   ],
 }
