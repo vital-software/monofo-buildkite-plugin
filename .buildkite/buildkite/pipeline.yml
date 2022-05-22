@@ -1,7 +1,27 @@
 ---
+# Backup buildkite pipeline for when Monofo is failing and won't deploy itself
+# Trigger this pipeline using `BUILD_IGNORE_MONOFO=1`
+
 env:
   # This is the dynamic image tag, used when changes have been made to the Dockerfile; it gives those changes a unique build artifact
   NODE_IMAGE_TAG: "239595706494.dkr.ecr.us-west-2.amazonaws.com/monofo:node-${BUILDKITE_COMMIT}-${BUILDKITE_BUILD_NUMBER}"
+
+templates:
+  # Plugin templates
+  - &dc
+    docker-compose#v3.9.0:
+      run: node
+
+  # Step templates
+  - &step
+    timeout_in_minutes: 10
+    depends_on:
+      - node-image
+      - node-modules
+      - typescript
+    retry:
+      manual:
+        permit_on_passed: true
 
 steps:
   - name: ":docker::nodejs: Container"
@@ -27,3 +47,83 @@ steps:
     plugins:
       - docker-compose#v3.9.0:
           run: node
+
+  - name: ":typescript: Build"
+    key: typescript
+    depends_on:
+      - node-image
+      - node-modules
+    commands:
+      - yarn build
+    timeout_in_minutes: 20
+    plugins:
+      - docker-compose#v3.9.0:
+          run: node
+      - vital-software/monofo#v5.0.11:
+          download:
+            - node-modules.catar.caibx
+          upload:
+            typescript.catar.caibx:
+              - ./dist/
+
+  - label: ":jest: Test"
+    key: test
+    command: yarn test
+    <<: *step
+    plugins:
+      - vital-software/monofo#v5.0.11:
+          download:
+            - node-modules.catar.caibx
+            - typescript.catar.caibx
+      - *dc
+
+  - label: ":eslint: Lint"
+    key: lint
+    command: yarn lint
+    <<: *step
+    plugins:
+      - vital-software/monofo#v5.0.11:
+          download:
+            - node-modules.catar.caibx
+            - typescript.catar.caibx
+      - *dc
+
+  - name: ":bash: Bash Tests"
+    key: plugin-test
+    timeout_in_minutes: 20
+    plugins:
+      - docker-compose#v3.9.0:
+          run: plugin-test
+
+  - name: ":buildkite: Plugin Lint"
+    key: plugin-lint
+    timeout_in_minutes: 20
+    plugins:
+      - docker-compose#v3.9.0:
+          run: plugin-lint
+    soft_fail: # until we can fix https://github.com/buildkite-plugins/buildkite-plugin-linter/issues/409
+      - exit_status: 1
+
+  - label: ":shipit: Release"
+    depends_on:
+      - node-image
+      - node-modules
+      - typescript
+      - test
+      - lint
+      - plugin-test
+      - plugin-lint
+    command: yarn run release
+    branches: main next next-major beta alpha
+    plugins:
+      - improbable-eng/metahook#v0.4.1:
+          pre-command: git fetch --tags -f # To allow mutating build tags for now
+      - vital-software/monofo#v5.0.11:
+          download:
+            - node-modules.catar.caibx
+            - typescript.catar.caibx
+      - docker-compose#v3.9.0:
+          run: node
+      - seek-oss/aws-sm#v2.3.1:
+          env:
+            NPM_TOKEN: "global/npm-token"
