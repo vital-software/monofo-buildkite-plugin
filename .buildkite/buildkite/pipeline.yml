@@ -12,16 +12,13 @@ templates:
     docker-compose#v3.9.0:
       run: node
 
-  # Step templates
-  - &step
-    timeout_in_minutes: 10
-    depends_on:
-      - node-image
-      - node-modules
-      - typescript
-    retry:
-      manual:
-        permit_on_passed: true
+  # Artifacts
+  - &node-ts-artifacts
+    improbable-eng/metahook#v0.4.1:
+      pre-command: >
+        buildkite-agent artifact download node-modules.tar.lz4 . && tar -x --use-compress-program=lz4 -f node-modules.tar.lz4 && rm -rf node-modules.tar.lz4 &
+        buildkite-agent artifact download typescript.tar.lz4 . && tar -x --use-compress-program=lz4 -f typescript.tar.lz4 && rm -rf typescript.tar.lz4 &
+        wait
 
 steps:
   - name: ":docker::nodejs: Container"
@@ -42,11 +39,14 @@ steps:
     key: node-modules
     depends_on:
       - node-image
-    command: yarn install --frozen-lockfile
+    commands:
+      - yarn install --frozen-lockfile
+      - tar -c --use-compress-program="lz4 -2" -f node-modules.tar.lz4 node_modules
     timeout_in_minutes: 20
     plugins:
-      - docker-compose#v3.9.0:
-          run: node
+      - artifacts#v1.5.0:
+          upload: node-modules.tar.lz4
+      - *dc
 
   - name: ":typescript: Build"
     key: typescript
@@ -55,37 +55,44 @@ steps:
       - node-modules
     commands:
       - yarn build
+      - tar -c --use-compress-program="lz4 -2" -f typescript.tar.lz4 dist/
     timeout_in_minutes: 20
     plugins:
-      - docker-compose#v3.9.0:
-          run: node
-      - vital-software/monofo#v5.0.11:
-          download:
-            - node-modules.catar.caibx
+      - improbable-eng/metahook#v0.4.1:
+          pre-command: buildkite-agent artifact download node-modules.tar.lz4 . && tar -x --use-compress-program=lz4 -f node-modules.tar.lz4 && rm -rf node-modules.tar.lz4
+      - *dc
+      - artifacts#v1.5.0:
           upload:
-            typescript.catar.caibx:
-              - ./dist/
+            - typescript.tar.lz4
 
   - label: ":jest: Test"
     key: test
     command: yarn test
-    <<: *step
+    timeout_in_minutes: 10
+    depends_on:
+      - node-image
+      - node-modules
+      - typescript
+    retry:
+      manual:
+        permit_on_passed: true
     plugins:
-      - vital-software/monofo#v5.0.11:
-          download:
-            - node-modules.catar.caibx
-            - typescript.catar.caibx
+      - *node-ts-artifacts
       - *dc
 
   - label: ":eslint: Lint"
     key: lint
     command: yarn lint
-    <<: *step
+    timeout_in_minutes: 10
+    depends_on:
+      - node-image
+      - node-modules
+      - typescript
+    retry:
+      manual:
+        permit_on_passed: true
     plugins:
-      - vital-software/monofo#v5.0.11:
-          download:
-            - node-modules.catar.caibx
-            - typescript.catar.caibx
+      - *node-ts-artifacts
       - *dc
 
   - name: ":bash: Bash Tests"
@@ -117,13 +124,12 @@ steps:
     branches: main next next-major beta alpha
     plugins:
       - improbable-eng/metahook#v0.4.1:
-          pre-command: git fetch --tags -f # To allow mutating build tags for now
-      - vital-software/monofo#v5.0.11:
-          download:
-            - node-modules.catar.caibx
-            - typescript.catar.caibx
-      - docker-compose#v3.9.0:
-          run: node
+          pre-command: >
+            buildkite-agent artifact download node-modules.tar.lz4 . && tar -x --use-compress-program=lz4 -f node-modules.tar.lz4 && rm -rf node-modules.tar.lz4 &
+            buildkite-agent artifact download typescript.tar.lz4 . && tar -x --use-compress-program=lz4 -f typescript.tar.lz4 && rm -rf typescript.tar.lz4 &
+            wait
+            git fetch --tags -f # Until we stop clobbering tags during artifact rollout
+      - *dc
       - seek-oss/aws-sm#v2.3.1:
           env:
             NPM_TOKEN: "global/npm-token"
