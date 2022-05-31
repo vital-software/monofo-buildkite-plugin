@@ -128,7 +128,7 @@ steps:
             buildkite-agent artifact download node-modules.tar.lz4 . && tar -x --use-compress-program=lz4 -f node-modules.tar.lz4 && rm -rf node-modules.tar.lz4 &
             buildkite-agent artifact download typescript.tar.lz4 . && tar -x --use-compress-program=lz4 -f typescript.tar.lz4 && rm -rf typescript.tar.lz4 &
             wait
-            git fetch --tags -f # Until we stop clobbering tags during artifact rollout
+            git fetch --tags -f
       - *dc
       - seek-oss/aws-sm#v2.3.1:
           env:
