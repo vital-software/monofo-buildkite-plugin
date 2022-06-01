@@ -1,5 +1,5 @@
 ---
-# Backup buildkite pipeline for when Monofo is failing and won't deploy itself
+# Backup buildkite pipeline for when Monofo is failing and won't deploy itself. No steps in this pipeline should rely on Monofo
 # Trigger this pipeline using `BUILD_IGNORE_MONOFO=1`
 
 env:
