@@ -1,3 +1,10 @@
+## [5.0.12](https://github.com/vital-software/monofo-buildkite-plugin/compare/v5.0.11...v5.0.12) (2022-06-01)
+
+
+### Bug Fixes
+
+* fixing failures when monofo runs on new pipelines ([6ceff63](https://github.com/vital-software/monofo-buildkite-plugin/commit/6ceff637ea75325a67cf88f14b82bdd438a2239a))
+
 ## [5.0.11](https://github.com/vital-software/monofo-buildkite-plugin/compare/v5.0.10...v5.0.11) (2022-05-13)
 
 
