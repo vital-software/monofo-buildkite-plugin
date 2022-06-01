@@ -29,7 +29,6 @@ export default class Pipeline extends BaseCommand {
     } catch (err: unknown) {
       log('Failed to find base commit or diff changes, falling back to do a full build', err);
       Config.configureFallback(configs);
-      return Promise.resolve();
     }
 
     const yaml = dumpYaml(await mergePipelines(configs));
